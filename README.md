@@ -2,6 +2,74 @@
 
 Mod Fabric para Minecraft 26.3 com progressão RPG e afixos orientados a dados.
 
+## Funcionalidades do mod
+
+O mod reúne um sistema de RPG persistente no mundo, com:
+
+- classes de personagem;
+- XP geral do jogador e XP separado por classe;
+- níveis, pontos de habilidade e árvore de habilidades;
+- perks carregadas por JSON;
+- menu de status e árvore de habilidades no cliente;
+- sincronização dos dados RPG entre servidor e cliente;
+- sistema de afixos para armas, ferramentas e armaduras;
+- rolagem automática de afixos em resultados de crafting;
+- atributo `rpgsystem:affix_luck` para favorecer raridades maiores.
+
+## Classes, XP e progressão
+
+O mod possui atualmente a classe `Aventureiro`. Ela recebe 10 XP de classe ao derrotar uma criatura hostil e possui a seguinte árvore de habilidades:
+
+- `vigor`: habilidade passiva que aumenta a vitalidade;
+- `golpe_firme`: requer `vigor` e fortalece ataques corpo a corpo;
+- `recuperacao`: requer `vigor` e recupera vida após derrotar uma criatura hostil;
+- `lenda_viva`: requer `golpe_firme` e `recuperacao` e representa o ápice da árvore.
+
+Cada nível de classe fornece 2 pontos de habilidade. As habilidades precisam respeitar seus pré-requisitos e são armazenadas por jogador. A progressão é salva no `SavedData` do mundo, associada ao UUID do jogador, portanto não depende apenas da sessão atual.
+
+O XP usa uma curva configurável no código: o primeiro nível exige 100 XP e cada nível seguinte aumenta o custo em 50 XP. O nível máximo matemático é 1.000.000.
+
+## Menu e telas
+
+Use `/rpg menu` para abrir o menu RPG. A interface mostra o perfil do jogador, a classe selecionada, XP, nível, pontos disponíveis e a árvore de habilidades. A comunicação entre servidor e cliente usa pacotes próprios para sincronizar o snapshot do perfil.
+
+## Comandos RPG
+
+### Classe
+
+```text
+/rpg class set aventureiro
+/rpg class reset
+/rpg menu
+```
+
+### XP
+
+Os comandos de XP exigem permissão de moderador. Podem operar em pontos ou níveis:
+
+```text
+/rpg xp player add 100 points
+/rpg xp player remove 1 levels
+/rpg xp player set 500 points
+/rpg xp class add 1 levels
+/rpg xp class set 100 points
+```
+
+Também é possível informar jogadores como alvo:
+
+```text
+/rpg xp player add <jogador> 100 points
+/rpg xp class add <jogador> 1 levels
+```
+
+Para zerar os dados RPG de um ou mais jogadores:
+
+```text
+/rpg reset <jogador>
+```
+
+Esse comando remove classe, XP, pontos e habilidades desbloqueadas do alvo.
+
 ## Como criar um afixo
 
 ### 1. Crie o arquivo JSON
