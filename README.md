@@ -29,6 +29,85 @@ Cada nível de classe fornece 2 pontos de habilidade. As habilidades precisam re
 
 O XP usa uma curva configurável no código: o primeiro nível exige 100 XP e cada nível seguinte aumenta o custo em 50 XP. O nível máximo matemático é 1.000.000.
 
+## Como criar uma classe
+
+Classes são implementadas em Java porque podem definir regras próprias de XP, perks e habilidades.
+
+### 1. Crie a classe Java
+
+Crie uma classe em `src/main/java/br/com/rpgsystem/classes/` que estenda `RpgClass`:
+
+```java
+public final class GuerreiroClass extends RpgClass {
+    private static final Identifier ID = RpgMod.id("guerreiro");
+    @Override public Identifier id() { return ID; }
+    @Override public String name() { return "Guerreiro"; }
+    @Override public String description() { return "Especialista em combate corpo a corpo."; }
+    @Override public List<Identifier> perkIds() { return List.of(); }
+    @Override public int xpFor(RpgAction action) {
+        return action == RpgAction.HOSTILE_MOB_KILL ? 10 : 0;
+    }
+    @Override public List<SkillDefinition> skillTree() {
+        return List.of(new SkillDefinition(
+            "forca", "Força", "Aumenta o dano corpo a corpo.",
+            1, SkillType.PASSIVE, List.of(), "melee_damage", 2.0));
+    }
+}
+```
+
+Os métodos definem o identificador, nome, descrição, perks, XP concedido por ação e árvore de habilidades. O `id()` deve ser único e normalmente usa `RpgMod.id("guerreiro")`.
+
+### 2. Registre a classe
+
+No método `onInitialize()` de `RpgMod`, adicione:
+
+```java
+ClassRegistry.register(new GuerreiroClass());
+```
+
+O nome usado no comando será o caminho do ID:
+
+```text
+/rpg class set guerreiro
+```
+
+### 3. Configure a árvore de habilidades
+
+Cada `SkillDefinition` recebe: ID, nome, descrição, custo, tipo, dependências, efeito e quantidade:
+
+```java
+new SkillDefinition(
+    "golpe_forte", "Golpe Forte", "Fortalece ataques.",
+    2, SkillType.PASSIVE, List.of("forca"), "melee_damage", 1.0
+)
+```
+
+Uma lista vazia de dependências cria uma habilidade inicial. Com dependências, o jogador precisa desbloquear as habilidades indicadas antes.
+
+### 4. Adicione perks por JSON
+
+Crie `src/main/resources/data/rpgsystem/perks/furia.json`:
+
+```json
+{
+  "name": "Fúria",
+  "description": "Aumenta o dano após derrotar criaturas.",
+  "effect": "melee_damage",
+  "amount": 2.0
+}
+```
+
+Associe-a à classe:
+
+```java
+private static final Identifier FURIA = RpgMod.id("furia");
+@Override public List<Identifier> perkIds() { return List.of(FURIA); }
+```
+
+### 5. Compile e teste
+
+Execute `./gradlew.bat build`, entre no jogo e use `/rpg class set guerreiro`. Abra `/rpg menu` para conferir a classe, XP, pontos e árvore. Use `/rpg class reset` para removê-la.
+
 ## Menu e telas
 
 Use `/rpg menu` para abrir o menu RPG. A interface mostra o perfil do jogador, a classe selecionada, XP, nível, pontos disponíveis e a árvore de habilidades. A comunicação entre servidor e cliente usa pacotes próprios para sincronizar o snapshot do perfil.
