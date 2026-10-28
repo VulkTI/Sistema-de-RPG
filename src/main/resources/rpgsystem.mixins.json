@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "br.com.rpgsystem.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"mixins": [
+		"ResultSlotMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

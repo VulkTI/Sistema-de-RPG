@@ -3,6 +3,9 @@ package br.com.rpgsystem.commands;
 import br.com.rpgsystem.classes.ClassRegistry;
 import br.com.rpgsystem.classes.RpgClass;
 import br.com.rpgsystem.data.RpgSavedData;
+import br.com.rpgsystem.affixes.AffixDefinition;
+import br.com.rpgsystem.affixes.AffixRepository;
+import br.com.rpgsystem.affixes.AffixService;
 import br.com.rpgsystem.network.RpgNetworking;
 import br.com.rpgsystem.progression.ProgressionMath;
 import com.mojang.brigadier.CommandDispatcher;
@@ -17,6 +20,7 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,7 +52,14 @@ public final class RpgCommands {
 								.then(xpAction("remove", true, ProgressionMath.Change.REMOVE))
 								.then(xpAction("set", true, ProgressionMath.Change.SET))))
 				.then(Commands.literal("reset").requires(RpgCommands::isModerator)
-						.then(Commands.argument("player", EntityArgument.players()).executes(RpgCommands::resetPlayer))));
+						.then(Commands.argument("player", EntityArgument.players()).executes(RpgCommands::resetPlayer)))
+				.then(Commands.literal("affix")
+						.then(Commands.literal("roll").executes(RpgCommands::rollAffix))
+						.then(Commands.literal("apply")
+								.then(Commands.argument("affix", StringArgumentType.word())
+										.suggests(RpgCommands::suggestAffixes)
+										.executes(RpgCommands::applyAffix)))
+						.then(Commands.literal("remove").executes(RpgCommands::removeAffix))));
 	}
 
 	private static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> xpAction(
@@ -137,6 +148,60 @@ public final class RpgCommands {
 		context.getSource().sendSuccess(() -> Component.literal("XP " + (classXp ? "da classe" : "do jogador")
 				+ " atualizado para " + changedCount + " jogador(es)."), true);
 		return changed;
+	}
+
+	private static int rollAffix(CommandContext<CommandSourceStack> context)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
+		ItemStack stack = player.getMainHandItem();
+		AffixDefinition definition = AffixService.rollFor(stack, player).orElse(null);
+		if (definition == null || !AffixService.apply(stack, definition)) {
+			context.getSource().sendFailure(Component.literal(
+					"Não há afixos compatíveis com o item na mão principal."));
+			return 0;
+		}
+		context.getSource().sendSuccess(() -> Component.literal("Afixo rolado: " + definition.name()
+				+ " (" + definition.rarity().displayName() + ")."), false);
+		return 1;
+	}
+
+	private static int applyAffix(CommandContext<CommandSourceStack> context)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
+		String requested = StringArgumentType.getString(context, "affix");
+		AffixDefinition definition = AffixRepository.byPath(requested).orElse(null);
+		if (definition == null) {
+			context.getSource().sendFailure(Component.literal("Afixo desconhecido: " + requested));
+			return 0;
+		}
+		if (!AffixService.apply(player.getMainHandItem(), definition)) {
+			context.getSource().sendFailure(Component.literal("Esse afixo não é compatível com o item na mão."));
+			return 0;
+		}
+		context.getSource().sendSuccess(() -> Component.literal("Afixo aplicado: " + definition.name() + "."), false);
+		return 1;
+	}
+
+	private static int removeAffix(CommandContext<CommandSourceStack> context)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
+		if (!AffixService.remove(player.getMainHandItem())) {
+			context.getSource().sendFailure(Component.literal("O item na mão não possui afixo."));
+			return 0;
+		}
+		context.getSource().sendSuccess(() -> Component.literal("Afixo removido."), false);
+		return 1;
+	}
+
+	private static CompletableFuture<Suggestions> suggestAffixes(CommandContext<CommandSourceStack> context,
+			SuggestionsBuilder builder) {
+		String prefix = builder.getRemaining().toLowerCase(java.util.Locale.ROOT);
+		for (AffixDefinition definition : AffixRepository.all()) {
+			String path = definition.id().getNamespace().equals("rpgsystem")
+					? definition.id().getPath() : definition.id().toString();
+			if (path.toLowerCase(java.util.Locale.ROOT).startsWith(prefix)) builder.suggest(path);
+		}
+		return builder.buildFuture();
 	}
 
 	private static boolean isModerator(CommandSourceStack source) {

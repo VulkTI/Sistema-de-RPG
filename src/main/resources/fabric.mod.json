@@ -10,6 +10,9 @@
 	"contact": {},
 	"license": "CC0-1.0",
 	"environment": "*",
+	"mixins": [
+		"rpgsystem.mixins.json"
+	],
 	"entrypoints": {
 		"main": [
 			"br.com.rpgsystem.RpgMod"
