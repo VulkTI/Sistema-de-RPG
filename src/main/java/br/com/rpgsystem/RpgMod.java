@@ -4,6 +4,7 @@ import br.com.rpgsystem.classes.ClassRegistry;
 import br.com.rpgsystem.classes.AventureiroClass;
 import br.com.rpgsystem.affixes.AffixComponents;
 import br.com.rpgsystem.affixes.AffixRepository;
+import br.com.rpgsystem.affixes.AffixItemGroups;
 import br.com.rpgsystem.affixes.RpgAttributes;
 import br.com.rpgsystem.commands.RpgCommands;
 import br.com.rpgsystem.events.RpgEvents;
@@ -22,6 +23,7 @@ public final class RpgMod implements ModInitializer {
 		RpgAttributes.register();
 		AffixComponents.register();
 		AffixRepository.register();
+		AffixItemGroups.register();
 		ClassRegistry.register(new AventureiroClass());
 		RpgNetworking.register();
 		RpgCommands.register();

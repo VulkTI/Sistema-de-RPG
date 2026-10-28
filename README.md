@@ -131,6 +131,75 @@ Um afixo pode ter vários grupos, e basta o item pertencer a um deles:
 "groups": ["Swords", "Axes"]
 ```
 
+Também é possível escolher itens específicos diretamente pelo ID registrado no Minecraft. O campo `items` aceita um ou mais IDs completos, incluindo itens vanilla e itens de outros mods:
+
+```json
+{
+  "name": "Tridente do Mar",
+  "rarity": "epico",
+  "items": ["minecraft:trident", "minecraft:diamond_sword"],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 5.0,
+      "operation": "add_value",
+      "slot": "mainhand",
+      "description": "Aumenta o dano"
+    }
+  ]
+}
+```
+
+O campo `items` é opcional. Um afixo precisa ter pelo menos um `group` ou um `item`. Se `groups` e `items` forem usados juntos, eles funcionam como alternativas: o item pode corresponder a qualquer grupo ou a qualquer ID específico.
+
+Use sempre o ID completo no formato `namespace:item`, por exemplo `minecraft:trident` ou `meu_mod:espada_solar`.
+
+## Grupos definidos por JSON
+
+Além dos grupos internos (`Swords`, `Metal`, `Leather` etc.), você pode criar grupos reutilizáveis em arquivos dentro de:
+
+```text
+data/<namespace>/affix_groups/<nome_do_grupo>.json
+```
+
+O nome do arquivo vira o nome do grupo. Por exemplo, `armas_especiais.json` pode ser usado como `Armas Especiais` ou `armas_especiais` no JSON do afixo.
+
+Um grupo pode listar itens diretamente:
+
+```json
+{
+  "items": [
+    "minecraft:trident",
+    "minecraft:diamond_sword",
+    "meu_mod:espada_solar"
+  ]
+}
+```
+
+Também pode reunir outros grupos:
+
+```json
+{
+  "groups": ["Swords", "Metal"]
+}
+```
+
+Os itens listados em `items` e nos grupos referenciados são unidos. Para fazer interseção, use dois grupos separados por espaço no afixo:
+
+```json
+"groups": ["Metal Armas Especiais"]
+```
+
+Nesse caso, somente itens que pertencem simultaneamente a `Metal` e `Armas Especiais` serão aceitos. Várias entradas na lista continuam sendo alternativas (`OU`):
+
+```json
+"groups": ["Metal Swords", "Armas Especiais"]
+```
+
+Isso significa `(Metal ∩ Swords) OU Armas Especiais`. Grupos JSON podem referenciar outros grupos, mas referências cíclicas são ignoradas para evitar loops.
+
+Depois de adicionar ou alterar grupos, execute `/reload` para recarregar os arquivos.
+
 Para exigir a interseção de material e categoria, use os nomes separados por espaço. Por exemplo:
 
 ```json
