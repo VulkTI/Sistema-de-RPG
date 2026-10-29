@@ -176,7 +176,9 @@ O nome do arquivo vira o ID do afixo (`rpgsystem:afiado`).
 }
 ```
 
-Campos: `name` é o nome exibido; `rarity` é a raridade; `groups` define os itens permitidos; e `modifiers` define os atributos aplicados. Cada modificador exige `attribute`, `amount`, `operation`, `slot` e `description`. A descrição é obrigatória e fica registrada na definição do afixo, mas não é exibida no tooltip atual.
+Campos: `name` é o nome exibido; `description` é a descrição única do afixo; `rarity` é a raridade; `groups` define os itens permitidos; e `modifiers` define os atributos aplicados. Cada modificador exige `attribute`, `amount`, `operation` e `slot`.
+
+O nome do afixo, junto com a raridade, aparece acima dos modificadores vanilla. A descrição do afixo aparece logo abaixo do nome do item somente enquanto Shift estiver pressionado. O antigo campo `description` dos modificadores continua aceito para compatibilidade, mas não é mais usado no tooltip.
 
 As operações aceitas são `add_value`, `add_multiplied_base` e `add_multiplied_total`. Para porcentagem, use uma operação multiplicada: `0.10` representa 10%.
 
@@ -235,7 +237,17 @@ Use sempre o ID completo no formato `namespace:item`, por exemplo `minecraft:tri
 
 ## Grupos definidos por JSON
 
-Além dos grupos internos (`Swords`, `Metal`, `Leather` etc.), você pode criar grupos reutilizáveis em arquivos dentro de:
+Além dos grupos internos (`Swords`, `Metal`, `Leather` etc.), existe o grupo virtual `All`. Ele contém a união de todos os itens dos grupos internos e de todos os grupos definidos por JSON, sem repetir itens. Se novos grupos JSON forem adicionados, eles entram automaticamente no `All` após `/reload`.
+
+Para aceitar qualquer item conhecido pelos grupos do mod, use:
+
+```json
+"groups": ["All"]
+```
+
+Você também pode usar o `All` em uma interseção, como `All Armas Especiais`, para limitar um grupo personalizado aos itens reconhecidos pelo sistema.
+
+Além dos grupos internos, você pode criar grupos reutilizáveis em arquivos dentro de:
 
 ```text
 data/<namespace>/affix_groups/<nome_do_grupo>.json
@@ -304,10 +316,10 @@ Itens criados por crafting também podem receber um afixo automaticamente quando
 
 ## Sorteio e chance de raridade
 
-O atributo `rpgsystem:affix_luck` começa com valor `1`. Valores maiores favorecem raridades mais altas:
+O atributo `rpgsystem:affix_luck` começa com valor `0`, que é neutro. Cada rolagem tem 33% de chance de não gerar nenhum afixo. O sistema converte o valor para um multiplicador interno usando `1 + affix_luck`; assim, valores positivos reduzem essa chance e favorecem raridades maiores, enquanto valores negativos pioram a rolagem. Por exemplo, `affix_luck = 1` resulta em 16,5% de chance de nenhum afixo, e `affix_luck = -1` resulta em 100% de chance de nenhum afixo.
 
 ```text
-/attribute @s rpgsystem:affix_luck base set 5
+/attribute @s rpgsystem:affix_luck base set 1
 ```
 
 Esse atributo afeta o sorteio, mas não altera os grupos permitidos nem força um afixo específico.

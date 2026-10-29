@@ -7,7 +7,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
 import java.util.Locale;
 
-/** Um modificador de afixo: atributo, operação, valor, slot e texto explicativo. */
+/** Um modificador de afixo: atributo, operação, valor e slot. */
 public record AffixModifier(String attribute, double amount, AttributeModifier.Operation operation,
 		EquipmentSlotGroup slot, String description) {
 	public static final Codec<AffixModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -17,7 +17,7 @@ public record AffixModifier(String attribute, double amount, AttributeModifier.O
 					.forGetter(AffixModifier::operation),
 			EquipmentSlotGroup.CODEC.optionalFieldOf("slot", EquipmentSlotGroup.ANY)
 					.forGetter(AffixModifier::slot),
-			Codec.STRING.fieldOf("description").forGetter(AffixModifier::description)
+			Codec.STRING.optionalFieldOf("description", "").forGetter(AffixModifier::description)
 	).apply(instance, AffixModifier::new));
 
 	public AffixModifier {
@@ -30,11 +30,8 @@ public record AffixModifier(String attribute, double amount, AttributeModifier.O
 		if (operation == null || slot == null) {
 			throw new IllegalArgumentException("Operação e slot são obrigatórios: " + attribute);
 		}
-		if (description == null || description.isBlank()) {
-			throw new IllegalArgumentException("Cada modificador precisa de uma descrição: " + attribute);
-		}
 		attribute = attribute.trim();
-		description = description.trim();
+		description = description == null ? "" : description.trim();
 	}
 
 	public String formattedAmount() {

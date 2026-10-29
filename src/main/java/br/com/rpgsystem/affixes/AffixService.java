@@ -21,6 +21,7 @@ import java.util.Optional;
 /** Operações de aplicação, remoção e rolagem de afixos. */
 public final class AffixService {
 	private static final String MODIFIER_PATH_PREFIX = "affix/";
+	private static final double BASE_NO_AFFIX_CHANCE = 0.33;
 
 	private AffixService() {}
 
@@ -36,14 +37,19 @@ public final class AffixService {
 				.toList();
 		if (candidates.isEmpty()) return Optional.empty();
 
-		final double effectiveLuck = Math.max(0.0, luck);
+		// Zero is neutral: the internal multiplier starts at 1 and receives the luck bonus.
+		final double luckMultiplier = Math.max(0.0, 1.0 + luck);
+		final double noAffixChance = Math.min(1.0,
+				BASE_NO_AFFIX_CHANCE / Math.max(0.000001, luckMultiplier));
+		if (random.nextDouble() < noAffixChance) return Optional.empty();
+
 		double totalWeight = candidates.stream().mapToDouble(definition ->
-				definition.rarity().baseWeight() * Math.pow(effectiveLuck, definition.rarity().ordinal())).sum();
+				definition.rarity().baseWeight() * Math.pow(luckMultiplier, definition.rarity().ordinal())).sum();
 		if (totalWeight <= 0.0) return Optional.empty();
 
 		double target = random.nextDouble() * totalWeight;
 		for (AffixDefinition candidate : candidates) {
-			target -= candidate.rarity().baseWeight() * Math.pow(effectiveLuck, candidate.rarity().ordinal());
+			target -= candidate.rarity().baseWeight() * Math.pow(luckMultiplier, candidate.rarity().ordinal());
 			if (target <= 0.0) return Optional.of(candidate);
 		}
 		return Optional.of(candidates.get(candidates.size() - 1));

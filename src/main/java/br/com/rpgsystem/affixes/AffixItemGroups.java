@@ -43,6 +43,15 @@ public final class AffixItemGroups extends SimpleJsonResourceReloadListener<Affi
 
 	private static Set<Identifier> resolve(String name, Set<String> visiting) {
 		String normalized = normalize(name);
+		if (normalized.equals("all")) {
+			Set<Identifier> all = new LinkedHashSet<>();
+			MAIN_GROUPS.values().forEach(all::addAll);
+			CUSTOM_GROUPS.values().forEach(all::addAll);
+			for (String group : JSON_GROUPS.keySet()) {
+				if (!group.equals("all")) all.addAll(resolve(group, new LinkedHashSet<>()));
+			}
+			return Set.copyOf(all);
+		}
 		Set<Identifier> direct = MAIN_GROUPS.get(normalized);
 		if (direct == null) direct = CUSTOM_GROUPS.get(normalized);
 		if (direct != null) return direct;

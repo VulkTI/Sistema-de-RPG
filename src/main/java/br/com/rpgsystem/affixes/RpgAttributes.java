@@ -13,13 +13,13 @@ public final class RpgAttributes {
 	public static final net.minecraft.core.Holder.Reference<Attribute> AFFIX_LUCK = Registry.registerForHolder(
 			BuiltInRegistries.ATTRIBUTE,
 			Identifier.fromNamespaceAndPath("rpgsystem", "affix_luck"),
-			new RangedAttribute("attribute.rpgsystem.affix_luck", 1.0, 0.0, 1024.0).setSyncable(true));
+			new RangedAttribute("attribute.rpgsystem.affix_luck", 0.0, -1.0, 1024.0).setSyncable(true));
 
 	private RpgAttributes() {}
 
 	public static void register() {
 		FabricDefaultAttributeRegistry.MODIFY.register(context -> context.modify(
 				type -> EntityType.getKey(type).equals(Identifier.fromNamespaceAndPath("minecraft", "player")),
-				(type, builder) -> builder.add(AFFIX_LUCK, 1.0)));
+				(type, builder) -> builder.add(AFFIX_LUCK, 0.0)));
 	}
 }

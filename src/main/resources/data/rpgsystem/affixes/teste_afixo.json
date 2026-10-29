@@ -1,21 +1,14 @@
 {
   "name": "Veloz",
+  "description": "Uma arma leve e rápida.",
   "rarity": "raro",
-  "groups": ["Metal Swords"],
+  "groups": ["Swords"],
   "modifiers": [
-    {
-      "attribute": "minecraft:attack_damage",
-      "amount": 3.0,
-      "operation": "add_value",
-      "slot": "mainhand",
-      "description": "Aumenta o dano de ataque"
-    },
     {
       "attribute": "minecraft:attack_speed",
       "amount": 0.10,
       "operation": "add_multiplied_total",
-      "slot": "mainhand",
-      "description": "Aumenta a velocidade de ataque"
+      "slot": "mainhand"
     }
   ]
 }
