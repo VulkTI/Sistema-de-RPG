@@ -34,9 +34,10 @@ public final class AffixService {
 
 	public static Optional<AffixDefinition> rollFor(ItemStack stack, double luck, RandomSource random) {
 		if (stack.isEmpty()) return Optional.empty();
-		List<AffixDefinition> candidates = AffixRepository.all().stream()
-				.filter(definition -> definition.matches(stack.getItem()))
-				.toList();
+		return rollFor(candidates(stack), luck, random);
+	}
+
+	public static Optional<AffixDefinition> rollFor(List<AffixDefinition> candidates, double luck, RandomSource random) {
 		if (candidates.isEmpty()) return Optional.empty();
 
 		// Zero is neutral: the internal multiplier starts at 1 and receives the luck bonus.
@@ -67,6 +68,69 @@ public final class AffixService {
 			}
 		}
 		return Optional.empty();
+	}
+
+	/**
+	 * Simula rolagens normais (usando os mesmos pesos de raridade, chance de vir sem afixo e sorte do jogador)
+	 * até obter o afixo alvo especificado, retornando a quantidade real de rolagens necessárias.
+	 */
+	public static Optional<Integer> rollUntil(List<AffixDefinition> candidates, AffixDefinition target,
+			double luck, RandomSource random) {
+		if (candidates.isEmpty() || target == null || !candidates.contains(target)) {
+			return Optional.empty();
+		}
+
+		final double luckMultiplier = Math.max(0.0, 1.0 + luck);
+		final double noAffixChance = Math.min(1.0, BASE_NO_AFFIX_CHANCE / Math.max(0.000001, luckMultiplier));
+		if (noAffixChance >= 1.0) {
+			return Optional.empty();
+		}
+
+		AffixRarity[] rarities = AffixRarity.values();
+		double[] weights = new double[rarities.length];
+		double totalWeight = 0.0;
+		for (int i = 0; i < rarities.length; i++) {
+			weights[i] = rarities[i].baseWeight() * Math.pow(luckMultiplier, rarities[i].ordinal());
+			totalWeight += weights[i];
+		}
+		if (totalWeight <= 0.0 || weights[target.rarity().ordinal()] <= 0.0) {
+			return Optional.empty();
+		}
+
+		Map<AffixRarity, List<AffixDefinition>> byRarity = new EnumMap<>(AffixRarity.class);
+		for (AffixDefinition def : candidates) {
+			byRarity.computeIfAbsent(def.rarity(), r -> new ArrayList<>()).add(def);
+		}
+
+		List<AffixDefinition> targetPool = byRarity.get(target.rarity());
+		if (targetPool == null || targetPool.isEmpty()) {
+			return Optional.empty();
+		}
+
+		int rolls = 0;
+		final int maxRolls = 10_000_000;
+		while (rolls < maxRolls) {
+			rolls++;
+			if (random.nextDouble() < noAffixChance) {
+				continue;
+			}
+			double rollTarget = random.nextDouble() * totalWeight;
+			for (int i = 0; i < rarities.length; i++) {
+				rollTarget -= weights[i];
+				if (rollTarget <= 0.0) {
+					AffixRarity chosenRarity = rarities[i];
+					List<AffixDefinition> pool = byRarity.get(chosenRarity);
+					if (pool != null && !pool.isEmpty()) {
+						AffixDefinition chosen = pool.get(random.nextInt(pool.size()));
+						if (chosen.equals(target)) {
+							return Optional.of(rolls);
+						}
+					}
+					break;
+				}
+			}
+		}
+		return Optional.of(rolls);
 	}
 
 	/** Candidatos calculados uma única vez para o item recebido. */

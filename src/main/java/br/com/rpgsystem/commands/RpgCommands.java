@@ -59,10 +59,11 @@ public final class RpgCommands {
 				.then(Commands.literal("affix")
 						.then(Commands.literal("list").executes(RpgCommands::listAffixes))
 						.then(Commands.literal("roll")
-								.then(Commands.argument("target", StringArgumentType.word()).suggests(RpgCommands::suggestAffixOrRarities)
-										.executes(RpgCommands::rollAffixByRarity)
+								.then(Commands.literal("rarity")
 										.then(Commands.argument("rarity", StringArgumentType.word()).suggests(RpgCommands::suggestRarities)
-												.executes(RpgCommands::rollUntilTarget)))
+												.executes(RpgCommands::rollAffixByRarity)))
+								.then(Commands.argument("affix", StringArgumentType.word()).suggests(RpgCommands::suggestAffixes)
+										.executes(RpgCommands::rollUntilTarget))
 								.executes(RpgCommands::rollAffix))
 						.then(Commands.literal("apply")
 								.then(Commands.argument("affix", StringArgumentType.word())
@@ -194,7 +195,7 @@ public final class RpgCommands {
 
 	private static int rollAffixByRarity(CommandContext<CommandSourceStack> context) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
 		ServerPlayer player = context.getSource().getPlayerOrException();
-		AffixRarity rarity = parseRarity(context, StringArgumentType.getString(context, "target"));
+		AffixRarity rarity = parseRarity(context, StringArgumentType.getString(context, "rarity"));
 		if (rarity == null) return 0;
 		ItemStack stack = player.getMainHandItem();
 		AffixDefinition definition = AffixService.rollWithinRarity(AffixService.candidates(stack), rarity, player.getRandom()).orElse(null);
@@ -207,25 +208,25 @@ public final class RpgCommands {
 
 	private static int rollUntilTarget(CommandContext<CommandSourceStack> context) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
 		ServerPlayer player = context.getSource().getPlayerOrException();
-		ItemStack stack = player.getMainHandItem(); // captura a mão uma única vez antes do loop
-		AffixRarity rarity = parseRarity(context, StringArgumentType.getString(context, "rarity"));
-		if (rarity == null) return 0;
-		String target = StringArgumentType.getString(context, "target");
-		List<AffixDefinition> candidates = AffixService.candidates(stack);
-		boolean all = target.equalsIgnoreCase("todos") || target.equalsIgnoreCase("all");
-		AffixDefinition wanted = all ? null : AffixRepository.byPath(target).orElse(null);
-		if (!all && (wanted == null || wanted.rarity() != rarity || !candidates.contains(wanted))) {
-			context.getSource().sendFailure(Component.literal("Esse afixo não existe nessa raridade ou não é compatível com o item.")); return 0;
+		ItemStack stack = player.getMainHandItem();
+		if (stack.isEmpty()) {
+			context.getSource().sendFailure(Component.literal("Você precisa segurar um item na mão principal."));
+			return 0;
 		}
-		List<AffixDefinition> pool = candidates.stream().filter(d -> d.rarity() == rarity).toList();
-		if (pool.isEmpty()) { context.getSource().sendFailure(Component.literal("Essa raridade não existe para o item na mão.")); return 0; }
-		int rolls = 0;
-		AffixDefinition result;
-		do { result = AffixService.rollWithinRarity(pool, rarity, player.getRandom()).orElseThrow(); rolls++; } while (!all && result != wanted);
-		AffixService.apply(stack, result);
-		AffixDefinition applied = result;
-		int totalRolls = rolls;
-		context.getSource().sendSuccess(() -> Component.literal("Afixo aplicado: " + applied.name() + " após " + totalRolls + " rolagem(ns)."), false);
+		String target = StringArgumentType.getString(context, "affix");
+		List<AffixDefinition> candidates = AffixService.candidates(stack);
+		AffixDefinition wanted = AffixRepository.byPath(target).orElse(null);
+		if (wanted == null || !candidates.contains(wanted)) {
+			context.getSource().sendFailure(Component.literal("Esse afixo não existe no pack ou não é compatível com o item."));
+			return 0;
+		}
+		int rolls = AffixService.rollUntil(candidates, wanted, AffixService.affixLuck(player), player.getRandom()).orElse(0);
+		if (rolls <= 0) {
+			context.getSource().sendFailure(Component.literal("Não foi possível obter esse afixo com as chances atuais."));
+			return 0;
+		}
+		AffixService.apply(stack, wanted);
+		context.getSource().sendSuccess(() -> Component.literal("Afixo aplicado: " + wanted.name() + " após " + rolls + " rolagem(ns)."), false);
 		return 1;
 	}
 
@@ -279,13 +280,6 @@ public final class RpgCommands {
 		return builder.buildFuture();
 	}
 
-	private static CompletableFuture<Suggestions> suggestAffixOrRarities(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-		suggestAffixes(context, builder);
-		String prefix = builder.getRemaining().toLowerCase(Locale.ROOT);
-		for (AffixRarity rarity : AffixRarity.values()) if (rarity.getSerializedName().startsWith(prefix)) builder.suggest(rarity.getSerializedName());
-		builder.suggest("todos");
-		return builder.buildFuture();
-	}
 
 	private static boolean isModerator(CommandSourceStack source) {
 		return source.permissions().hasPermission(Permissions.COMMANDS_MODERATOR);
