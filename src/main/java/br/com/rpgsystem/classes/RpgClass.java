@@ -13,6 +13,7 @@ public abstract class RpgClass {
 	public abstract String description();
 	public abstract List<Identifier> perkIds();
 	public abstract int xpFor(RpgAction action);
+	public double xpMultiplier(RpgAction action) { return 1.0; }
 	public List<SkillDefinition> skillTree() { return List.of(); }
 
 	public final List<PerkDefinition> perks() {

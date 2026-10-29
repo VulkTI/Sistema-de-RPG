@@ -4,6 +4,8 @@
 build/
 out/
 classes/
+!src/main/java/br/com/rpgsystem/classes/
+!src/main/java/br/com/rpgsystem/classes/*.java
 
 # eclipse
 

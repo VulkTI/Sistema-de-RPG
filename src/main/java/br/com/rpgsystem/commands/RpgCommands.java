@@ -9,6 +9,7 @@ import br.com.rpgsystem.affixes.AffixService;
 import br.com.rpgsystem.affixes.AffixRarity;
 import br.com.rpgsystem.network.RpgNetworking;
 import br.com.rpgsystem.progression.ProgressionMath;
+import br.com.rpgsystem.mining.MineradorEffects;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -100,6 +101,7 @@ public final class RpgCommands {
 		}
 		ServerPlayer player = context.getSource().getPlayerOrException();
 		RpgSavedData.get(player.level().getServer()).update(player.getUUID(), profile -> profile.withClass(rpgClass.id().toString()));
+		MineradorEffects.refreshMiningSpeed(player);
 		context.getSource().sendSuccess(() -> Component.literal("Sua classe agora é " + rpgClass.name() + "."), false);
 		RpgNetworking.sendSnapshot(player, false);
 		return 1;
@@ -108,6 +110,7 @@ public final class RpgCommands {
 	private static int resetClass(CommandContext<CommandSourceStack> context) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
 		ServerPlayer player = context.getSource().getPlayerOrException();
 		RpgSavedData.get(player.level().getServer()).update(player.getUUID(), RpgSavedData.Profile::withoutClass);
+		MineradorEffects.refreshMiningSpeed(player);
 		context.getSource().sendSuccess(() -> Component.literal("Sua classe foi removida."), false);
 		RpgNetworking.sendSnapshot(player, false);
 		return 1;
@@ -122,6 +125,7 @@ public final class RpgCommands {
 		Collection<ServerPlayer> targets = EntityArgument.getPlayers(context, "player");
 		for (ServerPlayer target : targets) {
 			RpgSavedData.get(target.level().getServer()).update(target.getUUID(), RpgSavedData.Profile::reset);
+			MineradorEffects.refreshMiningSpeed(target);
 			RpgNetworking.sendSnapshot(target, true);
 		}
 		context.getSource().sendSuccess(() -> Component.literal("Dados RPG resetados para " + targets.size() + " jogador(es)."), true);

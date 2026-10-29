@@ -1,339 +1,230 @@
 # Sistema RPG
 
-Mod Fabric para Minecraft 26.3 com progressão RPG e afixos orientados a dados.
+Mod para Fabric em Minecraft 26.3 que adiciona progressão de jogador e de classe, perks e afixos configuráveis por recursos JSON.
 
-## Funcionalidades do mod
+## Requisitos e instalação
 
-O mod reúne um sistema de RPG persistente no mundo, com:
+- Minecraft 26.3
+- Fabric Loader 0.20.1 ou superior e Fabric API
+- Java 25 ou superior
 
-- classes de personagem;
-- XP geral do jogador e XP separado por classe;
-- níveis, pontos de habilidade e árvore de habilidades;
-- perks carregadas por JSON;
-- menu de status e árvore de habilidades no cliente;
-- sincronização dos dados RPG entre servidor e cliente;
-- sistema de afixos para armas, ferramentas e armaduras;
-- rolagem automática de afixos em resultados de crafting;
-- atributo `rpgsystem:affix_luck` para favorecer raridades maiores.
+Para compilar o projeto no Windows, execute `./gradlew.bat build` (ou `compilar.bat`). O JAR fica em `build/libs`. Instale-o junto com Fabric API na pasta `mods` do perfil Fabric. O mod funciona nos ambientes cliente e servidor; dados de progressão são controlados pelo servidor.
 
-## Classes, XP e progressão
+## Conteúdo atual
 
-O mod possui atualmente a classe `Aventureiro`. Ela recebe 10 XP de classe ao derrotar uma criatura hostil e possui a seguinte árvore de habilidades:
+- XP e nível do jogador, além de XP, nível e pontos de habilidade por classe. Perfis são salvos no mundo por UUID do jogador.
+- Seleção de classe no primeiro acesso, tela de status e tela genérica para árvore de habilidades.
+- Duas classes registradas: **Ferreiro**, voltado a fundição e fabricação, e **Minerador**, voltado a escavação e coleta de minérios.
+- Sistema de afixos em armas, ferramentas, armaduras e outros itens compatíveis: modificadores de atributos, raridades, grupos, tags, itens específicos, tooltips e rolagem automática.
+- Herança de afixo ao aprimorar um item na ferraria; se o item-base não tiver afixo, o resultado pode receber um novo.
+- Atributo `rpgsystem:affix_luck`, comandos de administração e sincronização dos dados entre servidor e cliente.
 
-- `vigor`: habilidade passiva que aumenta a vitalidade;
-- `golpe_firme`: requer `vigor` e fortalece ataques corpo a corpo;
-- `recuperacao`: requer `vigor` e recupera vida após derrotar uma criatura hostil;
-- `lenda_viva`: requer `golpe_firme` e `recuperacao` e representa o ápice da árvore.
+O XP do jogador aumenta em 8 ao derrotar uma criatura da categoria MONSTER. A classe ativa pode receber XP adicional conforme a ação. O Ferreiro recebe XP ao coletar certos lingotes/nuggets fundidos e ao fabricar itens metálicos. A curva de XP começa em 100 para avançar do nível 1, aumentando 5 XP mais a metade do quadrado do número de níveis já avançados; o nível máximo é 100. Cada novo nível de classe concede 2 pontos de habilidade. A classe Ferreiro atual retorna uma árvore vazia, então não há habilidades para desbloquear nela no momento.
 
-Cada nível de classe fornece 2 pontos de habilidade. As habilidades precisam respeitar seus pré-requisitos e são armazenadas por jogador. A progressão é salva no `SavedData` do mundo, associada ao UUID do jogador, portanto não depende apenas da sessão atual.
+O botão **P** abre a tela de status. Use `/rpg menu` para escolher uma classe (também abre a seleção ao entrar sem classe). Para trocar de classe, use `/rpg class set ferreiro` ou `/rpg class set minerador`.
 
-O XP usa uma curva configurável no código: o primeiro nível exige 100 XP e cada nível seguinte aumenta o custo em 50 XP. O nível máximo matemático é 1.000.000.
+Os valores de XP são configurados em `config/rpgsystem_xp.json` na pasta do jogo. O arquivo é criado automaticamente na primeira inicialização do mod; edite os números e reinicie o jogo/servidor para aplicar. Os IDs dos minérios não incluem o prefixo `minecraft:`.
 
-## Como criar uma classe
+## Comandos
 
-Classes são implementadas em Java porque podem definir regras próprias de XP, perks e habilidades.
-
-### 1. Crie a classe Java
-
-Crie uma classe em `src/main/java/br/com/rpgsystem/classes/` que estenda `RpgClass`:
-
-```java
-public final class GuerreiroClass extends RpgClass {
-    private static final Identifier ID = RpgMod.id("guerreiro");
-    @Override public Identifier id() { return ID; }
-    @Override public String name() { return "Guerreiro"; }
-    @Override public String description() { return "Especialista em combate corpo a corpo."; }
-    @Override public List<Identifier> perkIds() { return List.of(); }
-    @Override public int xpFor(RpgAction action) {
-        return action == RpgAction.HOSTILE_MOB_KILL ? 10 : 0;
-    }
-    @Override public List<SkillDefinition> skillTree() {
-        return List.of(new SkillDefinition(
-            "forca", "Força", "Aumenta o dano corpo a corpo.",
-            1, SkillType.PASSIVE, List.of(), "melee_damage", 2.0));
-    }
-}
-```
-
-Os métodos definem o identificador, nome, descrição, perks, XP concedido por ação e árvore de habilidades. O `id()` deve ser único e normalmente usa `RpgMod.id("guerreiro")`.
-
-### 2. Registre a classe
-
-No método `onInitialize()` de `RpgMod`, adicione:
-
-```java
-ClassRegistry.register(new GuerreiroClass());
-```
-
-O nome usado no comando será o caminho do ID:
+### Classe e telas
 
 ```text
-/rpg class set guerreiro
-```
-
-### 3. Configure a árvore de habilidades
-
-Cada `SkillDefinition` recebe: ID, nome, descrição, custo, tipo, dependências, efeito e quantidade:
-
-```java
-new SkillDefinition(
-    "golpe_forte", "Golpe Forte", "Fortalece ataques.",
-    2, SkillType.PASSIVE, List.of("forca"), "melee_damage", 1.0
-)
-```
-
-Uma lista vazia de dependências cria uma habilidade inicial. Com dependências, o jogador precisa desbloquear as habilidades indicadas antes.
-
-### 4. Adicione perks por JSON
-
-Crie `src/main/resources/data/rpgsystem/perks/furia.json`:
-
-```json
-{
-  "name": "Fúria",
-  "description": "Aumenta o dano após derrotar criaturas.",
-  "effect": "melee_damage",
-  "amount": 2.0
-}
-```
-
-Associe-a à classe:
-
-```java
-private static final Identifier FURIA = RpgMod.id("furia");
-@Override public List<Identifier> perkIds() { return List.of(FURIA); }
-```
-
-### 5. Compile e teste
-
-Execute `./gradlew.bat build`, entre no jogo e use `/rpg class set guerreiro`. Abra `/rpg menu` para conferir a classe, XP, pontos e árvore. Use `/rpg class reset` para removê-la.
-
-## Menu e telas
-
-Use `/rpg menu` para abrir o menu RPG. A interface mostra o perfil do jogador, a classe selecionada, XP, nível, pontos disponíveis e a árvore de habilidades. A comunicação entre servidor e cliente usa pacotes próprios para sincronizar o snapshot do perfil.
-
-## Comandos RPG
-
-### Classe
-
-```text
-/rpg class set aventureiro
-/rpg class reset
 /rpg menu
+/rpg class set <classe>
+/rpg class reset
 ```
 
-### XP
+`/rpg class reset` remove a classe ativa, mas preserva XP e progressos guardados. `/rpg menu` abre a seleção de classe; a tela de status também pode ser aberta com **P**.
 
-Os comandos de XP exigem permissão de moderador. Podem operar em pontos ou níveis:
+### XP e reset de jogador
 
-```text
-/rpg xp player add 100 points
-/rpg xp player remove 1 levels
-/rpg xp player set 500 points
-/rpg xp class add 1 levels
-/rpg xp class set 100 points
-```
-
-Também é possível informar jogadores como alvo:
+Os comandos a seguir exigem permissão de moderador. Sem alvo, a operação vale para quem executa o comando; com `<jogador>`, pode-se selecionar um ou vários jogadores aceitos pelo argumento vanilla `players`.
 
 ```text
-/rpg xp player add <jogador> 100 points
-/rpg xp class add <jogador> 1 levels
-```
-
-Para zerar os dados RPG de um ou mais jogadores:
-
-```text
+/rpg xp player add <quantidade> points
+/rpg xp player remove <quantidade> levels
+/rpg xp player set <quantidade> points
+/rpg xp class add <quantidade> levels
+/rpg xp class remove <jogador> <quantidade> points
+/rpg xp class set <quantidade> points
 /rpg reset <jogador>
 ```
 
-Esse comando remove classe, XP, pontos e habilidades desbloqueadas do alvo.
+As mesmas operações de XP aceitam alvo opcional antes da quantidade, por exemplo `/rpg xp player add Steve 100 points` ou `/rpg xp class add Steve 1 levels`. `points` altera XP bruto; `levels` altera o nível, mantendo o progresso da barra quando possível. XP de classe só pode ser alterado para jogadores com uma classe ativa. `/rpg reset` apaga classe, XP, pontos e habilidades do alvo.
 
-## Como criar um afixo
+### Afixos
 
-### 1. Crie o arquivo JSON
-
-Crie um arquivo em `src/main/resources/data/<namespace>/affixes/<id_do_afixo>.json`.
-Por exemplo: `src/main/resources/data/rpgsystem/affixes/afiado.json`.
-O nome do arquivo vira o ID do afixo (`rpgsystem:afiado`).
-
-### 2. Preencha a estrutura obrigatória
-
-```json
-{
-  "name": "Afiado",
-  "rarity": "raro",
-  "groups": ["Swords"],
-  "modifiers": [
-    {
-      "attribute": "minecraft:attack_damage",
-      "amount": 3.0,
-      "operation": "add_value",
-      "slot": "mainhand",
-      "description": "Aumenta o dano de ataque"
-    }
-  ]
-}
-```
-
-Campos: `name` é o nome exibido; `description` é a descrição única do afixo; `rarity` é a raridade; `groups` define os itens permitidos; e `modifiers` define os atributos aplicados. Cada modificador exige `attribute`, `amount`, `operation` e `slot`.
-
-O nome do afixo, junto com a raridade, aparece acima dos modificadores vanilla. A descrição do afixo aparece logo abaixo do nome do item somente enquanto Shift estiver pressionado. O antigo campo `description` dos modificadores continua aceito para compatibilidade, mas não é mais usado no tooltip.
-
-As operações aceitas são `add_value`, `add_multiplied_base` e `add_multiplied_total`. Para porcentagem, use uma operação multiplicada: `0.10` representa 10%.
-
-### 3. Escolha a raridade
-
-Use exatamente: `comum`, `incomum`, `raro`, `epico`, `lendario` ou `mitico`.
-
-| Valor | Nome | Cor |
-|---|---|---|
-| `comum` | Comum | Cinza |
-| `incomum` | Incomum | Verde-limão |
-| `raro` | Raro | Azul-claro |
-| `epico` | Épico | Roxo |
-| `lendario` | Lendário | Dourado em negrito |
-| `mitico` | Mítico | Vermelho em negrito |
-
-A raridade altera a chance de rolagem, a cor do nome do item e a cor da linha do afixo.
-
-### 4. Relacione o afixo aos grupos de itens, tags ou IDs específicos
-
-Os grupos são definidos em arquivos JSON dentro de `data/<namespace>/item_groups/`. O mod já inclui por padrão:
-- Armas corpo-a-corpo: `Swords`, `Spears`, `Axes`;
-- Ferramentas: `Pickaxes`, `Shovels`, `Hoes`;
-- Armaduras por slot: `Helmets`, `Chestplates`, `Leggings`, `Boots`;
-- Grupos agregadores: `Armors` (todos os slots juntos);
-- Grupos de material: `Metal` e `Leather`.
-
-Um afixo pode definir itens aceitos por **Grupos**, **Tags do Minecraft** ou **IDs específicos de itens**:
-
-```json
-{
-  "name": "Lâmina Voraz",
-  "rarity": "epico",
-  "groups": ["Swords"],
-  "modifiers": [
-    {
-      "attribute": "minecraft:attack_damage",
-      "amount": 4.0,
-      "operation": "add_value",
-      "slot": "mainhand"
-    }
-  ]
-}
-```
-
-Você também pode referenciar uma **tag existente do Minecraft/Fabric diretamente no afixo**, sem precisar criar um grupo:
-
-```json
-{
-  "name": "Proteção Templária",
-  "rarity": "raro",
-  "tags": ["minecraft:chest_armor"],
-  "groups": ["#c:helmets"],
-  "items": ["#minecraft:foot_armor"],
-  "modifiers": [
-    {
-      "attribute": "minecraft:armor",
-      "amount": 2.0,
-      "operation": "add_value",
-      "slot": "armor"
-    }
-  ]
-}
-```
-
-> [!NOTE]
-> As três formas acima funcionam como alternativas (`OU`). Use a que faz mais sentido: `tags` ou a sintaxe `#namespace:tag` nos campos `groups`/`items` quando uma tag do jogo já cobre exatamente o que você quer; `groups` com o nome do grupo quando quiser aproveitar um grupo personalizado; `items` para IDs avulsos.
-
-Um afixo precisa ter pelo menos um `groups`, `tags` ou `items`. Se usados juntos, funcionam como alternativas (`OU`):
-- `groups`: nomes de grupos de `item_groups/` (ex: `Swords`, `Armors`, `Leather Armors`) ou tags com `#` (ex: `"#c:helmets"`).
-- `tags`: tags de itens do Minecraft ou Fabric (ex: `"minecraft:swords"`, `"c:pickaxes"`).
-- `items`: IDs completos de itens (ex: `"minecraft:trident"`) ou tags com `#` (ex: `"#minecraft:foot_armor"`).
-
-## Grupos de itens definidos por JSON (item_groups)
-
-Todos os grupos de itens do mod são gerenciados em:
+Os comandos de afixo atuam sobre o item na mão principal:
 
 ```text
-data/<namespace>/item_groups/<nome_do_grupo>.json
+/rpg affix list
+/rpg affix roll
+/rpg affix roll rarity <comum|incomum|raro|epico|lendario|mitico>
+/rpg affix roll <id_do_afixo>
+/rpg affix apply <id_do_afixo>
+/rpg affix remove
 ```
 
-O nome do arquivo vira o identificador do grupo (ex: `armas_especiais.json` pode ser usado como `Armas Especiais` ou `armas_especiais` no afixo).
+`list` mostra os afixos compatíveis e as chances individuais estimadas na rolagem normal. `roll` faz uma rolagem normal, incluindo chance de nenhum afixo. `roll rarity` escolhe uniformemente entre afixos compatíveis daquela raridade, sem a rolagem normal de raridade/ausência. `roll <id>` simula rolagens normais até obter o afixo indicado e aplica o resultado; serve para teste e pode levar muitas rolagens simuladas. `apply` aplica diretamente um afixo compatível e `remove` retira o afixo atual.
 
-Um arquivo de grupo pode combinar:
-- `items`: itens específicos ou tags do Minecraft iniciadas com `#`;
-- `tags`: tags nativas do Minecraft/Fabric;
-- `groups`: outros grupos da pasta `item_groups/`.
+## Classes e perks
 
-Exemplo (`data/rpgsystem/item_groups/armas_cacador.json`):
+Classes são implementadas em Java, pois definem identidade, regras de XP, perks e árvore de habilidades. A implementação atual é `FerreiroClass`, registrada em `RpgMod.onInitialize()`.
+
+### Passo a passo: criar uma classe
+
+1. Crie uma classe Java em `src/main/java/br/com/rpgsystem/classes/` estendendo `RpgClass`:
+
+   ```java
+   public final class GuerreiroClass extends RpgClass {
+       private static final Identifier ID = RpgMod.id("guerreiro");
+       @Override public Identifier id() { return ID; }
+       @Override public String name() { return "Guerreiro"; }
+       @Override public String description() { return "Especialista em combate corpo a corpo."; }
+       @Override public List<Identifier> perkIds() { return List.of(); }
+       @Override public int xpFor(RpgAction action) {
+           return action == RpgAction.HOSTILE_MOB_KILL ? 10 : 0;
+       }
+       @Override public List<SkillDefinition> skillTree() { return List.of(); }
+   }
+   ```
+
+2. Registre a classe em `RpgMod.onInitialize()`:
+
+   ```java
+   ClassRegistry.register(new GuerreiroClass());
+   ```
+
+3. O comando usa o caminho do ID, neste exemplo `/rpg class set guerreiro`. Para adicionar habilidades, retorne `SkillDefinition`s em `skillTree()`. Cada definição inclui ID, nome, descrição, custo, tipo, dependências, efeito e quantidade; o jogador precisa ter pontos suficientes e desbloquear as dependências primeiro. A tela e o armazenamento das habilidades são genéricos, mas os efeitos de habilidades precisam ser conectados às rotinas de jogo apropriadas.
+
+### Passo a passo: criar e associar uma perk
+
+1. Crie `src/main/resources/data/rpgsystem/perks/furia.json`:
+
+   ```json
+   {
+     "name": "Fúria",
+     "description": "Aumenta o dano após derrotar criaturas.",
+     "effect": "melee_damage",
+     "amount": 2.0
+   }
+   ```
+
+2. Associe o ID do recurso à classe:
+
+   ```java
+   private static final Identifier FURIA = RpgMod.id("furia");
+   @Override public List<Identifier> perkIds() { return List.of(FURIA); }
+   ```
+
+O JSON fornece nome, descrição, chave de efeito e quantidade. A interface mostra nome e descrição. Um efeito só funciona quando há código que reconhece sua chave; atualmente o tratamento de morte reconhece `heal_on_hostile_kill`, enquanto rotinas de crafting/ferraria implementam efeitos específicos do Ferreiro descritos abaixo.
+
+### Classe Ferreiro incluída
+
+- Recebe XP por lingotes e pepitas de cobre, ferro e ouro coletados da fundição. Cada barra vale, respectivamente, 4, 10 e 15 XP; pepitas valem um nono desses valores, arredondado para a pilha.
+- Recebe XP ao fabricar lingotes de netherita e itens do grupo `Metal`. Itens metálicos também ganham 10% de durabilidade máxima. A fórmula de XP por item usa base 10, bônus por material (ferro +10, ouro +20, diamante +35, netherita +50) e mais 30% por barra de metal usada; lingotes de netherita dão adicionalmente 500 XP por unidade.
+- A perk `Afixo de Mestre` reduz pela metade a chance-base de não receber afixo ao retirar resultados de crafting. A perk `Metal Reforçado` descreve durabilidade, aplicada atualmente aos resultados do grupo `Metal`. A perk `Reparação Eficiente` está descrita na interface, mas sua chave ainda não tem rotina de reparação ligada.
+- Ao aprimorar na ferraria, o afixo do item-base é preservado. Sem afixo herdado, o resultado pode receber um afixo novo, com chance-base reduzida pela metade.
+
+As perks ficam em `src/main/resources/data/rpgsystem/perks/` e são carregadas pelo ID referenciado pela classe.
+
+### Classe Minerador incluída
+
+- Recebe XP ao quebrar minérios vanilla sem Toque Suave, incluindo as variantes de ardosiabissal: carvão 2; cobre e quartzo 3; redstone e lápis-lazúli 4; ferro 5; ouro e ouro do Nether 6; esmeralda 12; diamante 16; e detritos ancestrais 40 XP.
+- Pedra e ardosiabissal sem Toque Suave acumulam progresso; a cada 64 blocos, concedem 4 XP. Esse contador é salvo no perfil do jogador, portanto não se perde ao desconectar ou trocar de classe.
+- **Picareta Conservada:** ao gastar durabilidade de uma picareta há 10% de chance adicional de não a gastar. A rolagem acontece antes da durabilidade vanilla, por isso se combina com Inquebrável.
+- **Golpes Precisos:** concede 5% de velocidade global para quebrar blocos enquanto Minerador é a classe ativa.
+- **Veio Rico:** ao quebrar um minério sem Toque Suave, há 1% de chance de receber um recurso mineral extra. O bônus entrega uma unidade do recurso-base do minério e não reaplica Fortuna.
+
+## Afixos
+
+Cada JSON de afixo é carregado como recurso de dados. O nome do arquivo forma o ID: `data/rpgsystem/affixes/afiado.json` corresponde a `rpgsystem:afiado`.
+
+### Passo a passo: criar um afixo
+
+1. Crie `src/main/resources/data/<namespace>/affixes/<id>.json`, por exemplo `src/main/resources/data/rpgsystem/affixes/afiado.json`.
+2. Preencha os campos obrigatórios `name`, `rarity`, ao menos uma regra de compatibilidade (`groups`, `tags` ou `items`) e `modifiers`:
+
+   ```json
+   {
+     "name": "Afiado",
+     "description": "Uma lâmina de fio excepcional.",
+     "rarity": "raro",
+     "groups": ["Swords"],
+     "modifiers": [
+       {
+         "attribute": "minecraft:attack_damage",
+         "amount": 3.0,
+         "operation": "add_value",
+         "slot": "mainhand"
+       }
+     ]
+   }
+   ```
+
+   `description` é opcional e aparece no tooltip quando Shift está pressionado; sem ela, descrições antigas nos modificadores são usadas como compatibilidade. Cada modificador exige `attribute`, `amount`, `operation` e `slot`. Operações válidas: `add_value`, `add_multiplied_base` e `add_multiplied_total`. Para um multiplicador de 10%, use `0.10` com uma operação multiplicada.
+
+3. Escolha uma raridade exatamente como aparece abaixo:
+
+   | Valor JSON | Exibição | Cor |
+   |---|---|---|
+   | `comum` | Comum | Cinza |
+   | `incomum` | Incomum | Verde |
+   | `raro` | Raro | Azul-claro |
+   | `epico` | Épico | Roxo |
+   | `lendario` | Lendário | Dourado e negrito |
+   | `mitico` | Mítico | Vermelho e negrito |
+
+4. Defina os itens aceitos. As listas de `groups`, `tags` e `items` são combinadas como alternativas (`OU`):
+
+   ```json
+   {
+     "groups": ["Swords", "Metal"],
+     "tags": ["minecraft:chest_armor"],
+     "items": ["minecraft:trident", "#minecraft:foot_armor"]
+   }
+   ```
+
+   `groups` aceita nomes de grupo, interseções com espaço (`"Metal Swords"`) e tags precedidas por `#`; `tags` aceita IDs de tags; `items` aceita IDs completos de itens ou tags precedidas por `#`. Dentro de cada grupo JSON também é possível combinar itens, tags e outros grupos. Confira a seção [Grupos de itens](#grupos-de-itens) para criar regras reutilizáveis.
+
+5. Execute `/reload` para recarregar afixos e grupos de itens após editar os recursos. Para validar no jogo, segure um item compatível e use `/rpg affix list`, `/rpg affix apply <id>` ou `/rpg affix roll`. Crafting e aprimoramentos na ferraria também podem rolar afixos automaticamente ao retirar o resultado.
+
+Os afixos aparecem no tooltip acima dos atributos vanilla. O nome e a raridade também definem a cor/nome customizado do item; a descrição única aparece ao segurar Shift.
+
+### Grupos de itens
+
+Os grupos são definidos em `src/main/resources/data/<namespace>/item_groups/<nome>.json`. O arquivo `metal.json`, por exemplo, pode ser referenciado como `Metal` ou `metal`. Os grupos padrão incluem armas corpo a corpo (`Swords`, `Spears`, `Axes`), ferramentas (`Pickaxes`, `Shovels`, `Hoes`), armaduras por peça (`Helmets`, `Chestplates`, `Leggings`, `Boots`), agregador `Armors` e materiais `Metal` e `Leather`.
+
+Cada grupo pode ter `items`, `tags` e `groups` opcionais:
 
 ```json
 {
-  "tags": [
-    "minecraft:swords",
-    "c:bows"
-  ],
-  "items": [
-    "minecraft:trident",
-    "#c:spears"
-  ],
-  "groups": [
-    "axes"
-  ]
+  "tags": ["minecraft:swords", "c:bows"],
+  "items": ["minecraft:trident", "#c:spears"],
+  "groups": ["axes"]
 }
 ```
 
-### O grupo virtual `All`
+Grupos podem referenciar outros grupos. Uma entrada com espaço exige interseção, por exemplo `"Leather Armors"` aceita itens que estejam nos dois grupos; `"Metal #minecraft:swords"` combina o grupo Metal com a tag. Entradas diferentes na lista continuam sendo alternativas. O grupo virtual `All` representa a união dos grupos JSON carregados. Após alterar os arquivos, execute `/reload`.
 
-Existe o grupo virtual `All`. Ele contém a união de todos os itens de todos os grupos carregados (incluindo os itens resolvidos por tags), sem repetições. Se novos grupos JSON ou tags forem adicionados, eles entram automaticamente no `All` após `/reload`.
+## Rolagem, atributo e criação de itens
 
-```json
-"groups": ["All"]
-```
+Uma rolagem normal começa com 33% de chance de não gerar afixo. Com `rpgsystem:affix_luck = 0`, os pesos-base das raridades são 60, 25, 10, 4, 0.9 e 0.1, nessa ordem, normalizados entre todas as seis raridades. Se um item não tiver afixos compatíveis da raridade sorteada, a rolagem também fica vazia. Depois da raridade, um afixo compatível é escolhido uniformemente dentro daquela raridade.
 
-### Interseção de grupos (Compostos)
-
-Para exigir a interseção entre dois grupos ou materiais, use dois termos separados por espaço:
-
-```json
-"groups": ["Leather Armors"]
-```
-
-Nesse caso, somente itens que pertencem simultaneamente a `Leather` e a `Armors` serão aceitos. Você também pode combinar material com tags:
-
-```json
-"groups": ["Metal #minecraft:swords"]
-```
-
-Várias entradas na lista continuam sendo alternativas (`OU`):
-
-```json
-"groups": ["Metal Swords", "#c:tools"]
-```
-
-### 5. Recarregue os arquivos
-
-Depois de criar ou alterar um JSON, execute `/reload` no jogo. O afixo só será rolado para itens compatíveis com seus grupos.
-
-## Testando no Minecraft
-
-1. Compile com `./gradlew.bat build` ou instale o JAR de `build/libs` no perfil Fabric 26.3.
-2. Segure um item compatível.
-3. Use `/rpg affix apply rpgsystem:teste_afixo` para aplicar o teste diretamente.
-4. O tooltip deverá mostrar, por exemplo, `Afixo: Veloz [Raro]`.
-5. Use `/rpg affix roll` para sortear um afixo compatível.
-6. Use `/rpg affix remove` para remover o afixo do item na mão.
-
-Itens criados por crafting também podem receber um afixo automaticamente quando o resultado é retirado da bancada, se existir algum afixo compatível carregado.
-
-## Sorteio e chance de raridade
-
-O atributo `rpgsystem:affix_luck` começa com valor `0`, que é neutro. Cada rolagem tem 33% de chance de não gerar nenhum afixo. O sistema converte o valor para um multiplicador interno usando `1 + affix_luck`; assim, valores positivos reduzem essa chance e favorecem raridades maiores, enquanto valores negativos pioram a rolagem. Por exemplo, `affix_luck = 1` resulta em 16,5% de chance de nenhum afixo, e `affix_luck = -1` resulta em 100% de chance de nenhum afixo.
+O modificador interno de sorte é `max(0, 1 + affix_luck)`: valores positivos reduzem a chance de nenhum afixo e aumentam o peso relativo de raridades altas; -1 ou menos torna a chance de nenhum afixo 100%. Exemplo para testar:
 
 ```text
 /attribute @s rpgsystem:affix_luck base set 1
 ```
 
-Esse atributo afeta o sorteio, mas não altera os grupos permitidos nem força um afixo específico.
+Isso afeta a rolagem, sem mudar compatibilidade. A perk do Ferreiro reduz em 50% a chance-base de ausência nos resultados retirados de crafting. Na ferraria, afixos do item-base são herdados; quando não há afixo para herdar, usa-se a rolagem de afixo com a mesma redução de ausência.
+
+## Desenvolvimento
+
+- Código comum: `src/main/java`; código cliente: `src/client/java`.
+- Recursos de dados: `src/main/resources/data/<namespace>/`, organizados em `affixes/`, `item_groups/` e `perks/`.
+- Recursos cliente, idioma e configuração de mixins: `src/main/resources/assets/` e `src/main/resources/rpgsystem.mixins.json`.
+- Versões de Minecraft, loader e Fabric API: `gradle.properties`; dependências e compilação: `build.gradle`.
+
+Para iniciar o ambiente de desenvolvimento, use `./gradlew.bat runClient` ou `./gradlew.bat runServer`. Para gerar o mod, use `./gradlew.bat build`.

@@ -1,6 +1,0 @@
-{
-  "name": "Segundo Fôlego",
-  "description": "Recupera 2 pontos de vida ao derrotar uma criatura hostil.",
-  "effect": "heal_on_hostile_kill",
-  "amount": 2.0
-}

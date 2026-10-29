@@ -3,7 +3,14 @@
 	"package": "br.com.rpgsystem.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
-		"ResultSlotMixin"
+		"ResultSlotMixin",
+		"FurnaceResultSlotMixin",
+		"FurnaceShiftMixin",
+		"SmithingMenuMixin",
+		"ItemStackDurabilityMixin"
+		,"CraftingShiftMixin"
+		,"InventoryCraftingShiftMixin"
+		,"ItemCombinerMenuMixin"
 	],
 	"client": [
 		"ItemStackTooltipMixin"

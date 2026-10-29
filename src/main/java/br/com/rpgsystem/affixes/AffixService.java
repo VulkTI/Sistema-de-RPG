@@ -33,17 +33,25 @@ public final class AffixService {
 	}
 
 	public static Optional<AffixDefinition> rollFor(ItemStack stack, double luck, RandomSource random) {
+		return rollFor(stack, luck, random, 0.0);
+	}
+
+	public static Optional<AffixDefinition> rollFor(ItemStack stack, double luck, RandomSource random, double noAffixChanceReduction) {
 		if (stack.isEmpty()) return Optional.empty();
-		return rollFor(candidates(stack), luck, random);
+		return rollFor(candidates(stack), luck, random, noAffixChanceReduction);
 	}
 
 	public static Optional<AffixDefinition> rollFor(List<AffixDefinition> candidates, double luck, RandomSource random) {
+		return rollFor(candidates, luck, random, 0.0);
+	}
+
+	public static Optional<AffixDefinition> rollFor(List<AffixDefinition> candidates, double luck, RandomSource random, double noAffixChanceReduction) {
 		if (candidates.isEmpty()) return Optional.empty();
 
 		// Zero is neutral: the internal multiplier starts at 1 and receives the luck bonus.
 		final double luckMultiplier = Math.max(0.0, 1.0 + luck);
 		final double noAffixChance = Math.min(1.0,
-				BASE_NO_AFFIX_CHANCE / Math.max(0.000001, luckMultiplier));
+				BASE_NO_AFFIX_CHANCE * (1.0 - Math.max(0.0, Math.min(1.0, noAffixChanceReduction))) / Math.max(0.000001, luckMultiplier));
 		if (random.nextDouble() < noAffixChance) return Optional.empty();
 
 		// Fase 1: sorteia a raridade com pesos FIXOS sobre todas as 6 raridades.
@@ -164,7 +172,17 @@ public final class AffixService {
 	}
 
 	public static boolean apply(ItemStack stack, AffixDefinition definition) {
-		if (stack.isEmpty() || !definition.matches(stack.getItem())) return false;
+		return apply(stack, definition, false);
+	}
+
+	/** Aplica um afixo herdado durante uma melhoria, mesmo que a definição original
+	 * tenha sido rolada para o item-base e não liste diretamente o item novo. */
+	public static boolean applyInherited(ItemStack stack, AffixDefinition definition) {
+		return apply(stack, definition, true);
+	}
+
+	private static boolean apply(ItemStack stack, AffixDefinition definition, boolean inherited) {
+		if (stack.isEmpty() || (!inherited && !definition.matches(stack.getItem()))) return false;
 		removeAffixModifiers(stack);
 		stack.set(DataComponents.RARITY, definition.rarity().itemRarity());
 		stack.set(DataComponents.CUSTOM_NAME,

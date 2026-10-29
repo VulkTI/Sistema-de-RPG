@@ -5,6 +5,7 @@ import br.com.rpgsystem.classes.RpgClass;
 import br.com.rpgsystem.classes.SkillDefinition;
 import br.com.rpgsystem.data.RpgSavedData;
 import br.com.rpgsystem.progression.ProgressionMath;
+import br.com.rpgsystem.mining.MineradorEffects;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.Gson;
@@ -101,6 +102,7 @@ public final class RpgNetworking {
 			return;
 		}
 		RpgSavedData.get(player.level().getServer()).update(player.getUUID(), profile -> profile.withClass(id.toString()));
+		MineradorEffects.refreshMiningSpeed(player);
 		player.sendSystemMessage(Component.literal("Classe definida: " + rpgClass.name() + "."));
 		sendSnapshot(player, false);
 	}
