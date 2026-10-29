@@ -8,12 +8,19 @@
 		"FurnaceShiftMixin",
 		"SmithingMenuMixin",
 		"ItemStackDurabilityMixin"
+		,"LivingEntityLevelMixin"
+		,"EntityLevelPersistenceMixin"
+		,"MobLevelTickMixin"
+		,"FeaturePlacerMixin"
+		,"OreFeatureMixin"
+		,"ScatteredOreFeatureMixin"
 		,"CraftingShiftMixin"
 		,"InventoryCraftingShiftMixin"
 		,"ItemCombinerMenuMixin"
 	],
 	"client": [
-		"ItemStackTooltipMixin"
+		"ItemStackTooltipMixin",
+		"EntityRendererLevelMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

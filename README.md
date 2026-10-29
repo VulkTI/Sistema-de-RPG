@@ -18,6 +18,7 @@ Para compilar o projeto no Windows, execute `./gradlew.bat build` (ou `compilar.
 - Sistema de afixos em armas, ferramentas, armaduras e outros itens compatíveis: modificadores de atributos, raridades, grupos, tags, itens específicos, tooltips e rolagem automática.
 - Herança de afixo ao aprimorar um item na ferraria; se o item-base não tiver afixo, o resultado pode receber um novo.
 - Atributo `rpgsystem:affix_luck`, comandos de administração e sincronização dos dados entre servidor e cliente.
+- Níveis persistentes de mobs, definidos por bioma/estrutura, escalonamento de combate e etiqueta do alvo sob a mira.
 
 O XP do jogador aumenta em 8 ao derrotar uma criatura da categoria MONSTER. A classe ativa pode receber XP adicional conforme a ação. O Ferreiro recebe XP ao coletar certos lingotes/nuggets fundidos e ao fabricar itens metálicos. A curva de XP começa em 100 para avançar do nível 1, aumentando 5 XP mais a metade do quadrado do número de níveis já avançados; o nível máximo é 100. Cada novo nível de classe concede 2 pontos de habilidade. A classe Ferreiro atual retorna uma árvore vazia, então não há habilidades para desbloquear nela no momento.
 
@@ -228,3 +229,158 @@ Isso afeta a rolagem, sem mudar compatibilidade. A perk do Ferreiro reduz em 50%
 - Versões de Minecraft, loader e Fabric API: `gradle.properties`; dependências e compilação: `build.gradle`.
 
 Para iniciar o ambiente de desenvolvimento, use `./gradlew.bat runClient` ou `./gradlew.bat runServer`. Para gerar o mod, use `./gradlew.bat build`.
+
+## Níveis de criaturas
+
+Todo `Mob` vanilla ou de mod que possua atributos compatíveis recebe uma única vez um nível entre 1 e 100. O servidor é a autoridade: ele persiste `rpgsystem.mob_level` nos dados da entidade e o sincroniza como dado de entidade vanilla. Assim, descarregar chunks, reiniciar o mundo, trocar de dimensão, mudar de bioma ou renomear a criatura não altera seu nível. Mobs de mundos antigos sem esse dado são inicializados na primeira vez que forem carregados pela versão nova, usando a posição daquela inicialização.
+
+A resolução é sempre: chefe fixo, peça de estrutura que contém o ponto, bioma de inicialização e, por último, `fallback_range`. Estruturas são consultadas apenas na inicialização e somente quando a posição está dentro de uma peça da estrutura — estar perto dela não basta. Em sobreposição, a ordem determinística é Ancient City, End City, bastião, fortaleza e Trial Chambers.
+
+### Zonas e biomas padrão
+
+| Zona | ID do bioma | Níveis |
+| --- | --- | ---: |
+| 1 | `minecraft:plains` | 1–5 |
+| 1 | `minecraft:sunflower_plains` | 1–5 |
+| 1 | `minecraft:forest` | 3–8 |
+| 1 | `minecraft:birch_forest` | 4–9 |
+| 1 | `minecraft:flower_forest` | 3–8 |
+| 1 | `minecraft:old_growth_birch_forest` | 6–12 |
+| 1 | `minecraft:meadow` | 5–11 |
+| 1 | `minecraft:cherry_grove` | 5–12 |
+| 1 | `minecraft:swamp` | 6–12 |
+| 1 | `minecraft:mushroom_fields` | 1–8 |
+| 1 | `minecraft:beach` | 2–7 |
+| 1 | `minecraft:ocean` | 2–8 |
+| 1 | `minecraft:lukewarm_ocean` | 3–9 |
+| 1 | `minecraft:deep_ocean` | 4–10 |
+| 1 | `minecraft:deep_lukewarm_ocean` | 4–10 |
+| 1 | `minecraft:river` | 2–7 |
+| 1 | `minecraft:lush_caves` | 5–12 |
+| 1 | `minecraft:dripstone_caves` | 6–13 |
+| 2 | `minecraft:dark_forest` | 10–18 |
+| 2 | `minecraft:pale_garden` | 12–20 |
+| 2 | `minecraft:jungle` | 15–23 |
+| 2 | `minecraft:sparse_jungle` | 12–20 |
+| 2 | `minecraft:bamboo_jungle` | 17–25 |
+| 2 | `minecraft:savanna` | 14–22 |
+| 2 | `minecraft:savanna_plateau` | 17–25 |
+| 2 | `minecraft:windswept_savanna` | 20–28 |
+| 2 | `minecraft:desert` | 18–27 |
+| 2 | `minecraft:badlands` | 22–30 |
+| 2 | `minecraft:wooded_badlands` | 20–29 |
+| 2 | `minecraft:eroded_badlands` | 24–32 |
+| 2 | `minecraft:mangrove_swamp` | 12–21 |
+| 2 | `minecraft:windswept_hills` | 10–19 |
+| 2 | `minecraft:windswept_gravelly_hills` | 13–22 |
+| 2 | `minecraft:windswept_forest` | 10–19 |
+| 2 | `minecraft:stony_peaks` | 19–28 |
+| 2 | `minecraft:stony_shore` | 8–16 |
+| 2 | `minecraft:cold_ocean` | 8–16 |
+| 2 | `minecraft:deep_cold_ocean` | 10–18 |
+| 2 | `minecraft:warm_ocean` | 8–16 |
+| 3 | `minecraft:taiga` | 28–37 |
+| 3 | `minecraft:old_growth_pine_taiga` | 30–39 |
+| 3 | `minecraft:old_growth_spruce_taiga` | 32–41 |
+| 3 | `minecraft:snowy_taiga` | 34–43 |
+| 3 | `minecraft:snowy_plains` | 35–44 |
+| 3 | `minecraft:frozen_river` | 35–43 |
+| 3 | `minecraft:snowy_beach` | 35–44 |
+| 3 | `minecraft:frozen_ocean` | 36–45 |
+| 3 | `minecraft:deep_frozen_ocean` | 38–47 |
+| 3 | `minecraft:ice_spikes` | 40–49 |
+| 3 | `minecraft:grove` | 38–47 |
+| 3 | `minecraft:snowy_slopes` | 41–50 |
+| 3 | `minecraft:frozen_peaks` | 44–53 |
+| 3 | `minecraft:jagged_peaks` | 45–54 |
+| 4 | `minecraft:warped_forest` | 60–65 |
+| 4 | `minecraft:crimson_forest` | 63–69 |
+| 4 | `minecraft:nether_wastes` | 66–72 |
+| 4 | `minecraft:soul_sand_valley` | 69–75 |
+| 4 | `minecraft:basalt_deltas` | 73–79 |
+| 5 | `minecraft:small_end_islands` | 80–83 |
+| 5 | `minecraft:end_barrens` | 81–85 |
+| 5 | `minecraft:end_midlands` | 83–87 |
+| 5 | `minecraft:end_highlands` | 86–89 |
+| 5 | `minecraft:the_end` | 87–89 |
+| 6 | `minecraft:deep_dark` | 90–100 |
+
+Os IDs acima foram validados contra os dados de Minecraft 26.3 incluídos pelas dependências do projeto. Biomas não listados não recebem uma faixa inventada: usam o fallback configurado, por padrão 1–5.
+
+### Estruturas e chefes
+
+| Regra | ID/entidade | Níveis |
+| --- | --- | ---: |
+| Estrutura | `minecraft:fortress` | 63–67 |
+| Estrutura | `minecraft:bastion_remnant` | 74–79 |
+| Estrutura | `minecraft:trial_chambers` | 36–41 |
+| Estrutura | `minecraft:end_city` | 84–89 |
+| Estrutura | `minecraft:ancient_city` | 94–99 |
+| Fixo | Ender Dragon | 90 |
+| Fixo | Wither | 80 |
+| Fixo | Warden | 100 |
+
+### Escalonamento de atributos
+
+Os modificadores do Sistema RPG são transitórios, têm IDs próprios e são atualizados de forma idempotente; modificadores de outros mods não são removidos. A entidade sem determinado atributo simplesmente não recebe aquele bônus. Para um nível `N`, os padrões são:
+
+- vida máxima: modificador multiplicado sobre o valor-base de `0,015 × (N − 1)`;
+- dano de ataque: modificador multiplicado sobre o valor-base de `0,020 × (N − 1)`;
+- armadura: `min(20, 0,250 × (N − 1))` pontos adicionados.
+
+Em nível 100, isso equivale a +148,5% de vida baseada no atributo, +198% de dano baseado no atributo e no máximo +20 de armadura. Ao reaplicar o sistema, a vida atual nunca aumenta: apenas é limitada à nova vida máxima se necessário.
+
+### Configuração
+
+Na primeira inicialização do servidor ou mundo, é criado `config/rpgsystem_mob_levels.json`. Ele é separado de `rpgsystem_xp.json` e aceita `fallback_range`, `health_per_level`, `damage_per_level`, `armor_per_level`, `armor_bonus_cap`, `biome_ranges` e `structure_ranges`. Cada faixa usa `{ "min": inteiro, "max": inteiro }`; valores são limitados a 1–100 e os campos de combate têm limites seguros. Somente os IDs padrão conhecidos são aceitos nas tabelas para evitar regras silenciosas para conteúdo inexistente. Reinicie o servidor após alterar o arquivo.
+
+## Geração de minérios por zonas
+
+A geração de minérios controlados usa `MiningZoneConfig`, separado de `MobLevelConfig`; nível de mob nunca é usado como nível de mineração. O mapa explícito de biomas e estruturas não possui fallback silencioso: um bioma/estrutura sem regra não recebe os minérios controlados.
+
+| Zona | Minérios com geração normal | Minérios anteriores autorizados |
+| --- | --- | --- |
+| 1 — inicial | carvão, cobre | — |
+| 2 — intermediária | ferro, redstone, lápis-lazúli | carvão e cobre, reduzidos |
+| 3 — avançada | ouro e diamante | minérios das Zonas 1 e 2, reduzidos |
+| 4 — Nether | detritos ancestrais | nenhum outro minério controlado |
+
+Os níveis de mineração padrão são independentes e estão centralizados em `src/main/java/br/com/rpgsystem/mining/MiningZoneConfig.java`. A Zona 1 usa níveis 1–6, a Zona 2 19–34 e a Zona 3 41–60; o Nether não usa progressão. Estruturas têm regras explícitas: `ancient_city` e `trial_chambers` usam a Zona 3, `fortress` e `bastion_remnant` usam a Zona 4, e `end_city` não recebe minérios controlados. A estrutura só prevalece quando o ponto está dentro de uma peça gerada, nunca por proximidade.
+
+### Valores-base
+
+| Minério | Tentativas por variante | Tamanhos-base |
+| --- | --- | --- |
+| Carvão | 45 + 25 | vanilla |
+| Cobre | 105 por variante, incluindo a variante de grande veio | vanilla |
+| Ferro | 45 + 15 + 15 | 9 + 9 + 5 |
+| Redstone | vanilla | vanilla |
+| Lápis-lazúli | vanilla | vanilla |
+| Ouro | vanilla | vanilla |
+| Diamante | vanilla | vanilla |
+| Detritos ancestrais | 2 + 1 | vanilla |
+
+Diamante, ouro, lápis-lazúli e redstone mantêm seus placed features, variantes, alturas, distribuições e regras de substituição vanilla. Cobre, carvão e detritos também mantêm tamanhos vanilla; somente as tentativas solicitadas são substituídas. A geração é interceptada no ponto final de colocação do `FeaturePlacer`, portanto não há uma segunda cópia dos recursos vanilla.
+
+### Progressão, pico e queda
+
+Na zona de origem, o sistema calcula `t = clamp((L − Lmin) / (Lmax − Lmin), 0, 1)` usando o nível explícito do bioma/estrutura:
+
+- frequência: `F = 0,75 + 0,75 × t`;
+- tamanho: `S = 0,75 + 0,60 × t`.
+
+Assim, o menor nível começa em 75%/75% e o maior nível real da zona atinge exatamente 150%/135%. Ao entrar em uma zona superior autorizada, a curva cai diretamente para 5% da frequência e 20% do tamanho-base e permanece nesses valores, sem recuperação nem acúmulo. Os percentuais são aplicados ao valor-base individual de cada minério, preservando a raridade relativa entre eles. O Nether é uma exceção independente: detritos usam 2 + 1 tentativas, seus tamanhos/distribuições vanilla e nenhum multiplicador de progressão.
+
+As distribuições verticais, filtros de altura, variantes triangulares/uniformes, mecanismos especiais de cobre e regras de substituição não são reconstruídos. Os overrides em `data/minecraft/worldgen/placed_feature` alteram apenas as contagens necessárias; chunks já existentes não são lidos nem convertidos, então somente a geração natural de chunks novos é afetada.
+
+Os cálculos e o cache de resolução por chunk são determinísticos no servidor e não usam o nível global do jogador. A configuração de mineração é código centralizado nesta versão, enquanto `rpgsystem_mob_levels.json` continua pertencendo exclusivamente ao sistema de mobs.
+
+### Etiqueta ao mirar e multiplayer
+
+Quando a mira do jogador acerta uma criatura com nível, somente ela recebe a etiqueta renderizada acima do corpo: `Nome - Nv. N`. Uma nametag substitui somente `Nome`; o nível continua separado, não é incorporado ao nome persistente e não duplica ao renomear repetidas vezes. O cliente não toma decisões de progressão: recebe o valor sincronizado pelo servidor, funcionando tanto em singleplayer quanto em servidor dedicado com o mod nos dois lados.
+
+### Limitações e testes
+
+O ponto de nascimento é registrado ao inicializar o mob quando ele entra no mundo; há um fallback no tick para spawns diretos, spawners e mods que não disparem o evento de carga. Para criaturas preexistentes sem nível, isto é explicitamente a posição da primeira carga após a atualização. A deteção de estruturas usa peças geradas, portanto não faz busca por proximidade. A compilação não substitui testes dentro do jogo: validação visual da etiqueta, combate contra cada chefe e cenários reais de portal/spawner devem ser feitos no cliente/servidor Minecraft.
+
+`./gradlew.bat test` verifica todas as 64 faixas de bioma e as cinco faixas/ordem de estruturas; `./gradlew.bat build` gera o JAR e executa esses testes.

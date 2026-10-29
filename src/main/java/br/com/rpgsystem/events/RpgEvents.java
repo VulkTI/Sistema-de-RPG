@@ -7,6 +7,8 @@ import br.com.rpgsystem.classes.MineradorClass;
 import br.com.rpgsystem.data.RpgSavedData;
 import br.com.rpgsystem.mining.MineradorEffects;
 import br.com.rpgsystem.config.XpConfig;
+import br.com.rpgsystem.mobs.MobLevelManager;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import br.com.rpgsystem.network.RpgNetworking;
 import br.com.rpgsystem.perks.PerkDefinition;
 import br.com.rpgsystem.progression.ProgressionMath;
@@ -28,6 +30,11 @@ public final class RpgEvents {
 	private RpgEvents() {}
 
 	public static void register() {
+		// Cobre spawn natural, spawners, comandos, ovos, mods e entidades antigas carregadas do disco.
+		ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+			if (entity instanceof net.minecraft.world.entity.Mob mob) MobLevelManager.initialize(mob, level);
+		});
+
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			ServerPlayer player = handler.player;
 			RpgSavedData.Profile profile = RpgSavedData.get(server).profile(player.getUUID());

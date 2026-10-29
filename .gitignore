@@ -18,7 +18,13 @@ classes/
 *.ipr
 *.iws
 
-# vscode
+# visual studio
+.vs/
+
+# logs
+logs/
+*.log
+
 
 .settings/
 .vscode/
