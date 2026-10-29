@@ -1,0 +1,22 @@
+{
+  "name": "Casca Dura",
+  "description": "Concede armadura e resistência contra empurrões de explosões.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:explosion_knockback_resistance",
+      "amount": 0.15,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

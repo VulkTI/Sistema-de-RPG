@@ -1,0 +1,22 @@
+{
+  "name": "Mestre do Duelo",
+  "description": "Aumenta o dano e a velocidade de ataque de espadas.",
+  "rarity": "lendario",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.15,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

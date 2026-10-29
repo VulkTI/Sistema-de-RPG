@@ -1,0 +1,22 @@
+{
+  "name": "Reflexos Exaustos",
+  "description": "Acelera os ataques, mas reduz a vida máxima em um coração.",
+  "rarity": "epico",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.15,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:max_health",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

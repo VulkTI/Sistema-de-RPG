@@ -1,0 +1,22 @@
+{
+  "name": "Nadador",
+  "description": "Melhora o deslocamento na água, com pequena perda de velocidade em terra.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:water_movement_efficiency",
+      "amount": 0.25,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.03,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

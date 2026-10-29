@@ -1,0 +1,16 @@
+{
+  "name": "Fio de Má Sorte",
+  "description": "Reduz a sorte do portador enquanto a espada amaldiçoada está ativa.",
+  "rarity": "comum",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": -0.75,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

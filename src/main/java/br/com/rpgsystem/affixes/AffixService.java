@@ -17,6 +17,8 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.EnumMap;
 
 /** Operações de aplicação, remoção e rolagem de afixos. */
 public final class AffixService {
@@ -43,16 +45,58 @@ public final class AffixService {
 				BASE_NO_AFFIX_CHANCE / Math.max(0.000001, luckMultiplier));
 		if (random.nextDouble() < noAffixChance) return Optional.empty();
 
-		double totalWeight = candidates.stream().mapToDouble(definition ->
-				definition.rarity().baseWeight() * Math.pow(luckMultiplier, definition.rarity().ordinal())).sum();
-		if (totalWeight <= 0.0) return Optional.empty();
+		// Fase 1: sorteia a raridade com pesos FIXOS sobre todas as 6 raridades.
+		// Raridades ausentes para o item contribuem com peso mas não produzem afixo,
+		// garantindo que a chance de raridades superiores não seja inflada.
+		double totalWeight = 0.0;
+		for (AffixRarity rarity : AffixRarity.values()) {
+			totalWeight += rarity.baseWeight() * Math.pow(luckMultiplier, rarity.ordinal());
+		}
 
 		double target = random.nextDouble() * totalWeight;
-		for (AffixDefinition candidate : candidates) {
-			target -= candidate.rarity().baseWeight() * Math.pow(luckMultiplier, candidate.rarity().ordinal());
-			if (target <= 0.0) return Optional.of(candidate);
+		for (AffixRarity rarity : AffixRarity.values()) {
+			target -= rarity.baseWeight() * Math.pow(luckMultiplier, rarity.ordinal());
+			if (target <= 0.0) {
+				// Fase 2: sorteia um afixo aleatório dentro da raridade selecionada.
+				// Se não houver afixo desta raridade para o item, o roll resulta em vazio.
+				List<AffixDefinition> pool = candidates.stream()
+						.filter(d -> d.rarity() == rarity)
+						.toList();
+				if (pool.isEmpty()) return Optional.empty();
+				return Optional.of(pool.get(random.nextInt(pool.size())));
+			}
 		}
-		return Optional.of(candidates.get(candidates.size() - 1));
+		return Optional.empty();
+	}
+
+	/** Candidatos calculados uma única vez para o item recebido. */
+	public static List<AffixDefinition> candidates(ItemStack stack) {
+		if (stack.isEmpty()) return List.of();
+		return AffixRepository.all().stream().filter(definition -> definition.matches(stack.getItem())).toList();
+	}
+
+	/** Rola uniformemente dentro de uma raridade, sem consultar novamente a mão do jogador. */
+	public static Optional<AffixDefinition> rollWithinRarity(List<AffixDefinition> candidates,
+			AffixRarity rarity, RandomSource random) {
+		List<AffixDefinition> pool = candidates.stream().filter(d -> d.rarity() == rarity).toList();
+		return pool.isEmpty() ? Optional.empty() : Optional.of(pool.get(random.nextInt(pool.size())));
+	}
+
+	/** Chance individual por rolagem, incluindo a chance de não sair afixo. */
+	public static Map<AffixDefinition, Double> individualChances(List<AffixDefinition> candidates, double luck) {
+		Map<AffixDefinition, Double> result = new java.util.LinkedHashMap<>();
+		if (candidates.isEmpty()) return result;
+		double multiplier = Math.max(0.0, 1.0 + luck);
+		double noAffix = Math.min(1.0, BASE_NO_AFFIX_CHANCE / Math.max(0.000001, multiplier));
+		double total = 0.0;
+		for (AffixRarity rarity : AffixRarity.values()) total += rarity.baseWeight() * Math.pow(multiplier, rarity.ordinal());
+		for (AffixRarity rarity : AffixRarity.values()) {
+			long count = candidates.stream().filter(d -> d.rarity() == rarity).count();
+			if (count == 0) continue;
+			double chance = (1.0 - noAffix) * rarity.baseWeight() * Math.pow(multiplier, rarity.ordinal()) / total / count;
+			candidates.stream().filter(d -> d.rarity() == rarity).forEach(d -> result.put(d, chance));
+		}
+		return result;
 	}
 
 	public static boolean apply(ItemStack stack, AffixDefinition definition) {

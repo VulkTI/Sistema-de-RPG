@@ -1,0 +1,16 @@
+{
+  "name": "Fogo Persistente",
+  "description": "Aumenta o tempo durante o qual o portador permanece queimando.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:burning_time",
+      "amount": 0.25,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

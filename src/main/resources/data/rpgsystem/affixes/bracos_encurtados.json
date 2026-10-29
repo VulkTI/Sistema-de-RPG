@@ -1,0 +1,16 @@
+{
+  "name": "Braços Encurtados",
+  "description": "Reduz o alcance de interação com blocos.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:block_interaction_range",
+      "amount": -0.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

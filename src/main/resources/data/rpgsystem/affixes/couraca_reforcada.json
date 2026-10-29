@@ -1,0 +1,16 @@
+{
+  "name": "Couraça Reforçada",
+  "description": "Aumenta a armadura fornecida por peças de armadura.",
+  "rarity": "comum",
+  "groups": [
+    "Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

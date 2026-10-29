@@ -1,0 +1,22 @@
+{
+  "name": "Picareta Brutal",
+  "description": "Melhora a mineração, mas reduz a velocidade de ataque.",
+  "rarity": "comum",
+  "groups": [
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.08,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

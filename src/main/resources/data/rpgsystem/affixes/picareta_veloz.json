@@ -1,0 +1,22 @@
+{
+  "name": "Picareta Veloz",
+  "description": "Melhora a mineração e dá uma pequena vantagem de movimento.",
+  "rarity": "incomum",
+  "groups": [
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.03,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

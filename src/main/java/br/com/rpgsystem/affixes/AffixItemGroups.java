@@ -1,16 +1,23 @@
 package br.com.rpgsystem.affixes;
 
+import br.com.rpgsystem.RpgMod;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.resources.Identifier;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.Item;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,131 +25,232 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-/** Grupos de itens aceitos pelos JSONs de afixo, incluindo interseções como "Leather Armors". */
+/** Grupos de itens aceitos pelos JSONs de afixo, carregados dinamicamente de item_groups/. */
 public final class AffixItemGroups extends SimpleJsonResourceReloadListener<AffixItemGroups.JsonGroup>
 		implements IdentifiableResourceReloadListener {
-	private static final String MINECRAFT = "minecraft";
-	private static final Map<String, Set<Identifier>> MAIN_GROUPS = createMainGroups();
-	private static final Map<String, Set<Identifier>> CUSTOM_GROUPS = createCustomGroups();
 	private static volatile Map<String, JsonGroup> JSON_GROUPS = Map.of();
 
-	private AffixItemGroups() { super(JsonGroup.CODEC, FileToIdConverter.json("affix_groups")); }
+	private AffixItemGroups() {
+		super(JsonGroup.CODEC, FileToIdConverter.json("item_groups"));
+	}
 
 	public static void register() {
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new AffixItemGroups());
 	}
 
 	public static boolean matches(String groupName, Identifier itemId) {
-		if (groupName == null || itemId == null) return false;
-		String normalized = normalize(groupName);
-		String[] compound = normalized.split(" ", 2);
-		if (compound.length == 1) return resolve(compound[0], new LinkedHashSet<>()).contains(itemId);
-		return resolve(compound[0], new LinkedHashSet<>()).contains(itemId)
-				&& resolve(compound[1], new LinkedHashSet<>()).contains(itemId);
+		return matches(groupName, itemId, null);
 	}
 
-	private static Set<Identifier> resolve(String name, Set<String> visiting) {
+	public static boolean matches(String groupName, Item item) {
+		if (item == null) return false;
+		return matches(groupName, BuiltInRegistries.ITEM.getKey(item), item);
+	}
+
+	public static boolean matches(String groupName, Identifier itemId, Item item) {
+		if (groupName == null || itemId == null) return false;
+		String trimmed = groupName.trim();
+
+		// 1. Tag direta iniciada por '#' (ex: "#minecraft:swords", "#c:tools")
+		if (trimmed.startsWith("#")) {
+			TagKey<Item> tagKey = parseItemTag(trimmed);
+			return tagKey != null && isItemInTag(itemId, item, tagKey);
+		}
+
+		String normalized = normalize(trimmed);
+
+		// 2. Grupo composto por espaço (ex: "leather armors", "metal #minecraft:swords")
+		//    Testa interseção: o item precisa satisfazer TODOS os termos.
+		String[] compound = normalized.split(" ", 2);
+		if (compound.length > 1) {
+			boolean firstMatch = matchesPart(compound[0], itemId, item);
+			boolean secondMatch = matchesPart(compound[1], itemId, item);
+			return firstMatch && secondMatch;
+		}
+
+		// 3. Grupo simples — verifica diretamente via tags e itens do grupo.
+		return matchesGroup(normalized, itemId, item, new LinkedHashSet<>());
+	}
+
+	/**
+	 * Verifica se o item pertence ao grupo pelo nome normalizado.
+	 * Usa isItemInTag() para tags (verificação direta no holder do item, sem expandir o registry),
+	 * garantindo que funcione mesmo com tags de data pack carregadas dinamicamente.
+	 */
+	private static boolean matchesGroup(String normalized, Identifier itemId, Item item, Set<String> visiting) {
+		if (normalized.equals("all")) {
+			for (String group : JSON_GROUPS.keySet()) {
+				if (!group.equals("all") && matchesGroup(group, itemId, item, new LinkedHashSet<>())) {
+					return true;
+				}
+			}
+			return false;
+		}
+		if (normalized.startsWith("#")) {
+			TagKey<Item> tagKey = parseItemTag(normalized);
+			return tagKey != null && isItemInTag(itemId, item, tagKey);
+		}
+		JsonGroup json = JSON_GROUPS.get(normalized);
+		if (json == null || !visiting.add(normalized)) return false;
+
+		// Itens diretos (incluindo "#tag" no campo items)
+		for (String itemEntry : json.items()) {
+			if (itemEntry.startsWith("#")) {
+				TagKey<Item> tagKey = parseItemTag(itemEntry);
+				if (tagKey != null && isItemInTag(itemId, item, tagKey)) {
+					visiting.remove(normalized);
+					return true;
+				}
+			} else {
+				Identifier expected = Identifier.tryParse(itemEntry);
+				if (expected != null && expected.equals(itemId)) {
+					visiting.remove(normalized);
+					return true;
+				}
+			}
+		}
+
+		// Tags do campo "tags" — verificação direta no holder do item
+		for (String tagEntry : json.tags()) {
+			TagKey<Item> tagKey = parseItemTag(tagEntry);
+			if (tagKey != null && isItemInTag(itemId, item, tagKey)) {
+				visiting.remove(normalized);
+				return true;
+			}
+		}
+
+		// Grupos aninhados
+		for (String reference : json.groups()) {
+			if (matchesGroup(reference.startsWith("#") ? reference : normalize(reference), itemId, item, visiting)) {
+				visiting.remove(normalized);
+				return true;
+			}
+		}
+
+		visiting.remove(normalized);
+		return false;
+	}
+
+	private static boolean matchesPart(String part, Identifier itemId, Item item) {
+		if (part.startsWith("#")) {
+			TagKey<Item> tagKey = parseItemTag(part);
+			return tagKey != null && isItemInTag(itemId, item, tagKey);
+		}
+		return matchesGroup(part, itemId, item, new LinkedHashSet<>());
+	}
+
+	public static boolean isItemInTag(Identifier itemId, Item item, TagKey<Item> tagKey) {
+		if (tagKey == null) return false;
+		if (item != null) return item.builtInRegistryHolder().is(tagKey);
+		return BuiltInRegistries.ITEM.get(itemId).map(holder -> holder.is(tagKey)).orElse(false);
+	}
+
+	public static TagKey<Item> parseItemTag(String tagString) {
+		if (tagString == null || tagString.isBlank()) return null;
+		String clean = tagString.trim();
+		if (clean.startsWith("#")) clean = clean.substring(1).trim();
+		Identifier id = Identifier.tryParse(clean.contains(":") ? clean : "minecraft:" + clean);
+		return id != null ? TagKey.create(Registries.ITEM, id) : null;
+	}
+
+	private static Set<Identifier> resolveTagItems(TagKey<Item> tagKey) {
+		if (tagKey == null) return Set.of();
+		Set<Identifier> items = new LinkedHashSet<>();
+		for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tagKey)) {
+			Identifier id = BuiltInRegistries.ITEM.getKey(holder.value());
+			if (id != null) items.add(id);
+		}
+		return items;
+	}
+
+	public static Set<Identifier> resolve(String name, Set<String> visiting) {
 		String normalized = normalize(name);
 		if (normalized.equals("all")) {
 			Set<Identifier> all = new LinkedHashSet<>();
-			MAIN_GROUPS.values().forEach(all::addAll);
-			CUSTOM_GROUPS.values().forEach(all::addAll);
 			for (String group : JSON_GROUPS.keySet()) {
-				if (!group.equals("all")) all.addAll(resolve(group, new LinkedHashSet<>()));
+				if (!group.equals("all")) {
+					all.addAll(resolve(group, new LinkedHashSet<>()));
+				}
 			}
 			return Set.copyOf(all);
 		}
-		Set<Identifier> direct = MAIN_GROUPS.get(normalized);
-		if (direct == null) direct = CUSTOM_GROUPS.get(normalized);
-		if (direct != null) return direct;
+		if (normalized.startsWith("#")) {
+			TagKey<Item> tagKey = parseItemTag(normalized);
+			return resolveTagItems(tagKey);
+		}
 		JsonGroup json = JSON_GROUPS.get(normalized);
 		if (json == null || !visiting.add(normalized)) return Set.of();
-		Set<Identifier> result = new LinkedHashSet<>(json.items());
-		for (String reference : json.groups()) result.addAll(resolve(reference, visiting));
+		Set<Identifier> result = new LinkedHashSet<>();
+
+		// Processa itens diretos (incluindo se algum item for uma tag "#tag")
+		for (String itemEntry : json.items()) {
+			if (itemEntry.startsWith("#")) {
+				result.addAll(resolveTagItems(parseItemTag(itemEntry)));
+			} else {
+				Identifier itemId = Identifier.tryParse(itemEntry);
+				if (itemId != null) result.add(itemId);
+			}
+		}
+
+		// Processa tags do campo "tags"
+		for (String tagEntry : json.tags()) {
+			result.addAll(resolveTagItems(parseItemTag(tagEntry)));
+		}
+
+		// Processa grupos aninhados
+		for (String reference : json.groups()) {
+			if (reference.startsWith("#")) {
+				result.addAll(resolveTagItems(parseItemTag(reference)));
+			} else {
+				result.addAll(resolve(reference, visiting));
+			}
+		}
+
 		visiting.remove(normalized);
 		return Set.copyOf(result);
 	}
 
 	public static Set<String> availableNames() {
-		Set<String> names = new LinkedHashSet<>();
-		names.addAll(MAIN_GROUPS.keySet());
-		names.addAll(CUSTOM_GROUPS.keySet());
-		names.addAll(JSON_GROUPS.keySet());
+		Set<String> names = new LinkedHashSet<>(JSON_GROUPS.keySet());
+		names.add("all");
 		return Set.copyOf(names);
 	}
 
-	@Override public Identifier getFabricId() { return Identifier.fromNamespaceAndPath("rpgsystem", "affix_groups"); }
-	@Override public java.util.Collection<Identifier> getFabricDependencies() { return List.of(); }
-	@Override protected void apply(Map<Identifier, JsonGroup> loaded, ResourceManager manager, ProfilerFiller profiler) {
+	@Override
+	public Identifier getFabricId() {
+		return RpgMod.id("item_groups");
+	}
+
+	@Override
+	public Collection<Identifier> getFabricDependencies() {
+		return List.of();
+	}
+
+	@Override
+	protected void apply(Map<Identifier, JsonGroup> loaded, ResourceManager manager, ProfilerFiller profiler) {
 		Map<String, JsonGroup> groups = new LinkedHashMap<>();
 		loaded.forEach((id, group) -> groups.put(normalize(id.getPath()), group));
 		JSON_GROUPS = Map.copyOf(groups);
-	}
-
-	private static Map<String, Set<Identifier>> createMainGroups() {
-		Map<String, Set<Identifier>> groups = new LinkedHashMap<>();
-		groups.put("swords", items(
-				"wooden_sword", "stone_sword", "copper_sword", "iron_sword", "golden_sword", "diamond_sword", "netherite_sword"));
-		groups.put("spears", items(
-				"wooden_spear", "stone_spear", "copper_spear", "iron_spear", "golden_spear", "diamond_spear", "netherite_spear"));
-		groups.put("pickaxes", items(
-				"wooden_pickaxe", "stone_pickaxe", "copper_pickaxe", "iron_pickaxe", "golden_pickaxe", "diamond_pickaxe", "netherite_pickaxe"));
-		groups.put("axes", items(
-				"wooden_axe", "stone_axe", "iron_axe", "golden_axe", "diamond_axe", "netherite_axe"));
-		groups.put("shovels", items(
-				"wooden_shovel", "stone_shovel", "iron_shovel", "golden_shovel", "diamond_shovel", "netherite_shovel"));
-		groups.put("hoes", items(
-				"wooden_hoe", "stone_hoe", "copper_hoe", "iron_hoe", "golden_hoe", "diamond_hoe", "netherite_hoe"));
-		groups.put("helmets", items(
-				"leather_helmet", "copper_helmet", "chainmail_helmet", "iron_helmet", "golden_helmet", "diamond_helmet", "netherite_helmet"));
-		groups.put("chestplates", items(
-				"leather_chestplate", "copper_chestplate", "chainmail_chestplate", "iron_chestplate", "golden_chestplate", "diamond_chestplate", "netherite_chestplate"));
-		groups.put("leggings", items(
-				"leather_leggings", "copper_leggings", "chainmail_leggings", "iron_leggings", "golden_leggings", "diamond_leggings", "netherite_leggings"));
-		groups.put("boots", items(
-				"leather_boots", "copper_boots", "chainmail_boots", "iron_boots", "golden_boots", "diamond_boots", "netherite_boots"));
-
-		Set<Identifier> armors = new LinkedHashSet<>();
-		armors.addAll(groups.get("helmets"));
-		armors.addAll(groups.get("chestplates"));
-		armors.addAll(groups.get("leggings"));
-		armors.addAll(groups.get("boots"));
-		groups.put("armors", Set.copyOf(armors));
-		return Map.copyOf(groups);
-	}
-
-	private static Map<String, Set<Identifier>> createCustomGroups() {
-		Set<Identifier> allItems = new LinkedHashSet<>();
-		MAIN_GROUPS.values().forEach(allItems::addAll);
-		Set<Identifier> metal = allItems.stream()
-				.filter(item -> List.of("copper_", "iron_", "golden_", "diamond_", "netherite_")
-						.stream().anyMatch(prefix -> item.getPath().startsWith(prefix)))
-				.collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
-		Set<Identifier> leather = allItems.stream()
-				.filter(item -> item.getPath().startsWith("leather_"))
-				.collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
-		return Map.of("metal", Set.copyOf(metal), "leather", Set.copyOf(leather));
-	}
-
-	private static Set<Identifier> items(String... paths) {
-		return Set.of(java.util.Arrays.stream(paths)
-				.map(path -> Identifier.fromNamespaceAndPath(MINECRAFT, path))
-				.toArray(Identifier[]::new));
+		RpgMod.LOGGER.info("{} grupo(s) de itens carregado(s).", JSON_GROUPS.size());
 	}
 
 	private static String normalize(String value) {
-		return value.trim().toLowerCase(Locale.ROOT).replace('_', ' ');
+		String trimmed = value.trim().toLowerCase(Locale.ROOT);
+		if (trimmed.startsWith("#")) return trimmed;
+		return trimmed.replace('_', ' ');
 	}
 
-	public record JsonGroup(List<Identifier> items, List<String> groups) {
+	public record JsonGroup(List<String> items, List<String> groups, List<String> tags) {
 		public static final Codec<JsonGroup> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				Identifier.CODEC.listOf().optionalFieldOf("items", List.of()).forGetter(JsonGroup::items),
-				Codec.STRING.listOf().optionalFieldOf("groups", List.of()).forGetter(JsonGroup::groups)
+				Codec.STRING.listOf().optionalFieldOf("items", List.of()).forGetter(JsonGroup::items),
+				Codec.STRING.listOf().optionalFieldOf("groups", List.of()).forGetter(JsonGroup::groups),
+				Codec.STRING.listOf().optionalFieldOf("tags", List.of()).forGetter(JsonGroup::tags)
 		).apply(instance, JsonGroup::new));
 
 		public JsonGroup {
-			items = items == null ? List.of() : List.copyOf(items);
+			items = items == null ? List.of() : items.stream().map(String::trim).filter(s -> !s.isBlank()).toList();
 			groups = groups == null ? List.of() : groups.stream().map(String::trim).filter(s -> !s.isBlank()).toList();
+			tags = tags == null ? List.of() : tags.stream().map(String::trim).filter(s -> !s.isBlank()).toList();
 		}
 	}
 }

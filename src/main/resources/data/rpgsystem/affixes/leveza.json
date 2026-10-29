@@ -1,0 +1,16 @@
+{
+  "name": "Leveza",
+  "description": "Golpes um pouco mais rápidos, sem outros benefícios.",
+  "rarity": "comum",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.06,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

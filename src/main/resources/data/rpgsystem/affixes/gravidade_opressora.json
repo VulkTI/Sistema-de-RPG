@@ -1,0 +1,22 @@
+{
+  "name": "Gravidade Opressora",
+  "description": "O portador fica mais resistente a empurrões, mas salta menos.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:knockback_resistance",
+      "amount": 0.15,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:jump_strength",
+      "amount": -0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

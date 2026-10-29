@@ -1,0 +1,22 @@
+{
+  "name": "Claustrofóbico",
+  "description": "Aumenta a vida máxima, mas reduz o alcance de interação com blocos.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:block_interaction_range",
+      "amount": -0.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

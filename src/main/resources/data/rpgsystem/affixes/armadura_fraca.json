@@ -1,0 +1,16 @@
+{
+  "name": "Armadura Fraca",
+  "description": "Reduz a proteção de armadura do conjunto.",
+  "rarity": "comum",
+  "groups": [
+    "Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

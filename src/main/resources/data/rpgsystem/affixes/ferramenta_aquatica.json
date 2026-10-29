@@ -1,0 +1,23 @@
+{
+  "name": "Ferramenta Aquática",
+  "description": "Favorece a movimentação e a respiração durante a exploração aquática.",
+  "rarity": "raro",
+  "groups": [
+    "Shovels",
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:water_movement_efficiency",
+      "amount": 0.15,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:oxygen_bonus",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

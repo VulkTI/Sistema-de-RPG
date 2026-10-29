@@ -1,0 +1,22 @@
+{
+  "name": "Guardião Ancestral",
+  "description": "Uma armadura muito resistente a dano e empurrões.",
+  "rarity": "lendario",
+  "groups": [
+    "Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "armor"
+    },
+    {
+      "attribute": "minecraft:knockback_resistance",
+      "amount": 0.2,
+      "operation": "add_value",
+      "slot": "armor"
+    }
+  ]
+}

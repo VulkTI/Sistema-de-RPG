@@ -1,0 +1,16 @@
+{
+  "name": "Fogo Controlado",
+  "description": "Reduz o tempo passado queimando.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:burning_time",
+      "amount": -0.2,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Armadura Incendiária",
+  "description": "Reduz o tempo queimando e reforça a armadura.",
+  "rarity": "lendario",
+  "groups": [
+    "Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:burning_time",
+      "amount": -0.25,
+      "operation": "add_multiplied_total",
+      "slot": "armor"
+    },
+    {
+      "attribute": "minecraft:armor",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "armor"
+    }
+  ]
+}

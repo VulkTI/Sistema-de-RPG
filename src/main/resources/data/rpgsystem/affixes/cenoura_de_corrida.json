@@ -1,0 +1,16 @@
+{
+  "name": "Cenoura de Corrida",
+  "description": "A cenoura no graveto aumenta a velocidade de movimento enquanto empunhada.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:carrot_on_a_stick"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

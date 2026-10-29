@@ -1,0 +1,22 @@
+{
+  "name": "Enxada de Midas",
+  "description": "Concede bastante sorte, mas reduz a defesa enquanto empunhada.",
+  "rarity": "lendario",
+  "items": [
+    "minecraft:golden_hoe"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:armor",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

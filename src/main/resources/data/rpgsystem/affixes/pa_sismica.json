@@ -1,0 +1,22 @@
+{
+  "name": "Pá Sísmica",
+  "description": "Aumenta a eficiência de mineração e o alcance de interação com blocos.",
+  "rarity": "raro",
+  "groups": [
+    "Shovels"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:block_interaction_range",
+      "amount": 0.25,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

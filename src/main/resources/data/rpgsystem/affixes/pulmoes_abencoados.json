@@ -1,0 +1,16 @@
+{
+  "name": "Pulmões Abençoados",
+  "description": "Aumenta a reserva de oxigênio.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:oxygen_bonus",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

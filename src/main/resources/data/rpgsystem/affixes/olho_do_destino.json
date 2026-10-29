@@ -1,0 +1,22 @@
+{
+  "name": "Olho do Destino",
+  "description": "Aumenta a sorte, mas pesa ligeiramente sobre o movimento.",
+  "rarity": "epico",
+  "items": [
+    "minecraft:ender_eye"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.03,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

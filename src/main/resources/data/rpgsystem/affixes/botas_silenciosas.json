@@ -1,0 +1,22 @@
+{
+  "name": "Botas Silenciosas",
+  "description": "Melhora o deslocamento agachado e a velocidade normal.",
+  "rarity": "incomum",
+  "groups": [
+    "Boots"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:sneaking_speed",
+      "amount": 0.18,
+      "operation": "add_multiplied_total",
+      "slot": "feet"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.03,
+      "operation": "add_multiplied_total",
+      "slot": "feet"
+    }
+  ]
+}

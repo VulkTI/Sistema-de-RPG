@@ -1,0 +1,22 @@
+{
+  "name": "Enxada Apressada",
+  "description": "Aumenta a velocidade de ataque, mas reduz a eficiência de mineração.",
+  "rarity": "comum",
+  "groups": [
+    "Hoes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

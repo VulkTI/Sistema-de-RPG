@@ -1,0 +1,23 @@
+{
+  "name": "Sorte da Relíquia",
+  "description": "Relíquias selecionadas concedem um pequeno bônus de sorte.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:totem_of_undying",
+    "minecraft:nether_star",
+    "minecraft:ender_eye",
+    "minecraft:ghast_tear",
+    "minecraft:amethyst_shard",
+    "minecraft:netherite_ingot",
+    "minecraft:emerald",
+    "minecraft:rabbit_foot"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

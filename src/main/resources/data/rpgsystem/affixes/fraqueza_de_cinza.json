@@ -1,0 +1,16 @@
+{
+  "name": "Fraqueza de Cinza",
+  "description": "Reduz o dano de ataque do portador.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": -1.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

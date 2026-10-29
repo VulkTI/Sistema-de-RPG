@@ -1,0 +1,22 @@
+{
+  "name": "Peso do Mundo",
+  "description": "Fica mais difícil de empurrar, mas a gravidade parece mais forte.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:knockback_resistance",
+      "amount": 0.15,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:gravity",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

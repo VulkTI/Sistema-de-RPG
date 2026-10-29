@@ -1,0 +1,22 @@
+{
+  "name": "Besta: Apoio de Cerco",
+  "description": "Aumenta a resistência a empurrões enquanto a besta estiver empunhada.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:crossbow"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:knockback_resistance",
+      "amount": 0.15,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.03,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

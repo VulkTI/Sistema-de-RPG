@@ -1,0 +1,22 @@
+{
+  "name": "Bastão Incandescente",
+  "description": "Aumenta o dano, mas o portador permanece queimando por mais tempo.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:blaze_rod"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:burning_time",
+      "amount": 0.2,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

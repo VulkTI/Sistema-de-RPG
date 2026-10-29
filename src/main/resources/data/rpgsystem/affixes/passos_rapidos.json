@@ -1,0 +1,16 @@
+{
+  "name": "Passos Rápidos",
+  "description": "Aumenta a velocidade de movimento.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.06,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

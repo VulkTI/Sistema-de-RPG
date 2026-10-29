@@ -1,0 +1,22 @@
+{
+  "name": "Fragmento Violeta",
+  "description": "Aumenta o salto e a eficiência de mineração enquanto o fragmento estiver na mão.",
+  "rarity": "incomum",
+  "items": [
+    "minecraft:amethyst_shard"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:jump_strength",
+      "amount": 0.08,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

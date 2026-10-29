@@ -1,0 +1,22 @@
+{
+  "name": "Riqueza Pesada",
+  "description": "Aumenta muito a sorte, mas torna o movimento mais lento.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

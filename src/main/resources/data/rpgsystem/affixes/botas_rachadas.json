@@ -1,0 +1,22 @@
+{
+  "name": "Botas Rachadas",
+  "description": "Aumenta a velocidade, mas torna as quedas mais perigosas.",
+  "rarity": "incomum",
+  "groups": [
+    "Boots"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "feet"
+    },
+    {
+      "attribute": "minecraft:fall_damage_multiplier",
+      "amount": 0.25,
+      "operation": "add_multiplied_total",
+      "slot": "feet"
+    }
+  ]
+}

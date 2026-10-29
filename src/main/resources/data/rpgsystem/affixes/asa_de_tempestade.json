@@ -1,0 +1,22 @@
+{
+  "name": "Asa de Tempestade",
+  "description": "Dá um bônus de movimento enquanto a elytra estiver equipada, sacrificando um pouco de armadura.",
+  "rarity": "mitico",
+  "items": [
+    "minecraft:elytra"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "chest"
+    },
+    {
+      "attribute": "minecraft:armor",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "chest"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Malha Flexível",
+  "description": "Melhora discretamente a mobilidade usando armadura.",
+  "rarity": "incomum",
+  "groups": [
+    "Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.03,
+      "operation": "add_multiplied_base",
+      "slot": "armor"
+    }
+  ]
+}

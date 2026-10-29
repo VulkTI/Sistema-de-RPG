@@ -1,0 +1,22 @@
+{
+  "name": "Vara da Fortuna",
+  "description": "Aumenta a sorte geral enquanto a vara de pesca estiver na mão.",
+  "rarity": "epico",
+  "items": [
+    "minecraft:fishing_rod"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.02,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

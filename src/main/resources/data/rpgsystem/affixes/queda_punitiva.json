@@ -1,0 +1,16 @@
+{
+  "name": "Queda Punitiva",
+  "description": "Aumenta o dano recebido em quedas.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:fall_damage_multiplier",
+      "amount": 0.2,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

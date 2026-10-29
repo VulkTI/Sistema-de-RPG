@@ -1,0 +1,22 @@
+{
+  "name": "Gigante",
+  "description": "Aumenta o tamanho do portador; pode afetar a sensação de espaço e colisões.",
+  "rarity": "mitico",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:scale",
+      "amount": 0.15,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:knockback_resistance",
+      "amount": 0.1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

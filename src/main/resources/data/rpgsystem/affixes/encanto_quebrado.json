@@ -1,0 +1,22 @@
+{
+  "name": "Encanto Quebrado",
+  "description": "Piora discretamente as rolagens de afixos, mas acelera os ataques.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "rpgsystem:affix_luck",
+      "amount": -0.05,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.08,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

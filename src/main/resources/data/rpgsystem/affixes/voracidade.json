@@ -1,0 +1,22 @@
+{
+  "name": "Voracidade",
+  "description": "Golpes mais fortes à custa de movimentação.",
+  "rarity": "raro",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.05,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

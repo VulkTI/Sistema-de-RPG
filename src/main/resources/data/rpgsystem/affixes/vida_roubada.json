@@ -1,0 +1,16 @@
+{
+  "name": "Vida Roubada",
+  "description": "Reduz a vida máxima do portador em dois corações.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:max_health",
+      "amount": -4,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

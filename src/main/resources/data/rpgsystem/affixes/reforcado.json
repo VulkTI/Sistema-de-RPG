@@ -1,0 +1,16 @@
+{
+  "name": "Reforçado",
+  "description": "Concede um ponto adicional de armadura.",
+  "rarity": "comum",
+  "groups": [
+    "Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "armor"
+    }
+  ]
+}

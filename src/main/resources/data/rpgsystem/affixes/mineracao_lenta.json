@@ -1,0 +1,16 @@
+{
+  "name": "Mineração Lenta",
+  "description": "Diminui bastante a eficiência de mineração da picareta.",
+  "rarity": "comum",
+  "groups": [
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": -3,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

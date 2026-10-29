@@ -1,0 +1,22 @@
+{
+  "name": "Relógio dos Segundos",
+  "description": "Um pequeno bônus de velocidade e de altura de degrau enquanto segura o relógio.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:clock"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.03,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:step_height",
+      "amount": 0.25,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

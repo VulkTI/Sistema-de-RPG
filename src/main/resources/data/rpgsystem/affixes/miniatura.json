@@ -1,0 +1,28 @@
+{
+  "name": "Miniatura",
+  "description": "Reduz o tamanho e acelera o movimento, mas diminui a vida máxima.",
+  "rarity": "epico",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:scale",
+      "amount": -0.1,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:max_health",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

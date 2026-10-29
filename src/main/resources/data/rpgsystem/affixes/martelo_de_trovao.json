@@ -1,0 +1,22 @@
+{
+  "name": "Martelo do Trovão",
+  "description": "Aumenta dano e capacidade de afastar inimigos com a maça.",
+  "rarity": "lendario",
+  "items": [
+    "minecraft:mace"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_knockback",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

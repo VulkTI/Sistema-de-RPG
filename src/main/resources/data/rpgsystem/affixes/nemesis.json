@@ -1,0 +1,23 @@
+{
+  "name": "Nêmesis",
+  "description": "Um aprimoramento extremo para espadas e machados.",
+  "rarity": "mitico",
+  "groups": [
+    "Swords",
+    "Axes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 6,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

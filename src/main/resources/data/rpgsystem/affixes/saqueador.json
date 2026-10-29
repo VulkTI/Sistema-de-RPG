@@ -1,0 +1,22 @@
+{
+  "name": "Saqueador",
+  "description": "Melhora a sorte, com uma pequena penalidade de movimento.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.75,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.04,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

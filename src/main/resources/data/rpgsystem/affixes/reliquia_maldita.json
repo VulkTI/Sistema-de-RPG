@@ -1,0 +1,29 @@
+{
+  "name": "Relíquia Maldita",
+  "description": "A relíquia aumenta a sorte geral, mas atrapalha as rolagens de afixos.",
+  "rarity": "incomum",
+  "items": [
+    "minecraft:totem_of_undying",
+    "minecraft:nether_star",
+    "minecraft:ender_eye",
+    "minecraft:ghast_tear",
+    "minecraft:amethyst_shard",
+    "minecraft:netherite_ingot",
+    "minecraft:emerald",
+    "minecraft:rabbit_foot"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "rpgsystem:affix_luck",
+      "amount": -0.1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

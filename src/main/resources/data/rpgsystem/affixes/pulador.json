@@ -1,0 +1,16 @@
+{
+  "name": "Pulador",
+  "description": "Aumenta a força do salto.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:jump_strength",
+      "amount": 0.08,
+      "operation": "add_multiplied_base",
+      "slot": "any"
+    }
+  ]
+}

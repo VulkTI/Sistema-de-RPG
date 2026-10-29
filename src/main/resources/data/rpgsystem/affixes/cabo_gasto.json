@@ -1,0 +1,25 @@
+{
+  "name": "Cabo Gasto",
+  "description": "Uma ferramenta pesada: causa mais dano, mas é lenta para atacar.",
+  "rarity": "comum",
+  "groups": [
+    "Pickaxes",
+    "Axes",
+    "Shovels",
+    "Hoes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.1,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

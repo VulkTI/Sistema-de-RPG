@@ -1,0 +1,16 @@
+{
+  "name": "Passo Seguro",
+  "description": "Permite quedas seguras a partir de uma altura maior.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:safe_fall_distance",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

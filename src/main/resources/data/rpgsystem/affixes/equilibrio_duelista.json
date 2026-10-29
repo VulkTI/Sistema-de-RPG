@@ -1,0 +1,22 @@
+{
+  "name": "Equilíbrio do Duelista",
+  "description": "Combina dano adicional com uma pequena melhora na velocidade de ataque.",
+  "rarity": "incomum",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.05,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

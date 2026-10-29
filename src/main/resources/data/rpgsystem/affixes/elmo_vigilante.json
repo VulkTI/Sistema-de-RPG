@@ -1,0 +1,16 @@
+{
+  "name": "Elmo Vigilante",
+  "description": "Aumenta a vida máxima enquanto o capacete estiver equipado.",
+  "rarity": "raro",
+  "groups": [
+    "Helmets"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "head"
+    }
+  ]
+}

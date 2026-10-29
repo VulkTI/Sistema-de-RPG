@@ -1,0 +1,22 @@
+{
+  "name": "Lingote Venerável",
+  "description": "Aumenta a vida máxima e a resistência da armadura enquanto o lingote estiver na mão.",
+  "rarity": "lendario",
+  "items": [
+    "minecraft:netherite_ingot"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:armor_toughness",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

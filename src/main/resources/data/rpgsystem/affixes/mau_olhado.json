@@ -1,0 +1,22 @@
+{
+  "name": "Mau-Olhado",
+  "description": "Piora as rolagens de afixos, mas aumenta a sorte geral.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "rpgsystem:affix_luck",
+      "amount": -0.2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

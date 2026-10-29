@@ -1,0 +1,22 @@
+{
+  "name": "Reflexo de Relâmpago",
+  "description": "Ataques rápidos com um reforço moderado de dano.",
+  "rarity": "epico",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.12,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

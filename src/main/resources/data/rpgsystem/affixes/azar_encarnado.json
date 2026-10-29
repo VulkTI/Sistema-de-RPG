@@ -1,0 +1,16 @@
+{
+  "name": "Azar Encarnado",
+  "description": "Reduz o atributo de sorte do portador.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Impacto Pesado",
+  "description": "A maça causa mais dano, mas seus ataques ficam ligeiramente mais lentos.",
+  "rarity": "lendario",
+  "items": [
+    "minecraft:mace"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2.0,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.05,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Gravidade Cruel",
+  "description": "Aumenta a gravidade sentida pelo portador, tornando saltos e quedas mais severos.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:gravity",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

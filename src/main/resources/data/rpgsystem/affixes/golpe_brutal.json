@@ -1,0 +1,16 @@
+{
+  "name": "Golpe Brutal",
+  "description": "Aumenta o dano causado por espadas.",
+  "rarity": "comum",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

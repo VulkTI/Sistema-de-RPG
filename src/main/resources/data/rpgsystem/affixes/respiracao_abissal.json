@@ -1,0 +1,23 @@
+{
+  "name": "Fôlego Abissal",
+  "description": "O tridente e o casco de tartaruga melhoram a adaptação à água.",
+  "rarity": "lendario",
+  "items": [
+    "minecraft:trident",
+    "minecraft:turtle_helmet"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:oxygen_bonus",
+      "amount": 2.0,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:water_movement_efficiency",
+      "amount": 0.1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

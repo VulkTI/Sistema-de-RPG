@@ -1,0 +1,22 @@
+{
+  "name": "Minerador Subaquático",
+  "description": "Melhora a mineração e a mobilidade na água.",
+  "rarity": "raro",
+  "groups": [
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:submerged_mining_speed",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:water_movement_efficiency",
+      "amount": 0.1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

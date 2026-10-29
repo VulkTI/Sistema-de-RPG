@@ -1,0 +1,22 @@
+{
+  "name": "Sem Peso",
+  "description": "Reduz a gravidade sentida e aumenta a distância de queda segura.",
+  "rarity": "epico",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:gravity",
+      "amount": -0.12,
+      "operation": "add_multiplied_base",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:safe_fall_distance",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

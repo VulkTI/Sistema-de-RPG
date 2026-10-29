@@ -1,0 +1,22 @@
+{
+  "name": "Toque Profundo",
+  "description": "Uma picareta excepcional para mineração subaquática.",
+  "rarity": "lendario",
+  "groups": [
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:submerged_mining_speed",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

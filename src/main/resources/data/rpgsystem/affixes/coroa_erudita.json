@@ -1,0 +1,16 @@
+{
+  "name": "Coroa Erudita",
+  "description": "Aumenta o atributo de sorte enquanto o capacete é usado.",
+  "rarity": "incomum",
+  "groups": [
+    "Helmets"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "head"
+    }
+  ]
+}

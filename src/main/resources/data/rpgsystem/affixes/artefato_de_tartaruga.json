@@ -1,0 +1,22 @@
+{
+  "name": "Artefato de Tartaruga",
+  "description": "Uma peça de casco de tartaruga aprimorada para exploração subaquática.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:turtle_helmet"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:oxygen_bonus",
+      "amount": 5,
+      "operation": "add_value",
+      "slot": "head"
+    },
+    {
+      "attribute": "minecraft:water_movement_efficiency",
+      "amount": 0.1,
+      "operation": "add_value",
+      "slot": "head"
+    }
+  ]
+}

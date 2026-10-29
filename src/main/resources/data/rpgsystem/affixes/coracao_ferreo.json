@@ -1,0 +1,22 @@
+{
+  "name": "Coração Férreo",
+  "description": "Concede três corações adicionais de vida máxima, mas reduz a mobilidade.",
+  "rarity": "epico",
+  "groups": [
+    "Chestplates"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 6,
+      "operation": "add_value",
+      "slot": "chest"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.08,
+      "operation": "add_multiplied_total",
+      "slot": "chest"
+    }
+  ]
+}

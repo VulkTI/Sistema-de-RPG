@@ -1,0 +1,22 @@
+{
+  "name": "Colheita Abundante",
+  "description": "Aumenta a sorte e a eficiência de mineração ao usar uma enxada.",
+  "rarity": "raro",
+  "groups": [
+    "Hoes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

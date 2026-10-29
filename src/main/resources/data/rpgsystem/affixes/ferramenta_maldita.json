@@ -1,0 +1,22 @@
+{
+  "name": "Ferramenta Maldita",
+  "description": "Minera muito melhor, mas pesa muito sobre o portador.",
+  "rarity": "incomum",
+  "groups": [
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.15,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

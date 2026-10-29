@@ -1,0 +1,23 @@
+{
+  "name": "Fúria Armada",
+  "description": "Aumenta muito o dano, mas torna o portador mais lento.",
+  "rarity": "epico",
+  "groups": [
+    "Swords",
+    "Axes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.1,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Ceifador",
+  "description": "Favorece o dano de ataques em varredura.",
+  "rarity": "incomum",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:sweeping_damage_ratio",
+      "amount": 0.1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

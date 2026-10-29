@@ -1,0 +1,22 @@
+{
+  "name": "Isca Esmeralda",
+  "description": "Aumenta a sorte geral enquanto a esmeralda estiver na mão, com leve penalidade de movimento.",
+  "rarity": "epico",
+  "items": [
+    "minecraft:emerald"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.75,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.03,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Empunhadura Firme",
+  "description": "Uma pegada estável aumenta ligeiramente o dano.",
+  "rarity": "comum",
+  "groups": [
+    "Swords",
+    "Axes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

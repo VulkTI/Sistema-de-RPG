@@ -1,0 +1,22 @@
+{
+  "name": "Passos Silenciosos",
+  "description": "Aumenta a velocidade ao agachar e melhora um pouco a mobilidade.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:sneaking_speed",
+      "amount": 0.2,
+      "operation": "add_multiplied_base",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.02,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

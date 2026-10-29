@@ -1,0 +1,16 @@
+{
+  "name": "Destino Favorável",
+  "description": "Melhora moderadamente as rolagens de raridade de afixos.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "rpgsystem:affix_luck",
+      "amount": 0.1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Minerador",
+  "description": "Melhora a eficiência de mineração da picareta.",
+  "rarity": "comum",
+  "groups": [
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

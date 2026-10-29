@@ -1,0 +1,16 @@
+{
+  "name": "Botas de Chumbo",
+  "description": "Reduz a velocidade de movimento do portador.",
+  "rarity": "comum",
+  "groups": [
+    "Boots"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Pérola Sem Gravidade",
+  "description": "Reduz um pouco a gravidade e aumenta a velocidade enquanto a pérola do End estiver na mão.",
+  "rarity": "epico",
+  "items": [
+    "minecraft:ender_pearl"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:gravity",
+      "amount": -0.08,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.05,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

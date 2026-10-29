@@ -1,0 +1,16 @@
+{
+  "name": "Destino Rubro",
+  "description": "Favorece bastante a sorte de afixos; este bônus é deliberadamente raro.",
+  "rarity": "mitico",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "rpgsystem:affix_luck",
+      "amount": 0.4,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

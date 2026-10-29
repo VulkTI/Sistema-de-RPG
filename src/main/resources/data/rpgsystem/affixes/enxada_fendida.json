@@ -1,0 +1,22 @@
+{
+  "name": "Enxada Fendida",
+  "description": "Uma ferramenta ruim para lavoura, mas que bate com mais força.",
+  "rarity": "comum",
+  "groups": [
+    "Hoes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

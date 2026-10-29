@@ -1,0 +1,22 @@
+{
+  "name": "Mortalidade",
+  "description": "Movimenta-se muito mais rápido, mas perde três corações de vida máxima.",
+  "rarity": "mitico",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.15,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:max_health",
+      "amount": -6,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

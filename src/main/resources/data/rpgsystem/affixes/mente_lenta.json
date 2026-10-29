@@ -1,0 +1,22 @@
+{
+  "name": "Mente Lenta",
+  "description": "A sorte aumenta, mas os ataques ficam mais lentos.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.12,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

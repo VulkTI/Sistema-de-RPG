@@ -1,0 +1,22 @@
+{
+  "name": "Arpão Abissal",
+  "description": "Dano elevado com um pequeno custo à velocidade de movimento.",
+  "rarity": "lendario",
+  "items": [
+    "minecraft:trident"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.05,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

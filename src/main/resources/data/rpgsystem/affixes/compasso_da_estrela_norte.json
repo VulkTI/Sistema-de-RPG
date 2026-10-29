@@ -1,0 +1,22 @@
+{
+  "name": "Compasso da Estrela Norte",
+  "description": "Aumenta a sorte e o alcance de interação com blocos enquanto segurado.",
+  "rarity": "incomum",
+  "items": [
+    "minecraft:compass"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.3,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:block_interaction_range",
+      "amount": 0.25,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

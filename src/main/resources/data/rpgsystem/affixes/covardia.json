@@ -1,0 +1,22 @@
+{
+  "name": "Covardia",
+  "description": "Faz o portador correr mais rápido, mas reduz o dano de ataque.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

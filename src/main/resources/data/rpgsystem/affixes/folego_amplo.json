@@ -1,0 +1,16 @@
+{
+  "name": "Fôlego Amplo",
+  "description": "Aumenta a reserva de oxigênio.",
+  "rarity": "comum",
+  "groups": [
+    "Helmets"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:oxygen_bonus",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

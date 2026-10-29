@@ -1,0 +1,16 @@
+{
+  "name": "Destino Turvo",
+  "description": "Piora as rolagens de obtenção e raridade de afixos.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "rpgsystem:affix_luck",
+      "amount": -0.12,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

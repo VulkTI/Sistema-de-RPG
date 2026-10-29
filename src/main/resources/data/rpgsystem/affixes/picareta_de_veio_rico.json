@@ -1,0 +1,22 @@
+{
+  "name": "Picareta de Veio Rico",
+  "description": "Melhora bastante a mineração e aumenta a sorte geral enquanto empunhada.",
+  "rarity": "epico",
+  "items": [
+    "minecraft:diamond_pickaxe"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

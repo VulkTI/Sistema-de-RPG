@@ -1,0 +1,16 @@
+{
+  "name": "Picareta Eficiente",
+  "description": "Melhora a eficiência de mineração.",
+  "rarity": "comum",
+  "groups": [
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

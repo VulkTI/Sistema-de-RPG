@@ -1,0 +1,22 @@
+{
+  "name": "Escudo do Bastião",
+  "description": "Aumenta a armadura e a resistência a empurrões enquanto o escudo estiver equipado na mão secundária.",
+  "rarity": "epico",
+  "items": [
+    "minecraft:shield"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "offhand"
+    },
+    {
+      "attribute": "minecraft:knockback_resistance",
+      "amount": 0.15,
+      "operation": "add_value",
+      "slot": "offhand"
+    }
+  ]
+}

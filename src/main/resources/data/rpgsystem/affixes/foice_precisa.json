@@ -1,0 +1,22 @@
+{
+  "name": "Foice Precisa",
+  "description": "Melhora a velocidade de ataque e a eficiência da enxada.",
+  "rarity": "incomum",
+  "groups": [
+    "Hoes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

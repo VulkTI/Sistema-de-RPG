@@ -1,0 +1,24 @@
+{
+  "name": "Ferramenta Universal",
+  "description": "Melhora a eficiência de mineração, mas reduz a vida máxima.",
+  "rarity": "epico",
+  "groups": [
+    "Pickaxes",
+    "Shovels",
+    "Hoes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:max_health",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Ancorado",
+  "description": "Resiste muito a empurrões, mas reduz a velocidade de movimento.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:knockback_resistance",
+      "amount": 0.3,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.12,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

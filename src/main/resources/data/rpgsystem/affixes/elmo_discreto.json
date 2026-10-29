@@ -1,0 +1,16 @@
+{
+  "name": "Elmo Discreto",
+  "description": "Favorece a movimentação enquanto agachado.",
+  "rarity": "raro",
+  "groups": [
+    "Helmets"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:sneaking_speed",
+      "amount": 0.2,
+      "operation": "add_multiplied_total",
+      "slot": "head"
+    }
+  ]
+}

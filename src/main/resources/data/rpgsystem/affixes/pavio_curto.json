@@ -1,0 +1,22 @@
+{
+  "name": "Pavio Curto",
+  "description": "Aumenta o dano, mas faz o portador permanecer queimando por mais tempo.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:burning_time",
+      "amount": 0.3,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

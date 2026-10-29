@@ -1,0 +1,16 @@
+{
+  "name": "Destino Dourado",
+  "description": "Um impulso raro para encontrar afixos de maior raridade.",
+  "rarity": "lendario",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "rpgsystem:affix_luck",
+      "amount": 0.25,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Para-Raios",
+  "description": "Movimenta-se um pouco mais rápido, mas resiste menos a empurrões.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.08,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:knockback_resistance",
+      "amount": -0.2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

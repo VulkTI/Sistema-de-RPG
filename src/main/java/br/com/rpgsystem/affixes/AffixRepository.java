@@ -49,7 +49,7 @@ public final class AffixRepository extends SimpleJsonResourceReloadListener<Affi
 
 	@Override
 	public Collection<Identifier> getFabricDependencies() {
-		return List.of();
+		return List.of(RpgMod.id("item_groups"));
 	}
 
 	@Override

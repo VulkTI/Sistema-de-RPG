@@ -1,0 +1,24 @@
+{
+  "name": "Ferrugem",
+  "description": "Reduz o dano, mas melhora um pouco a velocidade de ataque.",
+  "rarity": "comum",
+  "groups": [
+    "Swords",
+    "Axes",
+    "Spears"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": -1.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.08,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

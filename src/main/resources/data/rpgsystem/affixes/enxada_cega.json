@@ -1,0 +1,16 @@
+{
+  "name": "Enxada Cega",
+  "description": "Reduz a eficiência de mineração da enxada.",
+  "rarity": "comum",
+  "groups": [
+    "Hoes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

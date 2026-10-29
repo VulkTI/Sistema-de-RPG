@@ -1,0 +1,19 @@
+{
+  "name": "Mão de Artífice",
+  "description": "Ferramentas de vários tipos ficam mais rápidas ao atacar.",
+  "rarity": "raro",
+  "groups": [
+    "Pickaxes",
+    "Axes",
+    "Shovels",
+    "Hoes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

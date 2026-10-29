@@ -1,0 +1,22 @@
+{
+  "name": "Arco Correio do Vento",
+  "description": "Aumenta a mobilidade e o alcance de interação enquanto o arco estiver na mão.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:bow"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.08,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:block_interaction_range",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

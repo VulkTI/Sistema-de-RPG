@@ -1,0 +1,22 @@
+{
+  "name": "Fortaleza",
+  "description": "Grande bônus de armadura com penalidade de velocidade.",
+  "rarity": "raro",
+  "groups": [
+    "Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "armor"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.08,
+      "operation": "add_multiplied_total",
+      "slot": "armor"
+    }
+  ]
+}

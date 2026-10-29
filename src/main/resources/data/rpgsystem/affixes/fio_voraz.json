@@ -1,0 +1,22 @@
+{
+  "name": "Fio Voraz",
+  "description": "Espadas causam mais dano, mas ficam mais lentas.",
+  "rarity": "comum",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.08,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

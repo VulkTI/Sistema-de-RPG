@@ -1,0 +1,22 @@
+{
+  "name": "Botas Exploradoras",
+  "description": "Permite quedas seguras de uma altura maior e facilita subir pequenos degraus.",
+  "rarity": "raro",
+  "groups": [
+    "Boots"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:safe_fall_distance",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "feet"
+    },
+    {
+      "attribute": "minecraft:step_height",
+      "amount": 0.25,
+      "operation": "add_value",
+      "slot": "feet"
+    }
+  ]
+}

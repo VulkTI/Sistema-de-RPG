@@ -1,0 +1,16 @@
+{
+  "name": "Lentidão Persistente",
+  "description": "Reduz a velocidade de movimento do portador.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.08,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

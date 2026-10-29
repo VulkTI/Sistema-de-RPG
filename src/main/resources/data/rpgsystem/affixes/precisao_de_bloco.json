@@ -1,0 +1,22 @@
+{
+  "name": "Precisão de Bloco",
+  "description": "Aumenta o alcance para interagir com blocos e melhora a mineração.",
+  "rarity": "epico",
+  "groups": [
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:block_interaction_range",
+      "amount": 0.75,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

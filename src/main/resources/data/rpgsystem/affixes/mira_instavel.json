@@ -1,0 +1,24 @@
+{
+  "name": "Mira Instável",
+  "description": "Golpes empurram mais, mas a velocidade de ataque cai.",
+  "rarity": "incomum",
+  "groups": [
+    "Swords",
+    "Axes",
+    "Spears"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_knockback",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.1,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

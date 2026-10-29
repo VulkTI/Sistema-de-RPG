@@ -1,0 +1,22 @@
+{
+  "name": "Lâmina de Vidro",
+  "description": "Dano elevado em troca de uma defesa menor enquanto empunhada.",
+  "rarity": "epico",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:armor",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

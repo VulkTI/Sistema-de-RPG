@@ -1,0 +1,22 @@
+{
+  "name": "Escudo Rápido",
+  "description": "Reduz a penalidade de mobilidade por meio de um bônus de movimento enquanto equipado.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:shield"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.05,
+      "operation": "add_multiplied_total",
+      "slot": "offhand"
+    },
+    {
+      "attribute": "minecraft:armor",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "offhand"
+    }
+  ]
+}

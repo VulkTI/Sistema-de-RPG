@@ -1,0 +1,16 @@
+{
+  "name": "Mira Estável",
+  "description": "Arcos e bestas recebem um pequeno bônus de dano.",
+  "rarity": "incomum",
+  "tags": [
+    "c:bows"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 1.0,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

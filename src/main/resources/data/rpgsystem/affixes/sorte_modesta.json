@@ -1,0 +1,16 @@
+{
+  "name": "Sorte Modesta",
+  "description": "Aumenta um pouco o atributo de sorte do jogador.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

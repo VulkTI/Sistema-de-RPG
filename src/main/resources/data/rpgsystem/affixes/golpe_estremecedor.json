@@ -1,0 +1,22 @@
+{
+  "name": "Golpe Estremecedor",
+  "description": "Golpes mais contundentes empurram os alvos com mais força.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:mace"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_knockback",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

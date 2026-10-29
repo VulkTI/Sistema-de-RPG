@@ -1,0 +1,22 @@
+{
+  "name": "Sobrecarga",
+  "description": "Acelera muito os ataques, custando dois corações de vida máxima.",
+  "rarity": "epico",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.2,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:max_health",
+      "amount": -4,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

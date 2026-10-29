@@ -1,0 +1,16 @@
+{
+  "name": "Afiado",
+  "description": "Acrescenta dano direto ao ataque.",
+  "rarity": "comum",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

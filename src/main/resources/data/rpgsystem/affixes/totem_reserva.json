@@ -1,0 +1,22 @@
+{
+  "name": "Totem de Reserva",
+  "description": "Aumenta a vida máxima e a reserva de absorção enquanto o totem estiver na mão secundária.",
+  "rarity": "lendario",
+  "items": [
+    "minecraft:totem_of_undying"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "offhand"
+    },
+    {
+      "attribute": "minecraft:max_absorption",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "offhand"
+    }
+  ]
+}

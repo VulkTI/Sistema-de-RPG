@@ -1,0 +1,28 @@
+{
+  "name": "Armadura Fantasma",
+  "description": "Aumenta a mobilidade e reduz o dano de queda, com menos armadura.",
+  "rarity": "mitico",
+  "groups": [
+    "Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.12,
+      "operation": "add_multiplied_total",
+      "slot": "armor"
+    },
+    {
+      "attribute": "minecraft:fall_damage_multiplier",
+      "amount": -0.15,
+      "operation": "add_multiplied_total",
+      "slot": "armor"
+    },
+    {
+      "attribute": "minecraft:armor",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "armor"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Calças Guardiãs",
+  "description": "Reforça a armadura e a resistência a empurrões.",
+  "rarity": "epico",
+  "groups": [
+    "Leggings"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "legs"
+    },
+    {
+      "attribute": "minecraft:knockback_resistance",
+      "amount": 0.1,
+      "operation": "add_value",
+      "slot": "legs"
+    }
+  ]
+}

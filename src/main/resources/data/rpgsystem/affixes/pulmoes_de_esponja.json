@@ -1,0 +1,22 @@
+{
+  "name": "Pulmões de Esponja",
+  "description": "Aumenta um pouco a velocidade, mas reduz a reserva de oxigênio.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:oxygen_bonus",
+      "amount": -4,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.05,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

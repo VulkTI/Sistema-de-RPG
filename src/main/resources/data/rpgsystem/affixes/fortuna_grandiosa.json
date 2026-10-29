@@ -1,0 +1,16 @@
+{
+  "name": "Fortuna Grandiosa",
+  "description": "Concede um bônus expressivo ao atributo de sorte.",
+  "rarity": "lendario",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

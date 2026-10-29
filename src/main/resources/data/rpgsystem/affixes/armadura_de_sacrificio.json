@@ -1,0 +1,22 @@
+{
+  "name": "Armadura de Sacrifício",
+  "description": "Aumenta a proteção, mas reduz a velocidade de movimento.",
+  "rarity": "comum",
+  "groups": [
+    "Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.06,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

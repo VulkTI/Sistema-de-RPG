@@ -1,0 +1,22 @@
+{
+  "name": "Espada de Netherita Régia",
+  "description": "A espada de netherita recebe dano adicional e um pequeno bônus de velocidade.",
+  "rarity": "lendario",
+  "items": [
+    "minecraft:netherite_sword"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.05,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

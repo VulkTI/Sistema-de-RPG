@@ -1,0 +1,16 @@
+{
+  "name": "Salto Elástico",
+  "description": "Aumenta a força do salto com botas.",
+  "rarity": "comum",
+  "groups": [
+    "Boots"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:jump_strength",
+      "amount": 0.12,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

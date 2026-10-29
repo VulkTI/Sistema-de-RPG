@@ -197,107 +197,121 @@ Use exatamente: `comum`, `incomum`, `raro`, `epico`, `lendario` ou `mitico`.
 
 A raridade altera a chance de rolagem, a cor do nome do item e a cor da linha do afixo.
 
-### 4. Relacione o afixo aos grupos de itens
+### 4. Relacione o afixo aos grupos de itens, tags ou IDs específicos
 
-Os grupos principais são `Swords`, `Spears`, `Pickaxes`, `Axes`, `Shovels`, `Hoes`, `Helmets`, `Chestplates`, `Leggings`, `Boots` e `Armors`. Eles contêm as ferramentas, armas e armaduras das variantes listadas no mod.
+Os grupos são definidos em arquivos JSON dentro de `data/<namespace>/item_groups/`. O mod já inclui por padrão:
+- Armas corpo-a-corpo: `Swords`, `Spears`, `Axes`;
+- Ferramentas: `Pickaxes`, `Shovels`, `Hoes`;
+- Armaduras por slot: `Helmets`, `Chestplates`, `Leggings`, `Boots`;
+- Grupos agregadores: `Armors` (todos os slots juntos);
+- Grupos de material: `Metal` e `Leather`.
 
-Também existem grupos de material:
-
-- `Metal`: itens feitos de cobre, ferro, ouro, diamante ou netherita que pertencem aos grupos principais.
-- `Leather`: itens de couro dos grupos principais.
-
-Um afixo pode ter vários grupos, e basta o item pertencer a um deles:
-
-```json
-"groups": ["Swords", "Axes"]
-```
-
-Também é possível escolher itens específicos diretamente pelo ID registrado no Minecraft. O campo `items` aceita um ou mais IDs completos, incluindo itens vanilla e itens de outros mods:
+Um afixo pode definir itens aceitos por **Grupos**, **Tags do Minecraft** ou **IDs específicos de itens**:
 
 ```json
 {
-  "name": "Tridente do Mar",
+  "name": "Lâmina Voraz",
   "rarity": "epico",
-  "items": ["minecraft:trident", "minecraft:diamond_sword"],
+  "groups": ["Swords"],
   "modifiers": [
     {
       "attribute": "minecraft:attack_damage",
-      "amount": 5.0,
+      "amount": 4.0,
       "operation": "add_value",
-      "slot": "mainhand",
-      "description": "Aumenta o dano"
+      "slot": "mainhand"
     }
   ]
 }
 ```
 
-O campo `items` é opcional. Um afixo precisa ter pelo menos um `group` ou um `item`. Se `groups` e `items` forem usados juntos, eles funcionam como alternativas: o item pode corresponder a qualquer grupo ou a qualquer ID específico.
+Você também pode referenciar uma **tag existente do Minecraft/Fabric diretamente no afixo**, sem precisar criar um grupo:
 
-Use sempre o ID completo no formato `namespace:item`, por exemplo `minecraft:trident` ou `meu_mod:espada_solar`.
+```json
+{
+  "name": "Proteção Templária",
+  "rarity": "raro",
+  "tags": ["minecraft:chest_armor"],
+  "groups": ["#c:helmets"],
+  "items": ["#minecraft:foot_armor"],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 2.0,
+      "operation": "add_value",
+      "slot": "armor"
+    }
+  ]
+}
+```
 
-## Grupos definidos por JSON
+> [!NOTE]
+> As três formas acima funcionam como alternativas (`OU`). Use a que faz mais sentido: `tags` ou a sintaxe `#namespace:tag` nos campos `groups`/`items` quando uma tag do jogo já cobre exatamente o que você quer; `groups` com o nome do grupo quando quiser aproveitar um grupo personalizado; `items` para IDs avulsos.
 
-Além dos grupos internos (`Swords`, `Metal`, `Leather` etc.), existe o grupo virtual `All`. Ele contém a união de todos os itens dos grupos internos e de todos os grupos definidos por JSON, sem repetir itens. Se novos grupos JSON forem adicionados, eles entram automaticamente no `All` após `/reload`.
+Um afixo precisa ter pelo menos um `groups`, `tags` ou `items`. Se usados juntos, funcionam como alternativas (`OU`):
+- `groups`: nomes de grupos de `item_groups/` (ex: `Swords`, `Armors`, `Leather Armors`) ou tags com `#` (ex: `"#c:helmets"`).
+- `tags`: tags de itens do Minecraft ou Fabric (ex: `"minecraft:swords"`, `"c:pickaxes"`).
+- `items`: IDs completos de itens (ex: `"minecraft:trident"`) ou tags com `#` (ex: `"#minecraft:foot_armor"`).
 
-Para aceitar qualquer item conhecido pelos grupos do mod, use:
+## Grupos de itens definidos por JSON (item_groups)
+
+Todos os grupos de itens do mod são gerenciados em:
+
+```text
+data/<namespace>/item_groups/<nome_do_grupo>.json
+```
+
+O nome do arquivo vira o identificador do grupo (ex: `armas_especiais.json` pode ser usado como `Armas Especiais` ou `armas_especiais` no afixo).
+
+Um arquivo de grupo pode combinar:
+- `items`: itens específicos ou tags do Minecraft iniciadas com `#`;
+- `tags`: tags nativas do Minecraft/Fabric;
+- `groups`: outros grupos da pasta `item_groups/`.
+
+Exemplo (`data/rpgsystem/item_groups/armas_cacador.json`):
+
+```json
+{
+  "tags": [
+    "minecraft:swords",
+    "c:bows"
+  ],
+  "items": [
+    "minecraft:trident",
+    "#c:spears"
+  ],
+  "groups": [
+    "axes"
+  ]
+}
+```
+
+### O grupo virtual `All`
+
+Existe o grupo virtual `All`. Ele contém a união de todos os itens de todos os grupos carregados (incluindo os itens resolvidos por tags), sem repetições. Se novos grupos JSON ou tags forem adicionados, eles entram automaticamente no `All` após `/reload`.
 
 ```json
 "groups": ["All"]
 ```
 
-Você também pode usar o `All` em uma interseção, como `All Armas Especiais`, para limitar um grupo personalizado aos itens reconhecidos pelo sistema.
+### Interseção de grupos (Compostos)
 
-Além dos grupos internos, você pode criar grupos reutilizáveis em arquivos dentro de:
-
-```text
-data/<namespace>/affix_groups/<nome_do_grupo>.json
-```
-
-O nome do arquivo vira o nome do grupo. Por exemplo, `armas_especiais.json` pode ser usado como `Armas Especiais` ou `armas_especiais` no JSON do afixo.
-
-Um grupo pode listar itens diretamente:
-
-```json
-{
-  "items": [
-    "minecraft:trident",
-    "minecraft:diamond_sword",
-    "meu_mod:espada_solar"
-  ]
-}
-```
-
-Também pode reunir outros grupos:
-
-```json
-{
-  "groups": ["Swords", "Metal"]
-}
-```
-
-Os itens listados em `items` e nos grupos referenciados são unidos. Para fazer interseção, use dois grupos separados por espaço no afixo:
-
-```json
-"groups": ["Metal Armas Especiais"]
-```
-
-Nesse caso, somente itens que pertencem simultaneamente a `Metal` e `Armas Especiais` serão aceitos. Várias entradas na lista continuam sendo alternativas (`OU`):
-
-```json
-"groups": ["Metal Swords", "Armas Especiais"]
-```
-
-Isso significa `(Metal ∩ Swords) OU Armas Especiais`. Grupos JSON podem referenciar outros grupos, mas referências cíclicas são ignoradas para evitar loops.
-
-Depois de adicionar ou alterar grupos, execute `/reload` para recarregar os arquivos.
-
-Para exigir a interseção de material e categoria, use os nomes separados por espaço. Por exemplo:
+Para exigir a interseção entre dois grupos ou materiais, use dois termos separados por espaço:
 
 ```json
 "groups": ["Leather Armors"]
 ```
 
-Esse afixo só poderá ser aplicado a armaduras de couro. Outros exemplos são `Metal Swords` para espadas metálicas e `Metal Pickaxes` para picaretas metálicas. O material vem primeiro e o grupo principal depois.
+Nesse caso, somente itens que pertencem simultaneamente a `Leather` e a `Armors` serão aceitos. Você também pode combinar material com tags:
+
+```json
+"groups": ["Metal #minecraft:swords"]
+```
+
+Várias entradas na lista continuam sendo alternativas (`OU`):
+
+```json
+"groups": ["Metal Swords", "#c:tools"]
+```
 
 ### 5. Recarregue os arquivos
 

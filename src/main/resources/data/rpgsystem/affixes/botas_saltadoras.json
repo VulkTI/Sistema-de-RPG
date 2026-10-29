@@ -1,0 +1,22 @@
+{
+  "name": "Botas Saltadoras",
+  "description": "Aumenta a força de salto e a distância segura de queda.",
+  "rarity": "epico",
+  "groups": [
+    "Boots"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:jump_strength",
+      "amount": 0.15,
+      "operation": "add_multiplied_total",
+      "slot": "feet"
+    },
+    {
+      "attribute": "minecraft:safe_fall_distance",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "feet"
+    }
+  ]
+}

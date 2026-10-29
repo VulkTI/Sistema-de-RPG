@@ -1,0 +1,22 @@
+{
+  "name": "Lágrima do Espectro",
+  "description": "Concede vida máxima e reduz o dano de queda enquanto segurada.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:ghast_tear"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:fall_damage_multiplier",
+      "amount": -0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

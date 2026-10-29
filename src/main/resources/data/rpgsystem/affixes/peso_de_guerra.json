@@ -1,0 +1,24 @@
+{
+  "name": "Peso de Guerra",
+  "description": "Mais impacto, menos velocidade de ataque.",
+  "rarity": "incomum",
+  "groups": [
+    "Swords",
+    "Axes",
+    "Spears"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.1,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

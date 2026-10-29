@@ -1,0 +1,22 @@
+{
+  "name": "Elmo do Mergulhador",
+  "description": "Oferece mais tempo de oxigênio e mineração submersa.",
+  "rarity": "epico",
+  "items": [
+    "minecraft:turtle_helmet"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:oxygen_bonus",
+      "amount": 8,
+      "operation": "add_value",
+      "slot": "head"
+    },
+    {
+      "attribute": "minecraft:submerged_mining_speed",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "head"
+    }
+  ]
+}

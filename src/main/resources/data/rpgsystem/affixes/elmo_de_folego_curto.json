@@ -1,0 +1,22 @@
+{
+  "name": "Elmo de Fôlego Curto",
+  "description": "Oferece mais armadura, mas reduz a reserva de oxigênio.",
+  "rarity": "comum",
+  "groups": [
+    "Helmets"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:oxygen_bonus",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

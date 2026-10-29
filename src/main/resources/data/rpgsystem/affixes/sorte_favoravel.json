@@ -1,0 +1,16 @@
+{
+  "name": "Sorte Favorável",
+  "description": "Aumenta a sorte do portador.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

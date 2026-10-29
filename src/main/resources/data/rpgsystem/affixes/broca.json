@@ -1,0 +1,22 @@
+{
+  "name": "Broca",
+  "description": "Aumenta bastante a eficiência de mineração, com ataques um pouco mais lentos.",
+  "rarity": "raro",
+  "groups": [
+    "Pickaxes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.05,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

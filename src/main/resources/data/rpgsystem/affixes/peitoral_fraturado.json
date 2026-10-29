@@ -1,0 +1,22 @@
+{
+  "name": "Peitoral Fraturado",
+  "description": "Aumenta a armadura, mas reduz a vida máxima em dois corações.",
+  "rarity": "incomum",
+  "groups": [
+    "Chestplates"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "chest"
+    },
+    {
+      "attribute": "minecraft:max_health",
+      "amount": -4,
+      "operation": "add_value",
+      "slot": "chest"
+    }
+  ]
+}

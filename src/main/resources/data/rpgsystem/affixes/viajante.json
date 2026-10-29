@@ -1,0 +1,16 @@
+{
+  "name": "Viajante",
+  "description": "Aumenta discretamente a velocidade de movimento.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.03,
+      "operation": "add_multiplied_base",
+      "slot": "any"
+    }
+  ]
+}

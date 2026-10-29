@@ -1,0 +1,16 @@
+{
+  "name": "Pá Cega",
+  "description": "Reduz a eficiência de mineração da pá.",
+  "rarity": "comum",
+  "groups": [
+    "Shovels"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

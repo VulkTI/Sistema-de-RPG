@@ -6,6 +6,7 @@ import br.com.rpgsystem.data.RpgSavedData;
 import br.com.rpgsystem.affixes.AffixDefinition;
 import br.com.rpgsystem.affixes.AffixRepository;
 import br.com.rpgsystem.affixes.AffixService;
+import br.com.rpgsystem.affixes.AffixRarity;
 import br.com.rpgsystem.network.RpgNetworking;
 import br.com.rpgsystem.progression.ProgressionMath;
 import com.mojang.brigadier.CommandDispatcher;
@@ -25,6 +26,8 @@ import net.minecraft.world.item.ItemStack;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.Locale;
+import java.util.Map;
 
 public final class RpgCommands {
 	private RpgCommands() {}
@@ -54,7 +57,13 @@ public final class RpgCommands {
 				.then(Commands.literal("reset").requires(RpgCommands::isModerator)
 						.then(Commands.argument("player", EntityArgument.players()).executes(RpgCommands::resetPlayer)))
 				.then(Commands.literal("affix")
-						.then(Commands.literal("roll").executes(RpgCommands::rollAffix))
+						.then(Commands.literal("list").executes(RpgCommands::listAffixes))
+						.then(Commands.literal("roll")
+								.then(Commands.argument("target", StringArgumentType.word()).suggests(RpgCommands::suggestAffixOrRarities)
+										.executes(RpgCommands::rollAffixByRarity)
+										.then(Commands.argument("rarity", StringArgumentType.word()).suggests(RpgCommands::suggestRarities)
+												.executes(RpgCommands::rollUntilTarget)))
+								.executes(RpgCommands::rollAffix))
 						.then(Commands.literal("apply")
 								.then(Commands.argument("affix", StringArgumentType.word())
 										.suggests(RpgCommands::suggestAffixes)
@@ -165,6 +174,66 @@ public final class RpgCommands {
 		return 1;
 	}
 
+	private static int listAffixes(CommandContext<CommandSourceStack> context) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
+		ItemStack stack = player.getMainHandItem();
+		List<AffixDefinition> candidates = AffixService.candidates(stack);
+		if (stack.isEmpty() || candidates.isEmpty()) {
+			context.getSource().sendFailure(Component.literal("Não há afixos compatíveis com o item na mão principal."));
+			return 0;
+		}
+		Map<AffixDefinition, Double> chances = AffixService.individualChances(candidates, AffixService.affixLuck(player));
+		context.getSource().sendSuccess(() -> Component.literal("Afixos candidatos para " + stack.getHoverName().getString() + ":"), false);
+		for (AffixRarity rarity : AffixRarity.values()) {
+			context.getSource().sendSuccess(() -> Component.literal("  " + rarity.displayName() + ":"), false);
+			candidates.stream().filter(d -> d.rarity() == rarity).forEach(d ->
+				context.getSource().sendSuccess(() -> Component.literal(String.format(Locale.ROOT, "    - %s: %.4f%%", d.name(), chances.get(d) * 100.0)), false));
+		}
+		return candidates.size();
+	}
+
+	private static int rollAffixByRarity(CommandContext<CommandSourceStack> context) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
+		AffixRarity rarity = parseRarity(context, StringArgumentType.getString(context, "target"));
+		if (rarity == null) return 0;
+		ItemStack stack = player.getMainHandItem();
+		AffixDefinition definition = AffixService.rollWithinRarity(AffixService.candidates(stack), rarity, player.getRandom()).orElse(null);
+		if (definition == null || !AffixService.apply(stack, definition)) {
+			context.getSource().sendFailure(Component.literal("Não há afixos dessa raridade compatíveis com o item na mão.")); return 0;
+		}
+		context.getSource().sendSuccess(() -> Component.literal("Afixo rolado: " + definition.name() + " (" + rarity.displayName() + ")."), false);
+		return 1;
+	}
+
+	private static int rollUntilTarget(CommandContext<CommandSourceStack> context) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
+		ItemStack stack = player.getMainHandItem(); // captura a mão uma única vez antes do loop
+		AffixRarity rarity = parseRarity(context, StringArgumentType.getString(context, "rarity"));
+		if (rarity == null) return 0;
+		String target = StringArgumentType.getString(context, "target");
+		List<AffixDefinition> candidates = AffixService.candidates(stack);
+		boolean all = target.equalsIgnoreCase("todos") || target.equalsIgnoreCase("all");
+		AffixDefinition wanted = all ? null : AffixRepository.byPath(target).orElse(null);
+		if (!all && (wanted == null || wanted.rarity() != rarity || !candidates.contains(wanted))) {
+			context.getSource().sendFailure(Component.literal("Esse afixo não existe nessa raridade ou não é compatível com o item.")); return 0;
+		}
+		List<AffixDefinition> pool = candidates.stream().filter(d -> d.rarity() == rarity).toList();
+		if (pool.isEmpty()) { context.getSource().sendFailure(Component.literal("Essa raridade não existe para o item na mão.")); return 0; }
+		int rolls = 0;
+		AffixDefinition result;
+		do { result = AffixService.rollWithinRarity(pool, rarity, player.getRandom()).orElseThrow(); rolls++; } while (!all && result != wanted);
+		AffixService.apply(stack, result);
+		AffixDefinition applied = result;
+		int totalRolls = rolls;
+		context.getSource().sendSuccess(() -> Component.literal("Afixo aplicado: " + applied.name() + " após " + totalRolls + " rolagem(ns)."), false);
+		return 1;
+	}
+
+	private static AffixRarity parseRarity(CommandContext<CommandSourceStack> context, String value) {
+		for (AffixRarity rarity : AffixRarity.values()) if (rarity.getSerializedName().equalsIgnoreCase(value)) return rarity;
+		context.getSource().sendFailure(Component.literal("Raridade desconhecida: " + value)); return null;
+	}
+
 	private static int applyAffix(CommandContext<CommandSourceStack> context)
 			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
 		ServerPlayer player = context.getSource().getPlayerOrException();
@@ -201,6 +270,20 @@ public final class RpgCommands {
 					? definition.id().getPath() : definition.id().toString();
 			if (path.toLowerCase(java.util.Locale.ROOT).startsWith(prefix)) builder.suggest(path);
 		}
+		return builder.buildFuture();
+	}
+
+	private static CompletableFuture<Suggestions> suggestRarities(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+		String prefix = builder.getRemaining().toLowerCase(Locale.ROOT);
+		for (AffixRarity rarity : AffixRarity.values()) if (rarity.getSerializedName().startsWith(prefix)) builder.suggest(rarity.getSerializedName());
+		return builder.buildFuture();
+	}
+
+	private static CompletableFuture<Suggestions> suggestAffixOrRarities(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+		suggestAffixes(context, builder);
+		String prefix = builder.getRemaining().toLowerCase(Locale.ROOT);
+		for (AffixRarity rarity : AffixRarity.values()) if (rarity.getSerializedName().startsWith(prefix)) builder.suggest(rarity.getSerializedName());
+		builder.suggest("todos");
 		return builder.buildFuture();
 	}
 

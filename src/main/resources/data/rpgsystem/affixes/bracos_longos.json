@@ -1,0 +1,22 @@
+{
+  "name": "Braços Longos",
+  "description": "Aumenta o alcance de interação com entidades, mas reduz o dano de ataque.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:entity_interaction_range",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Pá de Pedreiro",
+  "description": "Aumenta um pouco a eficiência de mineração da pá.",
+  "rarity": "comum",
+  "groups": [
+    "Shovels"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:mining_efficiency",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

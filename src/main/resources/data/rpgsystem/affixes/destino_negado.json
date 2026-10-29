@@ -1,0 +1,22 @@
+{
+  "name": "Destino Negado",
+  "description": "Atrapalha a sorte de afixos, mas aumenta a vida máxima.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "rpgsystem:affix_luck",
+      "amount": -0.15,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

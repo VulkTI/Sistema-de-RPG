@@ -1,0 +1,22 @@
+{
+  "name": "Canhão de Vidro",
+  "description": "Dano muito maior em troca de dois corações a menos.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:max_health",
+      "amount": -4,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

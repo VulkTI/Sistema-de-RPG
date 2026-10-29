@@ -1,0 +1,22 @@
+{
+  "name": "Dedos Malditos",
+  "description": "Reduz a sorte, mas melhora o dano de ataque.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:luck",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

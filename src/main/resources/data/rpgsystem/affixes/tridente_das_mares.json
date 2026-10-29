@@ -1,0 +1,22 @@
+{
+  "name": "Tridente das Marés",
+  "description": "Favorece o combate com tridente e a movimentação na água.",
+  "rarity": "epico",
+  "items": [
+    "minecraft:trident"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:water_movement_efficiency",
+      "amount": 0.2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

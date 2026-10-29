@@ -1,0 +1,22 @@
+{
+  "name": "Peitoral Resiliente",
+  "description": "Melhora a resistência da armadura e reduz o empurrão de explosões.",
+  "rarity": "raro",
+  "groups": [
+    "Chestplates"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor_toughness",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "chest"
+    },
+    {
+      "attribute": "minecraft:explosion_knockback_resistance",
+      "amount": 0.15,
+      "operation": "add_value",
+      "slot": "chest"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Defesa de Papel",
+  "description": "Ataques mais rápidos, mas a armadura é reduzida.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": -3,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

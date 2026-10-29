@@ -1,0 +1,22 @@
+{
+  "name": "Couraça Titânica",
+  "description": "Aumenta a resistência da armadura e a vida máxima.",
+  "rarity": "epico",
+  "groups": [
+    "Chestplates"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor_toughness",
+      "amount": 3,
+      "operation": "add_value",
+      "slot": "chest"
+    },
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "chest"
+    }
+  ]
+}

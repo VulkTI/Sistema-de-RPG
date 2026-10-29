@@ -1,0 +1,16 @@
+{
+  "name": "Ponta Letal",
+  "description": "Aumenta o dano causado por lanças.",
+  "rarity": "incomum",
+  "groups": [
+    "Spears"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

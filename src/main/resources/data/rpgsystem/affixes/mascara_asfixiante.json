@@ -1,0 +1,22 @@
+{
+  "name": "Máscara Asfixiante",
+  "description": "Uma proteção pesada que dificulta a respiração submersa.",
+  "rarity": "comum",
+  "groups": [
+    "Helmets"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "head"
+    },
+    {
+      "attribute": "minecraft:oxygen_bonus",
+      "amount": -3,
+      "operation": "add_value",
+      "slot": "head"
+    }
+  ]
+}

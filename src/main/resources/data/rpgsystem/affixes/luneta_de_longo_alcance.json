@@ -1,0 +1,16 @@
+{
+  "name": "Luneta de Longo Alcance",
+  "description": "Aumenta o alcance de interação com blocos enquanto a luneta estiver empunhada.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:spyglass"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:block_interaction_range",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

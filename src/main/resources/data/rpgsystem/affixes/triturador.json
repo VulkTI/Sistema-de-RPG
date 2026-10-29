@@ -1,0 +1,22 @@
+{
+  "name": "Triturador",
+  "description": "A maça ganha grande dano bruto, mas fica mais lenta.",
+  "rarity": "lendario",
+  "items": [
+    "minecraft:mace"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.1,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Fio de Lenhador",
+  "description": "Um machado mais ameaçador em combate.",
+  "rarity": "comum",
+  "groups": [
+    "Axes"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Couro Ágil",
+  "description": "Armadura de couro mais leve: aumenta o movimento, mas reduz a defesa.",
+  "rarity": "incomum",
+  "groups": [
+    "Leather Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.06,
+      "operation": "add_multiplied_base",
+      "slot": "armor"
+    },
+    {
+      "attribute": "minecraft:armor",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "armor"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Calças do Vento",
+  "description": "Aumenta a velocidade de movimento, sacrificando um ponto de armadura.",
+  "rarity": "raro",
+  "groups": [
+    "Leggings"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.08,
+      "operation": "add_multiplied_total",
+      "slot": "legs"
+    },
+    {
+      "attribute": "minecraft:armor",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "legs"
+    }
+  ]
+}

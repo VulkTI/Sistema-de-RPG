@@ -1,0 +1,22 @@
+{
+  "name": "Relíquia Estelar",
+  "description": "Um bônus de vida máxima e de sorte de afixos enquanto a estrela do Nether estiver na mão.",
+  "rarity": "mitico",
+  "items": [
+    "minecraft:nether_star"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 4,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "rpgsystem:affix_luck",
+      "amount": 0.12,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Voo Controlado",
+  "description": "A elytra reduz o dano sofrido em quedas.",
+  "rarity": "epico",
+  "items": [
+    "minecraft:elytra"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:fall_damage_multiplier",
+      "amount": -0.25,
+      "operation": "add_value",
+      "slot": "chest"
+    }
+  ]
+}

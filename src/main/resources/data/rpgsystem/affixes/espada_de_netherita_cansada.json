@@ -1,0 +1,22 @@
+{
+  "name": "Espada de Netherita Cansada",
+  "description": "Reduz o dano e a velocidade de ataque da espada de netherita.",
+  "rarity": "comum",
+  "items": [
+    "minecraft:netherite_sword"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": -3,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.12,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

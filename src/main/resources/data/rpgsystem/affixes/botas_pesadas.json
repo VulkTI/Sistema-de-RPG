@@ -1,0 +1,22 @@
+{
+  "name": "Botas Pesadas",
+  "description": "Acrescenta defesa, mas deixa o movimento mais lento.",
+  "rarity": "comum",
+  "groups": [
+    "Boots"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:armor",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "feet"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": -0.08,
+      "operation": "add_multiplied_total",
+      "slot": "feet"
+    }
+  ]
+}

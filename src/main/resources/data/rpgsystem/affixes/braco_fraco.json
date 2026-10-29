@@ -1,0 +1,22 @@
+{
+  "name": "Braço Fraco",
+  "description": "Amplia o alcance de interação com entidades, mas reduz a armadura.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:entity_interaction_range",
+      "amount": 1,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:armor",
+      "amount": -2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

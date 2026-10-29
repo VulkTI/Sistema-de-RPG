@@ -1,0 +1,22 @@
+{
+  "name": "Pé de Coelho",
+  "description": "Aumenta o salto e a sorte geral enquanto o item estiver na mão.",
+  "rarity": "incomum",
+  "items": [
+    "minecraft:rabbit_foot"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:jump_strength",
+      "amount": 0.15,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:luck",
+      "amount": 0.5,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

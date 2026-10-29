@@ -1,0 +1,16 @@
+{
+  "name": "Lâmina Travada",
+  "description": "Torna os ataques com espada mais lentos.",
+  "rarity": "comum",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.12,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

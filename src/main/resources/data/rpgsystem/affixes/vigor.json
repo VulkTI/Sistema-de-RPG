@@ -1,0 +1,16 @@
+{
+  "name": "Vigor",
+  "description": "Concede um coração adicional de vida máxima enquanto equipado.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

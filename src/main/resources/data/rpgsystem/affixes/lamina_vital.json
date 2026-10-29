@@ -1,0 +1,22 @@
+{
+  "name": "Lâmina Vital",
+  "description": "Enquanto empunhada, concede dano e uma pequena reserva de vida máxima.",
+  "rarity": "mitico",
+  "groups": [
+    "Swords"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:max_health",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

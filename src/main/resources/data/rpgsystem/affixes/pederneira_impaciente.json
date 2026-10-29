@@ -1,0 +1,22 @@
+{
+  "name": "Pederneira Impaciente",
+  "description": "Aumenta o dano, mas faz o portador queimar por mais tempo.",
+  "rarity": "incomum",
+  "items": [
+    "minecraft:flint_and_steel"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 1.5,
+      "operation": "add_value",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:burning_time",
+      "amount": 0.2,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    }
+  ]
+}

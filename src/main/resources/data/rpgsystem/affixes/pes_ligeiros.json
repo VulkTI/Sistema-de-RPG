@@ -1,0 +1,22 @@
+{
+  "name": "Pés Ligeiros",
+  "description": "Melhora a mobilidade e a capacidade de subir pequenos degraus.",
+  "rarity": "raro",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:step_height",
+      "amount": 0.25,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.05,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

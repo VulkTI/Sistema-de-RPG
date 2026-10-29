@@ -1,0 +1,22 @@
+{
+  "name": "Mãos Trêmulas",
+  "description": "Aumenta a velocidade de ataque, mas reduz a força de empurrão.",
+  "rarity": "comum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": 0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_knockback",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

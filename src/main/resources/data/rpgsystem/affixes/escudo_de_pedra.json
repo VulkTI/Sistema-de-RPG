@@ -1,0 +1,16 @@
+{
+  "name": "Guarda de Pedra",
+  "description": "O escudo oferece maior resistência a empurrões de explosões.",
+  "rarity": "raro",
+  "items": [
+    "minecraft:shield"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:explosion_knockback_resistance",
+      "amount": 0.2,
+      "operation": "add_value",
+      "slot": "offhand"
+    }
+  ]
+}

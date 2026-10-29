@@ -1,0 +1,22 @@
+{
+  "name": "Asas Serenas",
+  "description": "Reduz o dano de queda e aumenta a altura segura de queda ao usar elytra.",
+  "rarity": "lendario",
+  "items": [
+    "minecraft:elytra"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:fall_damage_multiplier",
+      "amount": -0.25,
+      "operation": "add_multiplied_total",
+      "slot": "chest"
+    },
+    {
+      "attribute": "minecraft:safe_fall_distance",
+      "amount": 5,
+      "operation": "add_value",
+      "slot": "chest"
+    }
+  ]
+}

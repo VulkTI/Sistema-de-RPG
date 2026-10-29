@@ -1,0 +1,22 @@
+{
+  "name": "Couro Versátil",
+  "description": "Armaduras de couro favorecem a mobilidade, mas oferecem menos proteção.",
+  "rarity": "comum",
+  "groups": [
+    "Leather Armors"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.04,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:armor",
+      "amount": -1,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}

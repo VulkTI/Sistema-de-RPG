@@ -1,0 +1,22 @@
+{
+  "name": "Mão Pesada",
+  "description": "Aumenta o dano de ataque, mas reduz a velocidade de ataque.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:attack_speed",
+      "amount": -0.1,
+      "operation": "add_multiplied_total",
+      "slot": "any"
+    }
+  ]
+}

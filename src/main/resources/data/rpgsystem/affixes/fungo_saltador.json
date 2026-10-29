@@ -1,0 +1,22 @@
+{
+  "name": "Fungo Saltador",
+  "description": "O fungo no graveto aumenta a mobilidade, mas reduz a resistência a empurrões.",
+  "rarity": "incomum",
+  "items": [
+    "minecraft:warped_fungus_on_a_stick"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:movement_speed",
+      "amount": 0.08,
+      "operation": "add_multiplied_total",
+      "slot": "mainhand"
+    },
+    {
+      "attribute": "minecraft:knockback_resistance",
+      "amount": -0.1,
+      "operation": "add_value",
+      "slot": "mainhand"
+    }
+  ]
+}

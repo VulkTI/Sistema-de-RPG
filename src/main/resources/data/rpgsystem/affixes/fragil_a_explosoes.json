@@ -1,0 +1,22 @@
+{
+  "name": "Frágil a Explosões",
+  "description": "Mais dano de ataque, mas menos resistência ao empurrão de explosões.",
+  "rarity": "incomum",
+  "groups": [
+    "All"
+  ],
+  "modifiers": [
+    {
+      "attribute": "minecraft:attack_damage",
+      "amount": 2,
+      "operation": "add_value",
+      "slot": "any"
+    },
+    {
+      "attribute": "minecraft:explosion_knockback_resistance",
+      "amount": -0.3,
+      "operation": "add_value",
+      "slot": "any"
+    }
+  ]
+}
