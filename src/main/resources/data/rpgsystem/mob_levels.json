@@ -1,0 +1,16 @@
+{
+  "fallback_range": {
+    "min": 1,
+    "max": 5
+  },
+  "health_per_level": 0.015,
+  "damage_per_level": 0.02,
+  "armor_per_level": 0.25,
+  "armor_bonus_cap": 20.0,
+  "entity_overrides": {
+    "minecraft:warden": 100,
+    "minecraft:ender_dragon": 90,
+    "minecraft:wither": 80
+  }
+}
+

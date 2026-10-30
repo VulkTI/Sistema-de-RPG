@@ -38,6 +38,8 @@ bin/
 
 # fabric
 
+# runtime config
+/config/
 run/
 
 # java
