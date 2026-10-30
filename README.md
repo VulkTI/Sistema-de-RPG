@@ -242,68 +242,69 @@ A resolução é sempre: chefe fixo, peça de estrutura que contém o ponto, bio
 | --- | --- | ---: |
 | 1 | `minecraft:plains` | 1–5 |
 | 1 | `minecraft:sunflower_plains` | 1–5 |
-| 1 | `minecraft:forest` | 3–8 |
-| 1 | `minecraft:birch_forest` | 4–9 |
-| 1 | `minecraft:flower_forest` | 3–8 |
-| 1 | `minecraft:old_growth_birch_forest` | 6–12 |
-| 1 | `minecraft:meadow` | 5–11 |
-| 1 | `minecraft:cherry_grove` | 5–12 |
-| 1 | `minecraft:swamp` | 6–12 |
-| 1 | `minecraft:mushroom_fields` | 1–8 |
+| 1 | `minecraft:mushroom_fields` | 1–6 |
 | 1 | `minecraft:beach` | 2–7 |
+| 1 | `minecraft:river` | 2–7 |
 | 1 | `minecraft:ocean` | 2–8 |
+| 1 | `minecraft:forest` | 3–8 |
+| 1 | `minecraft:flower_forest` | 3–8 |
 | 1 | `minecraft:lukewarm_ocean` | 3–9 |
+| 1 | `minecraft:birch_forest` | 4–9 |
 | 1 | `minecraft:deep_ocean` | 4–10 |
 | 1 | `minecraft:deep_lukewarm_ocean` | 4–10 |
-| 1 | `minecraft:river` | 2–7 |
-| 1 | `minecraft:lush_caves` | 5–12 |
-| 1 | `minecraft:dripstone_caves` | 6–13 |
-| 2 | `minecraft:dark_forest` | 10–18 |
-| 2 | `minecraft:pale_garden` | 12–20 |
-| 2 | `minecraft:jungle` | 15–23 |
-| 2 | `minecraft:sparse_jungle` | 12–20 |
-| 2 | `minecraft:bamboo_jungle` | 17–25 |
-| 2 | `minecraft:savanna` | 14–22 |
-| 2 | `minecraft:savanna_plateau` | 17–25 |
-| 2 | `minecraft:windswept_savanna` | 20–28 |
-| 2 | `minecraft:desert` | 18–27 |
-| 2 | `minecraft:badlands` | 22–30 |
-| 2 | `minecraft:wooded_badlands` | 20–29 |
-| 2 | `minecraft:eroded_badlands` | 24–32 |
-| 2 | `minecraft:mangrove_swamp` | 12–21 |
-| 2 | `minecraft:windswept_hills` | 10–19 |
-| 2 | `minecraft:windswept_gravelly_hills` | 13–22 |
-| 2 | `minecraft:windswept_forest` | 10–19 |
-| 2 | `minecraft:stony_peaks` | 19–28 |
-| 2 | `minecraft:stony_shore` | 8–16 |
-| 2 | `minecraft:cold_ocean` | 8–16 |
-| 2 | `minecraft:deep_cold_ocean` | 10–18 |
-| 2 | `minecraft:warm_ocean` | 8–16 |
-| 3 | `minecraft:taiga` | 28–37 |
-| 3 | `minecraft:old_growth_pine_taiga` | 30–39 |
-| 3 | `minecraft:old_growth_spruce_taiga` | 32–41 |
-| 3 | `minecraft:snowy_taiga` | 34–43 |
-| 3 | `minecraft:snowy_plains` | 35–44 |
-| 3 | `minecraft:frozen_river` | 35–43 |
-| 3 | `minecraft:snowy_beach` | 35–44 |
-| 3 | `minecraft:frozen_ocean` | 36–45 |
-| 3 | `minecraft:deep_frozen_ocean` | 38–47 |
-| 3 | `minecraft:ice_spikes` | 40–49 |
-| 3 | `minecraft:grove` | 38–47 |
-| 3 | `minecraft:snowy_slopes` | 41–50 |
-| 3 | `minecraft:frozen_peaks` | 44–53 |
-| 3 | `minecraft:jagged_peaks` | 45–54 |
+| 1 | `minecraft:dappled_forest` | 5–11 |
+| 1 | `minecraft:meadow` | 5–11 |
+| 1 | `minecraft:cherry_grove` | 6–12 |
+| 1 | `minecraft:swamp` | 6–12 |
+| 1 | `minecraft:old_growth_birch_forest` | 7–13 |
+| 1 | `minecraft:lush_caves` | 8–14 |
+| 2 | `minecraft:stony_shore` | 11–15 |
+| 2 | `minecraft:cold_ocean` | 11–15 |
+| 2 | `minecraft:warm_ocean` | 11–15 |
+| 2 | `minecraft:windswept_hills` | 12–16 |
+| 2 | `minecraft:windswept_forest` | 12–17 |
+| 2 | `minecraft:deep_cold_ocean` | 13–17 |
+| 2 | `minecraft:dark_forest` | 14–18 |
+| 2 | `minecraft:mangrove_swamp` | 14–19 |
+| 2 | `minecraft:windswept_gravelly_hills` | 15–19 |
+| 2 | `minecraft:sparse_jungle` | 16–20 |
+| 2 | `minecraft:pale_garden` | 17–21 |
+| 2 | `minecraft:jungle` | 18–22 |
+| 2 | `minecraft:savanna` | 19–23 |
+| 2 | `minecraft:bamboo_jungle` | 20–24 |
+| 2 | `minecraft:savanna_plateau` | 21–25 |
+| 2 | `minecraft:desert` | 22–26 |
+| 2 | `minecraft:windswept_savanna` | 23–27 |
+| 2 | `minecraft:wooded_badlands` | 24–28 |
+| 2 | `minecraft:stony_peaks` | 25–29 |
+| 2 | `minecraft:badlands` | 26–30 |
+| 2 | `minecraft:sulfur_caves` | 28–34 |
+| 2 | `minecraft:eroded_badlands` | 28–34 |
+| 3 | `minecraft:taiga` | 35–39 |
+| 3 | `minecraft:old_growth_pine_taiga` | 36–40 |
+| 3 | `minecraft:old_growth_spruce_taiga` | 37–41 |
+| 3 | `minecraft:snowy_taiga` | 38–42 |
+| 3 | `minecraft:snowy_plains` | 39–43 |
+| 3 | `minecraft:frozen_river` | 40–44 |
+| 3 | `minecraft:snowy_beach` | 41–45 |
+| 3 | `minecraft:frozen_ocean` | 42–46 |
+| 3 | `minecraft:deep_frozen_ocean` | 43–47 |
+| 3 | `minecraft:grove` | 45–49 |
+| 3 | `minecraft:ice_spikes` | 47–51 |
+| 3 | `minecraft:snowy_slopes` | 49–53 |
+| 3 | `minecraft:frozen_peaks` | 52–56 |
+| 3 | `minecraft:jagged_peaks` | 55–59 |
 | 4 | `minecraft:warped_forest` | 60–65 |
-| 4 | `minecraft:crimson_forest` | 63–69 |
-| 4 | `minecraft:nether_wastes` | 66–72 |
-| 4 | `minecraft:soul_sand_valley` | 69–75 |
-| 4 | `minecraft:basalt_deltas` | 73–79 |
-| 5 | `minecraft:small_end_islands` | 80–83 |
-| 5 | `minecraft:end_barrens` | 81–85 |
+| 4 | `minecraft:crimson_forest` | 63–68 |
+| 4 | `minecraft:nether_wastes` | 66–71 |
+| 4 | `minecraft:soul_sand_valley` | 69–74 |
+| 4 | `minecraft:basalt_deltas` | 75–79 |
+| 5 | `minecraft:small_end_islands` | 81–85 |
+| 5 | `minecraft:end_barrens` | 82–86 |
 | 5 | `minecraft:end_midlands` | 83–87 |
-| 5 | `minecraft:end_highlands` | 86–89 |
-| 5 | `minecraft:the_end` | 87–89 |
-| 6 | `minecraft:deep_dark` | 90–100 |
+| 5 | `minecraft:the_end` | 84–88 |
+| 5 | `minecraft:end_highlands` | 85–89 |
+| 6 | `minecraft:deep_dark` | 92–97 |
 
 Os IDs acima foram validados contra os dados de Minecraft 26.3 incluídos pelas dependências do projeto. Biomas não listados não recebem uma faixa inventada: usam o fallback configurado, por padrão 1–5.
 
@@ -320,6 +321,32 @@ Os IDs acima foram validados contra os dados de Minecraft 26.3 incluídos pelas 
 | Fixo | Wither | 80 |
 | Fixo | Warden | 100 |
 
+As faixas de nível para estruturas e biomas são configuráveis no arquivo JSON `config/rpgsystem_areas.json`. Para adicionar ou alterar uma estrutura, basta incluir ou editar a entrada na seção `"structures"` do JSON informando os limites e a zona de mineração correspondente:
+
+```json
+{
+  "structures": {
+    "minecraft:trial_chambers": {
+      "min_level": 36,
+      "max_level": 41,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:monument": {
+      "min_level": 45,
+      "max_level": 55,
+      "mining_zone": "ZONE_3"
+    },
+    "mod_id:estrutura_customizada": {
+      "min_level": 50,
+      "max_level": 60,
+      "mining_zone": "NONE"
+    }
+  }
+}
+```
+
+O sistema identifica a estrutura em que o mob nasce ou em que o chunk gera minérios usando diretamente a peça da estrutura (`StructureStart`) em que o bloco se encontra. Caso nenhuma estrutura esteja registrada para aquele ponto, a regra do bioma prevalece. Se a estrutura estiver configurada com `mining_zone: "NONE"`, nenhum minério controlado será gerado dentro das suas peças.
+
 ### Escalonamento de atributos
 
 Os modificadores do Sistema RPG são transitórios, têm IDs próprios e são atualizados de forma idempotente; modificadores de outros mods não são removidos. A entidade sem determinado atributo simplesmente não recebe aquele bônus. Para um nível `N`, os padrões são:
@@ -332,11 +359,16 @@ Em nível 100, isso equivale a +148,5% de vida baseada no atributo, +198% de dan
 
 ### Configuração
 
-Na primeira inicialização do servidor ou mundo, é criado `config/rpgsystem_mob_levels.json`. Ele é separado de `rpgsystem_xp.json` e aceita `fallback_range`, `health_per_level`, `damage_per_level`, `armor_per_level`, `armor_bonus_cap`, `biome_ranges` e `structure_ranges`. Cada faixa usa `{ "min": inteiro, "max": inteiro }`; valores são limitados a 1–100 e os campos de combate têm limites seguros. Somente os IDs padrão conhecidos são aceitos nas tabelas para evitar regras silenciosas para conteúdo inexistente. Reinicie o servidor após alterar o arquivo.
+Na inicialização do servidor ou mundo, são gerados arquivos JSON em `config/`:
+- `config/rpgsystem_areas.json`: Configuração central unificada de áreas (biomas e estruturas). Define os níveis mínimos/máximos (`min_level`, `max_level`) e a zona de mineração (`mining_zone`: `ZONE_1`, `ZONE_2`, `ZONE_3`, `ZONE_4` ou `NONE`) para cada bioma ou estrutura. Mobs e regras de mineração consultam este mesmo arquivo, permitindo adicionar novos biomas/estruturas (incluindo de outros mods) diretamente via JSON.
+- `config/rpgsystem_mob_levels.json`: Ajustes finos de combate e escalonamento dos mobs (`fallback_range`, `health_per_level`, `damage_per_level`, `armor_per_level`, `armor_bonus_cap` e `entity_overrides`). Os limites de combate têm validação de segurança.
+- `config/rpgsystem_xp.json`: Ajustes dos ganhos de XP para jogadores e ações de classe.
+
+Reinicie o servidor/jogo após alterar os arquivos.
 
 ## Geração de minérios por zonas
 
-A geração de minérios controlados usa `MiningZoneConfig`, separado de `MobLevelConfig`; nível de mob nunca é usado como nível de mineração. O mapa explícito de biomas e estruturas não possui fallback silencioso: um bioma/estrutura sem regra não recebe os minérios controlados.
+A geração de minérios controlados usa `MiningZoneConfig`, que por sua vez obtém suas definições e zonas de mineração diretamente do `AreaConfig` (`config/rpgsystem_areas.json`). O mapa explícito de biomas e estruturas não possui fallback silencioso: um bioma/estrutura sem regra ou com `NONE` não recebe os minérios controlados.
 
 | Zona | Minérios com geração normal | Minérios anteriores autorizados |
 | --- | --- | --- |
@@ -373,7 +405,7 @@ Assim, o menor nível começa em 75%/75% e o maior nível real da zona atinge ex
 
 As distribuições verticais, filtros de altura, variantes triangulares/uniformes, mecanismos especiais de cobre e regras de substituição não são reconstruídos. Os overrides em `data/minecraft/worldgen/placed_feature` alteram apenas as contagens necessárias; chunks já existentes não são lidos nem convertidos, então somente a geração natural de chunks novos é afetada.
 
-Os cálculos e o cache de resolução por chunk são determinísticos no servidor e não usam o nível global do jogador. A configuração de mineração é código centralizado nesta versão, enquanto `rpgsystem_mob_levels.json` continua pertencendo exclusivamente ao sistema de mobs.
+Os cálculos e o cache de resolução por chunk são determinísticos no servidor e não usam o nível global do jogador. As zonas e níveis de mineração são gerenciados de forma centralizada pelo `rpgsystem_areas.json`, mantendo a configuração totalmente editável e consistente com o sistema de níveis de mobs.
 
 ### Etiqueta ao mirar e multiplayer
 

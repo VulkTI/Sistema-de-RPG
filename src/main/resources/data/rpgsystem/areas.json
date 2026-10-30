@@ -1,0 +1,357 @@
+{
+  "biomes": {
+    "minecraft:plains": {
+      "min_level": 1,
+      "max_level": 5,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:sunflower_plains": {
+      "min_level": 1,
+      "max_level": 5,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:mushroom_fields": {
+      "min_level": 1,
+      "max_level": 6,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:beach": {
+      "min_level": 2,
+      "max_level": 7,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:river": {
+      "min_level": 2,
+      "max_level": 7,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:ocean": {
+      "min_level": 2,
+      "max_level": 8,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:forest": {
+      "min_level": 3,
+      "max_level": 8,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:flower_forest": {
+      "min_level": 3,
+      "max_level": 8,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:lukewarm_ocean": {
+      "min_level": 3,
+      "max_level": 9,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:birch_forest": {
+      "min_level": 4,
+      "max_level": 9,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:deep_ocean": {
+      "min_level": 4,
+      "max_level": 10,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:deep_lukewarm_ocean": {
+      "min_level": 4,
+      "max_level": 10,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:dappled_forest": {
+      "min_level": 5,
+      "max_level": 11,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:meadow": {
+      "min_level": 5,
+      "max_level": 11,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:cherry_grove": {
+      "min_level": 6,
+      "max_level": 12,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:swamp": {
+      "min_level": 6,
+      "max_level": 12,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:old_growth_birch_forest": {
+      "min_level": 7,
+      "max_level": 13,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:lush_caves": {
+      "min_level": 8,
+      "max_level": 14,
+      "mining_zone": "ZONE_1"
+    },
+    "minecraft:stony_shore": {
+      "min_level": 11,
+      "max_level": 15,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:cold_ocean": {
+      "min_level": 11,
+      "max_level": 15,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:warm_ocean": {
+      "min_level": 11,
+      "max_level": 15,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:windswept_hills": {
+      "min_level": 12,
+      "max_level": 16,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:windswept_forest": {
+      "min_level": 12,
+      "max_level": 17,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:deep_cold_ocean": {
+      "min_level": 13,
+      "max_level": 17,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:dark_forest": {
+      "min_level": 14,
+      "max_level": 18,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:mangrove_swamp": {
+      "min_level": 14,
+      "max_level": 19,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:windswept_gravelly_hills": {
+      "min_level": 15,
+      "max_level": 19,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:sparse_jungle": {
+      "min_level": 16,
+      "max_level": 20,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:pale_garden": {
+      "min_level": 17,
+      "max_level": 21,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:jungle": {
+      "min_level": 18,
+      "max_level": 22,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:savanna": {
+      "min_level": 19,
+      "max_level": 23,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:bamboo_jungle": {
+      "min_level": 20,
+      "max_level": 24,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:savanna_plateau": {
+      "min_level": 21,
+      "max_level": 25,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:desert": {
+      "min_level": 22,
+      "max_level": 26,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:windswept_savanna": {
+      "min_level": 23,
+      "max_level": 27,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:wooded_badlands": {
+      "min_level": 24,
+      "max_level": 28,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:stony_peaks": {
+      "min_level": 25,
+      "max_level": 29,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:badlands": {
+      "min_level": 26,
+      "max_level": 30,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:sulfur_caves": {
+      "min_level": 28,
+      "max_level": 34,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:eroded_badlands": {
+      "min_level": 28,
+      "max_level": 34,
+      "mining_zone": "ZONE_2"
+    },
+    "minecraft:taiga": {
+      "min_level": 35,
+      "max_level": 39,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:old_growth_pine_taiga": {
+      "min_level": 36,
+      "max_level": 40,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:old_growth_spruce_taiga": {
+      "min_level": 37,
+      "max_level": 41,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:snowy_taiga": {
+      "min_level": 38,
+      "max_level": 42,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:snowy_plains": {
+      "min_level": 39,
+      "max_level": 43,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:frozen_river": {
+      "min_level": 40,
+      "max_level": 44,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:snowy_beach": {
+      "min_level": 41,
+      "max_level": 45,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:frozen_ocean": {
+      "min_level": 42,
+      "max_level": 46,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:deep_frozen_ocean": {
+      "min_level": 43,
+      "max_level": 47,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:grove": {
+      "min_level": 45,
+      "max_level": 49,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:ice_spikes": {
+      "min_level": 47,
+      "max_level": 51,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:snowy_slopes": {
+      "min_level": 49,
+      "max_level": 53,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:frozen_peaks": {
+      "min_level": 52,
+      "max_level": 56,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:jagged_peaks": {
+      "min_level": 55,
+      "max_level": 59,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:warped_forest": {
+      "min_level": 60,
+      "max_level": 65,
+      "mining_zone": "ZONE_4"
+    },
+    "minecraft:crimson_forest": {
+      "min_level": 63,
+      "max_level": 68,
+      "mining_zone": "ZONE_4"
+    },
+    "minecraft:nether_wastes": {
+      "min_level": 66,
+      "max_level": 71,
+      "mining_zone": "ZONE_4"
+    },
+    "minecraft:soul_sand_valley": {
+      "min_level": 69,
+      "max_level": 74,
+      "mining_zone": "ZONE_4"
+    },
+    "minecraft:basalt_deltas": {
+      "min_level": 75,
+      "max_level": 79,
+      "mining_zone": "ZONE_4"
+    },
+    "minecraft:small_end_islands": {
+      "min_level": 81,
+      "max_level": 85,
+      "mining_zone": "NONE"
+    },
+    "minecraft:end_barrens": {
+      "min_level": 82,
+      "max_level": 86,
+      "mining_zone": "NONE"
+    },
+    "minecraft:end_midlands": {
+      "min_level": 83,
+      "max_level": 87,
+      "mining_zone": "NONE"
+    },
+    "minecraft:the_end": {
+      "min_level": 84,
+      "max_level": 88,
+      "mining_zone": "NONE"
+    },
+    "minecraft:end_highlands": {
+      "min_level": 85,
+      "max_level": 89,
+      "mining_zone": "NONE"
+    },
+    "minecraft:deep_dark": {
+      "min_level": 92,
+      "max_level": 97,
+      "mining_zone": "ZONE_3"
+    }
+  },
+  "structures": {
+    "minecraft:ancient_city": {
+      "min_level": 94,
+      "max_level": 99,
+      "mining_zone": "ZONE_3"
+    },
+    "minecraft:end_city": {
+      "min_level": 84,
+      "max_level": 89,
+      "mining_zone": "NONE"
+    },
+    "minecraft:bastion_remnant": {
+      "min_level": 74,
+      "max_level": 79,
+      "mining_zone": "ZONE_4"
+    },
+    "minecraft:fortress": {
+      "min_level": 63,
+      "max_level": 67,
+      "mining_zone": "ZONE_4"
+    },
+    "minecraft:trial_chambers": {
+      "min_level": 36,
+      "max_level": 41,
+      "mining_zone": "ZONE_3"
+    }
+  }
+}
+

@@ -10,6 +10,7 @@ import br.com.rpgsystem.affixes.RpgAttributes;
 import br.com.rpgsystem.commands.RpgCommands;
 import br.com.rpgsystem.events.RpgEvents;
 import br.com.rpgsystem.network.RpgNetworking;
+import br.com.rpgsystem.config.AreaConfig;
 import br.com.rpgsystem.config.XpConfig;
 import br.com.rpgsystem.config.MobLevelConfig;
 import net.fabricmc.api.ModInitializer;
@@ -23,6 +24,7 @@ public final class RpgMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		AreaConfig.load();
 		XpConfig.load();
 		MobLevelConfig.load();
 		RpgAttributes.register();

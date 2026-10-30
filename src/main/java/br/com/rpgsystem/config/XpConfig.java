@@ -36,6 +36,14 @@ public final class XpConfig {
 	}
 
 	private static JsonObject defaults() {
+		try (java.io.InputStream in = XpConfig.class.getResourceAsStream("/data/rpgsystem/xp.json")) {
+			if (in != null) {
+				return JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8)).getAsJsonObject();
+			}
+		} catch (Exception exception) {
+			System.err.println("Não foi possível ler /data/rpgsystem/xp.json embutido: " + exception.getMessage());
+		}
+
 		JsonObject json = new JsonObject();
 		json.addProperty("player_hostile_kill", 8);
 		JsonObject minerador = new JsonObject();
