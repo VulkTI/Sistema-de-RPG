@@ -6,6 +6,9 @@ import br.com.rpgsystem.classes.SkillDefinition;
 import br.com.rpgsystem.data.RpgSavedData;
 import br.com.rpgsystem.progression.ProgressionMath;
 import br.com.rpgsystem.mining.MineradorEffects;
+import br.com.rpgsystem.skills.UniversalProgression;
+import br.com.rpgsystem.skills.UniversalSkill;
+import br.com.rpgsystem.skills.UniversalSkillTrees;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.Gson;
@@ -25,10 +28,13 @@ public final class RpgNetworking {
 		PayloadTypeRegistry.clientboundPlay().register(RpgPayloads.Snapshot.TYPE, RpgPayloads.Snapshot.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RpgPayloads.SelectClass.TYPE, RpgPayloads.SelectClass.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RpgPayloads.LearnSkill.TYPE, RpgPayloads.LearnSkill.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(RpgPayloads.LearnUniversalSkill.TYPE, RpgPayloads.LearnUniversalSkill.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(RpgPayloads.SelectClass.TYPE, (payload, context) ->
 				context.server().execute(() -> selectClass(context.player(), payload.classId())));
 		ServerPlayNetworking.registerGlobalReceiver(RpgPayloads.LearnSkill.TYPE, (payload, context) ->
 				context.server().execute(() -> learnSkill(context.player(), payload.skillId())));
+		ServerPlayNetworking.registerGlobalReceiver(RpgPayloads.LearnUniversalSkill.TYPE, (payload, context) ->
+				context.server().execute(() -> learnUniversalSkill(context.player(), payload.skillId(), payload.nodeId())));
 	}
 
 	public static void sendSnapshot(ServerPlayer player, boolean openMenu) {
@@ -91,6 +97,37 @@ public final class RpgNetworking {
 			skillTree.add(entry);
 		}
 		snapshot.add("skillTree", skillTree);
+		JsonArray universalSkills = new JsonArray();
+		JsonObject universalTrees = new JsonObject();
+		for (UniversalSkill skill : UniversalSkill.values()) {
+			long xp = profile.xpForUniversal(skill.id());
+			int level = UniversalProgression.levelForXp(skill, xp);
+			JsonObject entry = new JsonObject();
+			entry.addProperty("id", skill.id());
+			entry.addProperty("name", skill.displayName());
+			entry.addProperty("level", level);
+			entry.addProperty("xpTotal", xp);
+			entry.addProperty("xpCurrent", UniversalProgression.xpIntoLevel(skill, xp));
+			entry.addProperty("xpNext", UniversalProgression.xpForNextLevel(skill, level));
+			universalSkills.add(entry);
+			JsonArray nodes = new JsonArray();
+			UniversalSkillTrees.tree(skill).forEach(node -> {
+				JsonObject nodeJson = new JsonObject();
+				nodeJson.addProperty("id", node.id());
+				nodeJson.addProperty("name", node.name());
+				nodeJson.addProperty("description", node.description());
+				nodeJson.addProperty("cost", node.cost());
+				nodeJson.addProperty("type", node.type().name());
+				nodeJson.addProperty("effect", node.effect());
+				nodeJson.addProperty("amount", node.amount());
+				JsonArray deps = new JsonArray(); node.dependencies().forEach(deps::add); nodeJson.add("dependencies", deps);
+				nodeJson.addProperty("unlocked", profile.hasSkill("universal:" + skill.id(), node.id()));
+				nodes.add(nodeJson);
+			});
+			universalTrees.add(skill.id(), nodes);
+		}
+		snapshot.add("universalSkills", universalSkills);
+		snapshot.add("universalSkillTrees", universalTrees);
 		return snapshot;
 	}
 
@@ -127,6 +164,20 @@ public final class RpgNetworking {
 		}
 		data.update(player.getUUID(), current -> current.unlockSkill(selected.id().toString(), skillId, skill.cost()));
 		player.sendSystemMessage(Component.literal("Habilidade desbloqueada: " + skill.name() + "."));
+		sendSnapshot(player, false);
+	}
+
+	private static void learnUniversalSkill(ServerPlayer player, String skillId, String nodeId) {
+		UniversalSkill skill = UniversalSkill.byId(skillId);
+		if (skill == null) return;
+		RpgSavedData data = RpgSavedData.get(player.level().getServer());
+		RpgSavedData.Profile profile = data.profile(player.getUUID());
+		SkillDefinition definition = UniversalSkillTrees.tree(skill).stream().filter(node -> node.id().equals(nodeId)).findFirst().orElse(null);
+		String treeId = "universal:" + skill.id();
+		if (definition == null || profile.hasSkill(treeId, nodeId)
+				|| profile.availableSkillPoints(treeId) < definition.cost()
+				|| !definition.dependencies().stream().allMatch(dependency -> profile.hasSkill(treeId, dependency))) return;
+		data.update(player.getUUID(), current -> current.unlockSkill(treeId, nodeId, definition.cost()));
 		sendSnapshot(player, false);
 	}
 }

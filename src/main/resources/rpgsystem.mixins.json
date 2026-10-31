@@ -17,6 +17,13 @@
 		,"CraftingShiftMixin"
 		,"InventoryCraftingShiftMixin"
 		,"ItemCombinerMenuMixin"
+		,"LivingEntityDamageMixin"
+		,"MerchantMenuMixin"
+		,"MerchantResultSlotMixin"
+		,"AnvilMenuMixin"
+		,"AnimalInteractionMixin"
+		,"EnchantmentMenuMixin"
+		,"BrewingStandBlockEntityMixin"
 	],
 	"client": [
 		"ItemStackTooltipMixin",

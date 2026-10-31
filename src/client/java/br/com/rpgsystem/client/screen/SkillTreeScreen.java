@@ -34,14 +34,24 @@ public final class SkillTreeScreen extends Screen {
 	private boolean dragging;
 	private boolean movedDuringDrag;
 	private Button learnButton;
+	private final String universalSkillId;
 
-	public SkillTreeScreen() {
+	public SkillTreeScreen() { this(null); }
+
+	public SkillTreeScreen(String universalSkillId) {
 		super(Component.literal("Árvore de habilidades"));
-		JsonArray tree = RpgClientState.snapshot().getAsJsonArray("skillTree");
+		this.universalSkillId = universalSkillId;
+		JsonArray tree = treeFromSnapshot(RpgClientState.snapshot());
 		skills = tree == null ? new JsonArray() : tree;
 		if (!skills.isEmpty()) selectedSkillId = skills.get(0).getAsJsonObject().get("id").getAsString();
 		for (int i = 0; i < skills.size(); i++) depth(skills.get(i).getAsJsonObject(), new java.util.HashSet<>());
 		layoutGraph();
+	}
+
+	private JsonArray treeFromSnapshot(JsonObject snapshot) {
+		if (universalSkillId == null) return snapshot.getAsJsonArray("skillTree");
+		JsonObject trees = snapshot.getAsJsonObject("universalSkillTrees");
+		return trees == null || !trees.has(universalSkillId) ? new JsonArray() : trees.getAsJsonArray(universalSkillId);
 	}
 
 	private int depth(JsonObject skill, java.util.Set<String> visiting) {
@@ -93,7 +103,9 @@ public final class SkillTreeScreen extends Screen {
 	@Override
 	protected void init() {
 		learnButton = addRenderableWidget(Button.builder(Component.literal("Aprender habilidade"), button -> {
-			if (!selectedSkillId.isBlank()) ClientPlayNetworking.send(new RpgPayloads.LearnSkill(selectedSkillId));
+			if (selectedSkillId.isBlank()) return;
+			if (universalSkillId == null) ClientPlayNetworking.send(new RpgPayloads.LearnSkill(selectedSkillId));
+			else ClientPlayNetworking.send(new RpgPayloads.LearnUniversalSkill(universalSkillId, selectedSkillId));
 		}).bounds(width - SIDEBAR_WIDTH + 15, height - 62, SIDEBAR_WIDTH - 30, 20).build());
 		addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> onClose())
 				.bounds(width - SIDEBAR_WIDTH + 15, height - 36, SIDEBAR_WIDTH - 30, 20).build());
@@ -103,7 +115,7 @@ public final class SkillTreeScreen extends Screen {
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 		// O servidor publica um snapshot novo após cada desbloqueio; manter a tela sincronizada
 		// também atualiza cores, dependências e disponibilidade do botão sem reabrir a interface.
-		JsonArray latestTree = RpgClientState.snapshot().getAsJsonArray("skillTree");
+		JsonArray latestTree = treeFromSnapshot(RpgClientState.snapshot());
 		if (latestTree != null) skills = latestTree;
 		super.extractRenderState(graphics, mouseX, mouseY, delta);
 		drawGraph(graphics);
@@ -219,12 +231,23 @@ public final class SkillTreeScreen extends Screen {
 	private void drawSidebar(GuiGraphicsExtractor graphics) {
 		int left = width - SIDEBAR_WIDTH;
 		JsonObject data = RpgClientState.snapshot();
-		RpgScreenText.drawWrapped(graphics, font, "Árvore de " + data.get("selectedClassName").getAsString(),
+		String title = universalSkillId == null ? data.get("selectedClassName").getAsString() : universalSkillName(data);
+		RpgScreenText.drawWrapped(graphics, font, "Árvore de " + title,
 				left + 15, 22, SIDEBAR_WIDTH - 30, 0xFFFFFFFF);
-		RpgScreenText.draw(graphics, font, "Pontos: " + data.get("skillPoints").getAsInt(),
+		RpgScreenText.draw(graphics, font, universalSkillId == null ? "Pontos: " + data.get("skillPoints").getAsInt() : "Nível da skill universal",
 				left + 15, 60, 0xFFFFFFFF, false, true);
+		if (universalSkillId != null) {
+			JsonObject progress = universalSkill(data);
+			if (progress != null) RpgScreenText.draw(graphics, font, "Nível " + progress.get("level").getAsInt() +
+					"  XP " + progress.get("xpCurrent").getAsLong() + " / " + progress.get("xpNext").getAsLong(), left + 15, 78, 0xFFFFFFFF, false, true);
+		}
 		JsonObject selected = find(selectedSkillId);
-		if (selected == null) return;
+		if (selected == null) {
+			if (universalSkillId != null) RpgScreenText.drawWrapped(graphics, font,
+					"Os bônus desta skill são concedidos automaticamente pelo nível. Não há habilidades para desbloquear.",
+					left + 15, 110, SIDEBAR_WIDTH - 30, 0xFFFFFFFF);
+			return;
+		}
 		int detailX = left + 15;
 		RpgScreenText.drawWrapped(graphics, font, selected.get("name").getAsString(), detailX, 92, SIDEBAR_WIDTH - 30, 0xFFFFFFFF);
 		RpgScreenText.drawWrapped(graphics, font, selected.get("description").getAsString(), detailX, 116, SIDEBAR_WIDTH - 30, 0xFFFFFFFF);
@@ -239,6 +262,17 @@ public final class SkillTreeScreen extends Screen {
 		} else {
 			RpgScreenText.drawWrapped(graphics, font, "Habilidade desbloqueada.", detailX, 222, SIDEBAR_WIDTH - 30, 0xFFFFFFFF);
 		}
+	}
+
+	private JsonObject universalSkill(JsonObject snapshot) {
+		JsonArray values = snapshot.getAsJsonArray("universalSkills");
+		for (int i = 0; values != null && i < values.size(); i++) if (values.get(i).getAsJsonObject().get("id").getAsString().equals(universalSkillId)) return values.get(i).getAsJsonObject();
+		return null;
+	}
+
+	private String universalSkillName(JsonObject snapshot) {
+		JsonObject value = universalSkill(snapshot);
+		return value == null ? universalSkillId : value.get("name").getAsString();
 	}
 
 	@Override

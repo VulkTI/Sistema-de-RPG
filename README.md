@@ -29,12 +29,22 @@ Para compilar o projeto no Windows, execute `./gradlew.bat build` (ou `compilar.
 - Herança de afixo ao aprimorar um item na ferraria; se o item-base não tiver afixo, o resultado pode receber um novo.
 - Atributo `rpgsystem:affix_luck`, comandos de administração e sincronização dos dados entre servidor e cliente.
 - Níveis persistentes de mobs, definidos por bioma/estrutura, escalonamento de combate e etiqueta do alvo sob a mira.
+- Seis habilidades universais — Combate, Mineração, Agricultura e Pecuária, Conhecimento, Exploração e Comércio — com XP independente, nível máximo 20 e progresso persistente por UUID.
+- Cartões das seis habilidades na tela de status e telas informativas independentes carregadas dos JSONs em `src/main/resources/data/rpgsystem/universal_skills/`.
 
 O XP do jogador aumenta em 8 ao derrotar uma criatura da categoria MONSTER. A classe ativa pode receber XP adicional conforme a ação. O Ferreiro recebe XP ao coletar certos lingotes/nuggets fundidos e ao fabricar itens metálicos. A curva de XP começa em 100 para avançar do nível 1, aumentando 5 XP mais a metade do quadrado do número de níveis já avançados; o nível máximo é 100. Cada novo nível de classe concede 2 pontos de habilidade. A classe Ferreiro atual retorna uma árvore vazia, então não há habilidades para desbloquear nela no momento.
 
 O botão **P** abre a tela de status. Use `/rpg menu` para escolher uma classe (também abre a seleção ao entrar sem classe). Para trocar de classe, use `/rpg class set ferreiro` ou `/rpg class set minerador`.
 
 Os valores de XP são configurados em `config/rpgsystem_xp.json` na pasta do jogo. O arquivo é criado automaticamente na primeira inicialização do mod; edite os números e reinicie o jogo/servidor para aplicar. Os IDs dos minérios não incluem o prefixo `minecraft:`.
+
+### Habilidades universais
+
+O arquivo `config/rpgsystem_universal_skills.json` é criado automaticamente a partir de `src/main/resources/data/rpgsystem/universal_skills.json`. Ele contém, por habilidade, a lista `xp_to_next` dos 19 avanços até o nível 20, os valores de XP das atividades, multiplicadores de mineração e recompensas de Exploração. As recompensas das estruturas relevantes ficam em `exploracao.structures`; a primeira instância de cada tipo recebe também o multiplicador configurado em `first_structure_multiplier`.
+
+O servidor é a autoridade do XP. O perfil persistente usa os campos `universal_skill_xp` e `explored_structures`; as instâncias de estruturas são identificadas por dimensão, ID e posição da peça, enquanto baús com loot pendente são registrados por dimensão e posição. O bônus de Conhecimento usa o atributo existente `rpgsystem:affix_luck`; os bônus de Combate, Mineração e Exploração são atributos transitórios recalculados após login, mudança de nível e durante a execução do servidor.
+
+As definições informativas podem ser editadas como recursos JSON em `src/main/resources/data/rpgsystem/universal_skills/` (`combat.json`, `mining.json`, `farming.json`, `knowledge.json`, `exploration.json` e `trading.json`). Os buffs não dependem de nós desbloqueáveis: são aplicados automaticamente pelo nível da skill universal.
 
 ## Comandos
 

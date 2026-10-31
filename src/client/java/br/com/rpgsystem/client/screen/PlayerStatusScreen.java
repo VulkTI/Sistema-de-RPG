@@ -10,7 +10,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class PlayerStatusScreen extends Screen {
+	private final List<Button> universalButtons = new ArrayList<>();
 	public PlayerStatusScreen() { super(Component.literal("Status do jogador")); }
 
 	@Override
@@ -20,6 +24,15 @@ public final class PlayerStatusScreen extends Screen {
 		addRenderableWidget(Button.builder(Component.literal("Árvore de habilidades"), button ->
 				Minecraft.getInstance().gui.setScreen(new SkillTreeScreen()))
 				.bounds(width / 2 + 5, height - 36, 200, 20).build());
+		JsonArray skills = RpgClientState.snapshot().getAsJsonArray("universalSkills");
+		if (skills != null) for (int i = 0; i < skills.size(); i++) {
+			JsonObject skill = skills.get(i).getAsJsonObject();
+			int row = i;
+			Button button = Button.builder(Component.literal(skill.get("name").getAsString() + "  Nv. " + skill.get("level").getAsInt()),
+					unused -> Minecraft.getInstance().gui.setScreen(new SkillTreeScreen(skill.get("id").getAsString())))
+					.bounds(10, 105 + row * 27, 145, 20).build();
+			universalButtons.add(addRenderableWidget(button));
+		}
 	}
 
 	@Override
@@ -42,6 +55,7 @@ public final class PlayerStatusScreen extends Screen {
 		RpgScreenText.draw(graphics, font,
 				"XP da classe: " + data.get("classXpCurrent").getAsLong() + " / " + data.get("classXpNext").getAsLong(),
 				left, top + 96, 0xFFFFFFFF, false, true);
+		RpgScreenText.draw(graphics, font, "Skills universais", 10, 88, 0xFFFFFFFF, false, true);
 
 		JsonArray options = data.getAsJsonArray("classes");
 		if (options != null) {
