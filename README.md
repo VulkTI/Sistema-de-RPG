@@ -8,6 +8,7 @@ Mod para Fabric em Minecraft 26.3 que adiciona progressão de jogador e de class
 - [Comandos](#comandos)
 - [Classes e perks](#classes-e-perks)
 - [Sistema de afixos](#sistema-de-afixos)
+- [Tabelas de Looting](#tabelas-de-looting-personalizadas)
 - [Níveis de criaturas e zonas](#níveis-de-criaturas)
 - [Geração de minérios por zonas](#geração-de-minérios-por-zonas)
 - [Guia para desenvolvimento](#guia-para-desenvolvimento-e-criação-de-conteúdo)
@@ -28,6 +29,7 @@ Para compilar o projeto no Windows, execute `./gradlew.bat build` (ou `compilar.
 - Sistema de afixos em armas, ferramentas, armaduras e outros itens compatíveis: modificadores de atributos, raridades, grupos, tags, itens específicos, tooltips e rolagem automática.
 - Herança de afixo ao aprimorar um item na ferraria; se o item-base não tiver afixo, o resultado pode receber um novo.
 - Atributo `rpgsystem:affix_luck`, comandos de administração e sincronização dos dados entre servidor e cliente.
+- Sistema completo de tabelas de looting customizadas com cálculo ponderado de pesos, deduplicação por NBT, ferramenta de aplicação para baús/barris e exportação automática em JSON.
 - Níveis persistentes de mobs, definidos por bioma/estrutura, escalonamento de combate e etiqueta do alvo sob a mira.
 - Seis habilidades universais — Combate, Mineração, Agropecuária, Conhecimento, Exploração e Comércio — com XP independente, nível máximo 20 e progresso persistente por UUID.
 - Cartões das seis habilidades na tela de status e telas informativas independentes carregadas dos JSONs em `src/main/resources/data/rpgsystem/universal_skills/`.
@@ -88,6 +90,37 @@ Os comandos de afixo atuam sobre o item na mão principal:
 ```
 
 `list` mostra os afixos compatíveis e as chances individuais estimadas na rolagem normal. `roll` faz uma rolagem normal, incluindo chance de nenhum afixo. `roll rarity` escolhe uniformemente entre afixos compatíveis daquela raridade, sem a rolagem normal de raridade/ausência. `roll <id>` simula rolagens normais até obter o afixo indicado e aplica o resultado; serve para teste e pode levar muitas rolagens simuladas. `apply` aplica diretamente um afixo compatível e `remove` retira o afixo atual.
+
+### Tabelas de Looting
+
+Gerenciamento dinâmico e teste de tabelas de itens para baús e futuras dungeons:
+
+```text
+/rpg table list
+/rpg table list <nome_tabela>
+/rpg table list <nome_tabela> <id|name|chance> <crescente|decrescente>
+/rpg table create <nome_tabela>
+/rpg table create <nome_tabela> <min> <max>
+/rpg table insert <nome_tabela> <item> <peso>
+/rpg table inserthand <nome_tabela> <peso>
+/rpg table deleteitem <nome_tabela> <id>
+/rpg table weight <nome_tabela> <id> <peso>
+/rpg table amount <nome_tabela> <min> <max>
+/rpg table delete <nome_tabela>
+/rpg table tool <nome_tabela>
+```
+
+- `/rpg table list`: exibe todas as tabelas criadas no mundo, com número de itens e limites mín/máx. Cada nome é clicável para abrir a listagem detalhada.
+- `/rpg table create <nome_tabela> <min> <max>`: cria a tabela já definindo a quantidade mínima e máxima de itens sorteados no baú.
+- `/rpg table insert` / `inserthand`: adiciona itens alocando automaticamente o menor ID numérico disponível. Se o item inserido já existir com o mesmo tipo e NBT/componentes, seu peso é atualizado sem duplicar o item.
+- `/rpg table list <nome_tabela>`: interface no chat dividida em colunas (ID, Nome, % de Chance / Peso) com botões clicáveis de ordenação interativa (`[ID]`, `[A-Z]`, `[Chance]`, `[Crescente]`, `[Decrescente]`), limpando mensagens anteriores automaticamente para visualização limpa.
+- `/rpg table tool <nome_tabela>`: entrega uma ferramenta especial de teste. Clicar com botão direito em qualquer baú, baú com armadilha ou barril preenche o recipiente sorteando os itens da tabela com base nos pesos configurados.
+- `/rpg table deleteitem` / `weight` / `amount`: remove itens reutilizando os IDs vagos, reajusta pesos ou redefine o intervalo de quantidade de itens.
+- `/rpg table delete`: apaga a tabela e seu arquivo correspondente.
+
+#### Persistência e exportação de tabelas
+- **Arquivos gerados em jogo:** salvos automaticamente em `.minecraft/config/rpgsystem/loot_tables/<nome>.json` a cada criação ou edição.
+- **Tabelas embutidas no mod:** para incluir tabelas fixas distribuídas junto ao mod (que funcionam em qualquer novo mundo), basta colocar o arquivo JSON em `src/main/resources/data/rpgsystem/loot_tables/<nome>.json`. No início do mundo, o mod carrega as tabelas da pasta config e os padrões embutidos no mod.
 
 ## Classes e perks
 
