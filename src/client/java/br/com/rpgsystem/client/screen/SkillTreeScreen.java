@@ -1,6 +1,10 @@
 package br.com.rpgsystem.client.screen;
 
 import br.com.rpgsystem.client.RpgClientState;
+import br.com.rpgsystem.client.ui.RpgButton;
+import br.com.rpgsystem.client.ui.RpgProgressBar;
+import br.com.rpgsystem.client.ui.RpgScrollArea;
+import br.com.rpgsystem.client.ui.RpgUiSounds;
 import br.com.rpgsystem.network.RpgPayloads;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -8,6 +12,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -19,13 +24,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Grafo navegável de uma árvore de classe ou de uma skill universal. */
+/**
+ * Grafo navegável de uma árvore de habilidades da classe ou universal.
+ * Atualizado com a nova base de UI:
+ * - Área de rolagem lateral usando RpgScrollArea
+ * - Barra de progresso reativa RpgProgressBar
+ * - Animações de pulso em nós prontos para aprender
+ * - Conexões com realce luminoso e sons imersivos
+ */
 public final class SkillTreeScreen extends Screen {
 	private static final int SIDEBAR_WIDTH = 230;
 	private static final int FOOTER_HEIGHT = 38;
 	private static final int SCREEN_MARGIN = 12;
 	private static final double MIN_ZOOM = 0.45;
 	private static final double MAX_ZOOM = 2.5;
+
 	private JsonArray skills;
 	private final Map<String, Integer> depths = new HashMap<>();
 	private final Map<String, Double> horizontalOffsets = new HashMap<>();
@@ -37,15 +50,18 @@ public final class SkillTreeScreen extends Screen {
 	private double dragX;
 	private double dragY;
 	private boolean dragging;
-	private int sidebarScroll;
-	private static final int SIDEBAR_MAX_SCROLL = 180;
+
+	private RpgScrollArea sidebarScrollArea;
+	private RpgProgressBar sidebarProgressBar;
 	private RpgButton confirmButton;
 	private final String universalSkillId;
 
-	public SkillTreeScreen() { this(null); }
+	public SkillTreeScreen() {
+		this(null);
+	}
 
 	public SkillTreeScreen(String universalSkillId) {
-		super(Component.literal("Árvore de habilidades"));
+		super(Component.literal("Árvore de Habilidades"));
 		this.universalSkillId = universalSkillId;
 		JsonArray tree = treeFromSnapshot(RpgClientState.snapshot());
 		skills = tree == null ? new JsonArray() : tree;
@@ -67,8 +83,11 @@ public final class SkillTreeScreen extends Screen {
 			levels.computeIfAbsent(depths.getOrDefault(skill.get("id").getAsString(), 0), unused -> new ArrayList<>()).add(skill);
 		}
 		horizontalOffsets.clear();
-		for (List<JsonObject> nodes : levels.values()) for (int i = 0; i < nodes.size(); i++)
-			horizontalOffsets.put(nodes.get(i).get("id").getAsString(), (i - (nodes.size() - 1) / 2.0) * 180.0);
+		for (List<JsonObject> nodes : levels.values()) {
+			for (int i = 0; i < nodes.size(); i++) {
+				horizontalOffsets.put(nodes.get(i).get("id").getAsString(), (i - (nodes.size() - 1) / 2.0) * 180.0);
+			}
+		}
 	}
 
 	private int depth(JsonObject skill, java.util.Set<String> visiting) {
@@ -105,21 +124,82 @@ public final class SkillTreeScreen extends Screen {
 
 	@Override
 	protected void init() {
+		super.init();
+		RpgUiSounds.playOpen();
+
 		int sidebarX = sidebarX();
-		confirmButton = addRenderableWidget(new RpgButton(sidebarX + 16, height - SCREEN_MARGIN - FOOTER_HEIGHT - 27, SIDEBAR_WIDTH - 32, 22,
-				Component.literal("CONFIRMAR"), RpgUi.CYAN, this::confirmTree));
+		int bodyHeight = height - SCREEN_MARGIN - FOOTER_HEIGHT;
+
+		// Botão CONFIRMAR
+		confirmButton = addRenderableWidget(new RpgButton(
+				sidebarX + 16,
+				height - SCREEN_MARGIN - FOOTER_HEIGHT - 27,
+				SIDEBAR_WIDTH - 32,
+				22,
+				Component.literal("APRENDER"),
+				RpgUi.CYAN,
+				this::confirmTree
+		).setHoverEffect(RpgButton.HoverEffect.PULSE));
+
+		// Botão VOLTAR
+		addRenderableWidget(new RpgButton(
+				SCREEN_MARGIN + 10,
+				SCREEN_MARGIN + 10,
+				60,
+				16,
+				Component.literal("← VOLTAR"),
+				RpgUi.BLUE,
+				this::returnToCharacter
+		).setHoverEffect(RpgButton.HoverEffect.STATIC));
+
+		// Barra de progresso de XP na sidebar
+		sidebarProgressBar = addRenderableWidget(new RpgProgressBar(
+				sidebarX + 26,
+				SCREEN_MARGIN + 55,
+				SIDEBAR_WIDTH - 52,
+				8,
+				() -> getXpCurrent(),
+				() -> getXpNext(),
+				RpgUi.CYAN
+		).setPulseWhenFull(true));
+
+		// Área de rolagem para o corpo da sidebar
+		int viewportTop = SCREEN_MARGIN + 72;
+		int viewportBottom = bodyHeight - 32;
+		sidebarScrollArea = new RpgScrollArea(sidebarX + 14, viewportTop, SIDEBAR_WIDTH - 28, viewportBottom - viewportTop);
+	}
+
+	private long getXpCurrent() {
+		JsonObject snap = RpgClientState.snapshot();
+		if (universalSkillId == null) return longValue(snap, "classXpCurrent");
+		JsonObject u = universalSkill(snap);
+		return u != null ? longValue(u, "xpCurrent") : 0L;
+	}
+
+	private long getXpNext() {
+		JsonObject snap = RpgClientState.snapshot();
+		if (universalSkillId == null) return Math.max(1L, longValue(snap, "classXpNext"));
+		JsonObject u = universalSkill(snap);
+		return u != null ? Math.max(1L, longValue(u, "xpNext")) : 1L;
 	}
 
 	private void confirmTree() {
 		JsonObject selected = find(selectedSkillId);
 		if (selected != null && !boolValue(selected, "unlocked") && requirementsMet(selected) && availablePoints() >= intValue(selected, "cost")) {
-		if (universalSkillId == null) ClientPlayNetworking.send(new RpgPayloads.LearnSkill(selectedSkillId));
-		else ClientPlayNetworking.send(new RpgPayloads.LearnUniversalSkill(universalSkillId, selectedSkillId));
+			RpgUiSounds.playSkillLearn();
+			if (universalSkillId == null) {
+				ClientPlayNetworking.send(new RpgPayloads.LearnSkill(selectedSkillId));
+			} else {
+				ClientPlayNetworking.send(new RpgPayloads.LearnUniversalSkill(universalSkillId, selectedSkillId));
+			}
+		} else {
+			RpgUiSounds.playClick();
 		}
 		returnToCharacter();
 	}
 
 	private void returnToCharacter() {
+		RpgUiSounds.playClose();
 		Minecraft.getInstance().gui.setScreen(new PlayerStatusScreen());
 	}
 
@@ -131,29 +211,44 @@ public final class SkillTreeScreen extends Screen {
 			if (!selectedSkillId.isBlank() && find(selectedSkillId) == null) selectedSkillId = "";
 			rebuildLayout();
 		}
+
 		JsonObject selected = find(selectedSkillId);
-		confirmButton.active = true;
+		boolean canLearn = selected != null && !boolValue(selected, "unlocked") && requirementsMet(selected) && availablePoints() >= intValue(selected, "cost");
+		confirmButton.active = selected == null || canLearn;
+		confirmButton.setMessage(Component.literal(selected == null ? "RETORNAR" : canLearn ? "APRENDER" : boolValue(selected, "unlocked") ? "DESBLOQUEADO" : "BLOQUEADO"));
+
 		RpgUi.dim(graphics, width, height);
 		int sidebarX = sidebarX();
+
+		// Moldura do Canvas e Divisor
 		RpgUi.panel(graphics, SCREEN_MARGIN, SCREEN_MARGIN, width - SCREEN_MARGIN * 2, height - SCREEN_MARGIN * 2, 0xEE111A2A, 0xFF3A526D);
 		graphics.fill(sidebarX - 1, SCREEN_MARGIN, sidebarX, height - SCREEN_MARGIN, 0xFF0A0F1A);
+
 		drawCanvas(graphics, mouseX, mouseY);
-		drawSidebar(graphics, sidebarX, selected);
+		drawSidebar(graphics, sidebarX, selected, mouseX, mouseY, delta);
+
 		JsonObject hovered = hoverNode(mouseX, mouseY);
 		if (hovered != null) drawNodeTooltip(graphics, mouseX, mouseY, hovered);
+
 		super.extractRenderState(graphics, mouseX, mouseY, delta);
 	}
 
 	private void drawCanvas(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		int canvasWidth = canvasWidth();
-		int headerHeight = SCREEN_MARGIN + 46;
+		int headerHeight = SCREEN_MARGIN + 36;
+
+		// Faixa do topo do canvas
 		graphics.fill(SCREEN_MARGIN, SCREEN_MARGIN, canvasWidth, headerHeight, 0xCC0A111E);
-		RpgScreenText.draw(graphics, font, "ÁRVORE DE HABILIDADES", canvasWidth / 2, SCREEN_MARGIN + 15, RpgUi.TEXT, true, true);
-		for (int x = SCREEN_MARGIN; x < canvasWidth; x += 32) graphics.fill(x, headerHeight, x + 1, canvasBottom(), 0x351D3045);
-		for (int y = headerHeight; y < canvasBottom(); y += 32) graphics.fill(SCREEN_MARGIN, y, canvasWidth, y + 1, 0x351D3045);
+		RpgScreenText.draw(graphics, font, "ÁRVORE DE HABILIDADES", canvasWidth / 2, SCREEN_MARGIN + 14, RpgUi.TEXT, true, true);
+
+		// Grid sutil decorativo
+		for (int x = SCREEN_MARGIN; x < canvasWidth; x += 32) graphics.fill(x, headerHeight, x + 1, canvasBottom(), 0x301D3045);
+		for (int y = headerHeight; y < canvasBottom(); y += 32) graphics.fill(SCREEN_MARGIN, y, canvasWidth, y + 1, 0x301D3045);
 
 		int centerX = canvasWidth / 2;
 		double baseY = baseY();
+
+		// Conexões
 		for (int i = 0; i < skills.size(); i++) {
 			JsonObject skill = skills.get(i).getAsJsonObject();
 			JsonArray deps = skill.getAsJsonArray("dependencies");
@@ -162,12 +257,20 @@ public final class SkillTreeScreen extends Screen {
 				if (parent != null) drawConnection(graphics, centerX, baseY, parent, skill);
 			}
 		}
-		for (int i = 0; i < skills.size(); i++) drawNode(graphics, centerX, baseY, skills.get(i).getAsJsonObject(), mouseX, mouseY);
+
+		// Nós da árvore
+		for (int i = 0; i < skills.size(); i++) {
+			drawNode(graphics, centerX, baseY, skills.get(i).getAsJsonObject(), mouseX, mouseY);
+		}
+
 		if (skills.isEmpty()) {
 			RpgScreenText.draw(graphics, font, "Sem habilidades para mostrar", canvasWidth / 2, (SCREEN_MARGIN + canvasBottom()) / 2 - 6,
 					RpgUi.TEXT, true, true);
 		}
-		RpgUi.badge(graphics, font, String.format(java.util.Locale.ROOT, "ZOOM  %d%%", Math.round(zoom * 100.0)), canvasWidth - 112, SCREEN_MARGIN + 12, RpgUi.BLUE);
+
+		// Badge de Zoom no canto
+		RpgUi.badge(graphics, font, String.format(java.util.Locale.ROOT, "ZOOM %d%%", Math.round(zoom * 100.0)),
+				canvasWidth - 92, SCREEN_MARGIN + 10, RpgUi.BLUE);
 	}
 
 	private void drawConnection(GuiGraphicsExtractor graphics, double centerX, double baseY, JsonObject parent, JsonObject child) {
@@ -175,8 +278,12 @@ public final class SkillTreeScreen extends Screen {
 		double py = baseY + panY - depths.getOrDefault(stringValue(parent, "id", ""), 0) * 150.0 * zoom;
 		double cx = centerX + panX + horizontalOffsets.getOrDefault(stringValue(child, "id", ""), 0.0) * zoom;
 		double cy = baseY + panY - depths.getOrDefault(stringValue(child, "id", ""), 0) * 150.0 * zoom;
-		int x1 = (int) px, x2 = (int) cx, y1 = (int) (py - 24 * zoom), y2 = (int) (cy + 24 * zoom);
+
+		int x1 = (int) px, x2 = (int) cx;
+		int y1 = (int) (py - 24 * zoom);
+		int y2 = (int) (cy + 24 * zoom);
 		int middle = (y1 + y2) / 2;
+
 		int color = boolValue(parent, "unlocked") && boolValue(child, "unlocked") ? RpgUi.CYAN : 0xFF34455B;
 		fillGraphClipped(graphics, Math.min(x1, x2), middle, Math.max(x1, x2) + 1, middle + 2, color);
 		fillGraphClipped(graphics, x1, middle, x1 + 2, y1 + 2, color);
@@ -187,7 +294,7 @@ public final class SkillTreeScreen extends Screen {
 		int canvasWidth = canvasWidth();
 		int left = Math.max(0, Math.min(x1, x2));
 		int right = Math.min(canvasWidth, Math.max(x1, x2));
-		int top = Math.max(SCREEN_MARGIN + 46, Math.min(y1, y2));
+		int top = Math.max(SCREEN_MARGIN + 36, Math.min(y1, y2));
 		int bottom = Math.min(canvasBottom(), Math.max(y1, y2));
 		if (right > left && bottom > top) graphics.fill(left, top, right, bottom, color);
 	}
@@ -196,104 +303,113 @@ public final class SkillTreeScreen extends Screen {
 		String id = stringValue(skill, "id", "");
 		double nodeX = centerX + panX + horizontalOffsets.getOrDefault(id, 0.0) * zoom;
 		double nodeY = baseY + panY - depths.getOrDefault(id, 0) * 150.0 * zoom;
-		int nodeWidth = Math.max(48, (int) (64 * zoom));
+		int nodeWidth = Math.max(44, (int) (58 * zoom));
 		int nodeHeight = nodeWidth;
+
 		if (nodeX < SCREEN_MARGIN - nodeWidth || nodeX > canvasWidth() + nodeWidth) return;
 		int x = (int) nodeX - nodeWidth / 2;
 		int y = (int) nodeY - nodeHeight / 2;
+
 		boolean unlocked = boolValue(skill, "unlocked");
 		boolean available = requirementsMet(skill);
+		boolean readyToLearn = !unlocked && available && availablePoints() >= intValue(skill, "cost");
 		boolean hovered = mouseX >= x && mouseX < x + nodeWidth && mouseY >= y && mouseY < y + nodeHeight;
-		int color = unlocked ? RpgUi.CYAN : available ? RpgUi.PURPLE : RpgUi.TEXT_DIM;
-		int fill = id.equals(selectedSkillId) || hovered ? RpgUi.PANEL_HOVER : unlocked ? 0xFF172B34 : available ? 0xFF211F35 : 0xFF111824;
-		RpgUi.panel(graphics, x, y, nodeWidth, nodeHeight, fill, id.equals(selectedSkillId) ? color : RpgUi.BORDER);
+		boolean isSelected = id.equals(selectedSkillId);
+
+		int color = unlocked ? RpgUi.CYAN : readyToLearn ? RpgUi.GOLD : available ? RpgUi.PURPLE : RpgUi.TEXT_DIM;
+		if (readyToLearn) {
+			float pulse = RpgUi.pulse(2.0F);
+			color = RpgUi.blend(RpgUi.RED, RpgUi.GOLD, pulse);
+		}
+
+		int border = isSelected ? 0xFFFFFFFF : hovered ? RpgUi.BORDER_HIGHLIGHT : color;
+		int fill = isSelected ? 0xF02B374A : hovered ? RpgUi.PANEL_HOVER : unlocked ? 0xFF172B34 : available ? 0xFF211F35 : 0xFF111824;
+
+		RpgUi.panel(graphics, x, y, nodeWidth, nodeHeight, fill, border);
 		RpgUi.accent(graphics, x, y, nodeWidth, color);
+
 		ItemStack icon = new ItemStack(universalSkillId == null ? Items.ENCHANTED_BOOK : Items.NETHER_STAR);
 		graphics.item(icon, x + nodeWidth / 2 - 8, y + nodeHeight / 2 - 8);
 	}
 
-	private void drawSidebar(GuiGraphicsExtractor graphics, int left, JsonObject selected) {
+	private void drawSidebar(GuiGraphicsExtractor graphics, int left, JsonObject selected, int mouseX, int mouseY, float delta) {
 		int bodyHeight = height - SCREEN_MARGIN - FOOTER_HEIGHT;
-		RpgUi.panel(graphics, left + 10, SCREEN_MARGIN, SIDEBAR_WIDTH - 22, bodyHeight - SCREEN_MARGIN - 4, RpgUi.PANEL, RpgUi.BORDER);
-		int viewportTop = SCREEN_MARGIN + 1;
-		int viewportBottom = bodyHeight - 5;
-		graphics.enableScissor(left + 11, viewportTop, left + SIDEBAR_WIDTH - 12, viewportBottom);
-		graphics.pose().pushMatrix();
-		graphics.pose().translate(0, -sidebarScroll);
-		int x = left + 26;
+		RpgUi.panel(graphics, left + 10, SCREEN_MARGIN, SIDEBAR_WIDTH - 20, bodyHeight - SCREEN_MARGIN - 4, RpgUi.PANEL, RpgUi.BORDER);
+
+		// Cabeçalho da Sidebar
 		String treeName = universalSkillId == null ? stringValue(RpgClientState.snapshot(), "selectedClassName", "Classe") : universalSkillName(RpgClientState.snapshot());
-		RpgScreenText.draw(graphics, font, treeName, left + SIDEBAR_WIDTH / 2, 28, RpgUi.TEXT, true, true);
+		RpgScreenText.draw(graphics, font, treeName, left + SIDEBAR_WIDTH / 2, SCREEN_MARGIN + 12, RpgUi.TEXT, true, true);
+
 		int level = 0;
-		long xpCurrent = 0L;
-		long xpNext = 0L;
 		int points = availablePoints();
 		JsonObject snapshot = RpgClientState.snapshot();
 		if (universalSkillId == null) {
 			level = intValue(snapshot, "classLevel");
-			xpCurrent = longValue(snapshot, "classXpCurrent");
-			xpNext = longValue(snapshot, "classXpNext");
 		} else {
 			JsonObject progress = universalSkill(snapshot);
-			if (progress != null) {
-				level = intValue(progress, "level");
-				xpCurrent = longValue(progress, "xpCurrent");
-				xpNext = longValue(progress, "xpNext");
-			}
+			if (progress != null) level = intValue(progress, "level");
 		}
-		RpgScreenText.draw(graphics, font, "NÍVEL " + level, x, 55, RpgUi.CYAN, false, true);
-		String pointsText = "PONTOS  " + points;
-		RpgScreenText.draw(graphics, font, pointsText, left + SIDEBAR_WIDTH - font.width(pointsText) - 26, 55, RpgUi.GOLD, false, true);
-		RpgUi.bar(graphics, x, 70, SIDEBAR_WIDTH - 54, 8, xpCurrent, xpNext, RpgUi.CYAN);
-		RpgScreenText.draw(graphics, font, RpgUi.number(xpCurrent) + " / " + RpgUi.number(xpNext) + " XP", x, 83, RpgUi.TEXT_MUTED, false, true);
-		int y = 105;
-		RpgUi.divider(graphics, x, y, SIDEBAR_WIDTH - 54);
-		y += 14;
-		RpgScreenText.draw(graphics, font, "DESCRIÇÃO", x, y, RpgUi.TEXT, false, true);
-		y += 16;
-		y = RpgScreenText.drawWrapped(graphics, font, treeDescription(snapshot), x, y, SIDEBAR_WIDTH - 54, RpgUi.TEXT_MUTED) + 8;
-		RpgScreenText.draw(graphics, font, "COMO GANHA XP", x, y, RpgUi.TEXT, false, true);
-		y += 16;
-		y = RpgScreenText.drawWrapped(graphics, font, treeXpGuide(), x, y, SIDEBAR_WIDTH - 54, RpgUi.TEXT_MUTED) + 14;
-		if (selected == null) {
-			if (skills.isEmpty()) {
-				RpgUi.label(graphics, font, "habilidades ativas", x, y, RpgUi.TEXT_MUTED);
-			} else {
-				RpgUi.label(graphics, font, "habilidades ativas", x, y, RpgUi.TEXT_MUTED);
-				int activeY = y + 24;
-				for (int i = 0; i < skills.size() && activeY < canvasBottom() - 30; i++) {
-					JsonObject node = skills.get(i).getAsJsonObject();
-					if (!boolValue(node, "unlocked")) continue;
-					RpgScreenText.drawWrapped(graphics, font, "●  " + stringValue(node, "name", "Habilidade"), x, activeY, SIDEBAR_WIDTH - 54, RpgUi.GREEN);
-					activeY += font.lineHeight + 5;
-				}
-				if (activeY == y + 24) RpgScreenText.drawWrapped(graphics, font, "Nenhuma habilidade desbloqueada ainda.", x, activeY, SIDEBAR_WIDTH - 54, RpgUi.TEXT_MUTED);
-			}
-			finishSidebar(graphics, left, viewportTop, viewportBottom);
-			return;
-		}
-		boolean unlocked = boolValue(selected, "unlocked");
-		boolean available = requirementsMet(selected);
-		RpgScreenText.drawWrapped(graphics, font, stringValue(selected, "name", "Habilidade"), x, y, SIDEBAR_WIDTH - 54, RpgUi.TEXT);
-		y += 32;
-		y = RpgScreenText.drawWrapped(graphics, font, stringValue(selected, "description", "Sem descrição."), x, y, SIDEBAR_WIDTH - 54, RpgUi.TEXT_MUTED) + 12;
-		RpgScreenText.draw(graphics, font, "HABILIDADE ATIVA", left + SIDEBAR_WIDTH / 2, y, RpgUi.TEXT, true, true);
-		y += 22;
-		String effect = stringValue(selected, "effect", "");
-		if (!effect.isBlank()) {
-			RpgScreenText.drawWrapped(graphics, font, effect + "  (" + selected.get("amount").getAsString() + ")", x, y, SIDEBAR_WIDTH - 54, RpgUi.CYAN);
-		}
-		finishSidebar(graphics, left, viewportTop, viewportBottom);
-	}
 
-	private void finishSidebar(GuiGraphicsExtractor graphics, int left, int viewportTop, int viewportBottom) {
-		graphics.pose().popMatrix();
-		graphics.disableScissor();
-		int trackX = left + SIDEBAR_WIDTH - 20;
-		int trackHeight = viewportBottom - viewportTop;
-		graphics.fill(trackX, viewportTop, trackX + 5, viewportBottom, 0xFF172236);
-		int thumbHeight = Math.max(24, trackHeight * trackHeight / (trackHeight + SIDEBAR_MAX_SCROLL));
-		int thumbY = viewportTop + (trackHeight - thumbHeight) * sidebarScroll / SIDEBAR_MAX_SCROLL;
-		graphics.fill(trackX, thumbY, trackX + 5, thumbY + thumbHeight, RpgUi.TEXT_MUTED);
+		int x = left + 26;
+		RpgScreenText.draw(graphics, font, "NÍVEL " + level, x, SCREEN_MARGIN + 40, RpgUi.CYAN, false, true);
+		String pointsText = "PONTOS: " + points;
+		RpgScreenText.draw(graphics, font, pointsText, left + SIDEBAR_WIDTH - font.width(pointsText) - 26, SCREEN_MARGIN + 40, RpgUi.GOLD, false, true);
+
+		// Renderizar conteúdo rolável da sidebar com RpgScrollArea
+		int textWidth = sidebarScrollArea.getVisibleContentWidth() - 4;
+		int textX = left + 24;
+
+		sidebarScrollArea.render(graphics, mouseX, mouseY, delta, innerGraphics -> {
+			int curY = SCREEN_MARGIN + 74;
+
+			RpgUi.divider(innerGraphics, textX, curY, textWidth);
+			curY += 10;
+
+			RpgScreenText.draw(innerGraphics, font, "DESCRIÇÃO", textX, curY, RpgUi.TEXT, false, true);
+			curY += 14;
+			curY = RpgScreenText.drawWrapped(innerGraphics, font, treeDescription(snapshot), textX, curY, textWidth, RpgUi.TEXT_MUTED) + 10;
+
+			RpgScreenText.draw(innerGraphics, font, "COMO GANHAR XP", textX, curY, RpgUi.TEXT, false, true);
+			curY += 14;
+			curY = RpgScreenText.drawWrapped(innerGraphics, font, treeXpGuide(), textX, curY, textWidth, RpgUi.TEXT_MUTED) + 12;
+
+			if (selected == null) {
+				RpgUi.label(innerGraphics, font, "Habilidades Ativas", textX, curY, RpgUi.TEXT_MUTED);
+				curY += 16;
+				boolean any = false;
+				for (int i = 0; i < skills.size(); i++) {
+					JsonObject node = skills.get(i).getAsJsonObject();
+					if (boolValue(node, "unlocked")) {
+						any = true;
+						curY = RpgScreenText.drawWrapped(innerGraphics, font, "●  " + stringValue(node, "name", "Habilidade"), textX, curY, textWidth, RpgUi.GREEN) + 4;
+					}
+				}
+				if (!any) {
+					curY = RpgScreenText.drawWrapped(innerGraphics, font, "Nenhuma habilidade aprendida ainda.", textX, curY, textWidth, RpgUi.TEXT_DIM) + 4;
+				}
+			} else {
+				RpgUi.divider(innerGraphics, textX, curY, textWidth);
+				curY += 10;
+
+				RpgScreenText.draw(innerGraphics, font, stringValue(selected, "name", "Habilidade"), textX, curY, RpgUi.TEXT, false, true);
+				curY += 14;
+				curY = RpgScreenText.drawWrapped(innerGraphics, font, stringValue(selected, "description", "Sem descrição."), textX, curY, textWidth, RpgUi.TEXT_MUTED) + 10;
+
+				String effect = stringValue(selected, "effect", "");
+				if (!effect.isBlank()) {
+					RpgScreenText.draw(innerGraphics, font, "EFEITO ATIVO:", textX, curY, RpgUi.CYAN, false, true);
+					curY += 14;
+					curY = RpgScreenText.drawWrapped(innerGraphics, font, effect + " (" + selected.get("amount").getAsString() + ")", textX, curY, textWidth, RpgUi.TEXT) + 10;
+				}
+
+				int cost = intValue(selected, "cost");
+				RpgScreenText.draw(innerGraphics, font, "Custo: " + cost + " ponto(s)", textX, curY, RpgUi.GOLD, false, true);
+				curY += 14;
+			}
+
+			int totalH = curY - (SCREEN_MARGIN + 74);
+			sidebarScrollArea.setContentHeight(totalH);
+		});
 	}
 
 	private String treeDescription(JsonObject snapshot) {
@@ -326,13 +442,15 @@ public final class SkillTreeScreen extends Screen {
 
 	private void drawNodeTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY, JsonObject skill) {
 		List<Component> lines = new ArrayList<>();
-		lines.add(Component.literal(stringValue(skill, "name", "Habilidade")));
-		lines.add(Component.literal(stringValue(skill, "description", "Sem descrição.")));
-		lines.add(Component.literal("Tipo: " + stringValue(skill, "type", "PASSIVO") + "  •  Custo: " + intValue(skill, "cost") + " pontos"));
+		lines.add(Component.literal("§6" + stringValue(skill, "name", "Habilidade")));
+		lines.add(Component.literal("§7" + stringValue(skill, "description", "Sem descrição.")));
+		lines.add(Component.literal("§bTipo: §f" + stringValue(skill, "type", "PASSIVO") + "  •  §bCusto: §e" + intValue(skill, "cost") + " pontos"));
 		String effect = stringValue(skill, "effect", "");
-		if (!effect.isBlank()) lines.add(Component.literal("Efeito: " + effect + " (" + skill.get("amount").getAsString() + ")"));
+		if (!effect.isBlank()) lines.add(Component.literal("§aEfeito: §f" + effect + " (" + skill.get("amount").getAsString() + ")"));
 		JsonArray deps = skill.getAsJsonArray("dependencies");
-		if (deps != null && !deps.isEmpty()) lines.add(Component.literal(requirementsMet(skill) ? "Pré-requisitos atendidos." : "Falta: " + missingRequirements(skill)));
+		if (deps != null && !deps.isEmpty()) {
+			lines.add(Component.literal(requirementsMet(skill) ? "§a✔ Pré-requisitos atendidos." : "§cFalta: " + missingRequirements(skill)));
+		}
 		List<FormattedCharSequence> wrapped = new ArrayList<>();
 		for (Component line : lines) wrapped.addAll(font.split(line, 260));
 		graphics.setTooltipForNextFrame(font, wrapped, mouseX, mouseY);
@@ -350,7 +468,9 @@ public final class SkillTreeScreen extends Screen {
 
 	private JsonObject universalSkill(JsonObject snapshot) {
 		JsonArray values = snapshot.getAsJsonArray("universalSkills");
-		for (int i = 0; values != null && i < values.size(); i++) if (universalSkillId.equals(stringValue(values.get(i).getAsJsonObject(), "id", ""))) return values.get(i).getAsJsonObject();
+		for (int i = 0; values != null && i < values.size(); i++) {
+			if (universalSkillId.equals(stringValue(values.get(i).getAsJsonObject(), "id", ""))) return values.get(i).getAsJsonObject();
+		}
 		return null;
 	}
 
@@ -367,13 +487,21 @@ public final class SkillTreeScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		if (sidebarScrollArea != null && sidebarScrollArea.mouseClicked(event)) {
+			return true;
+		}
 		if (event.x() >= sidebarX()) return super.mouseClicked(event, doubleClick);
 		if (event.button() == 1) {
 			dragging = true;
 			dragX = event.x();
 			dragY = event.y();
 			pressedSkillId = hitNode(event.x(), event.y());
-			selectedSkillId = pressedSkillId == null ? "" : pressedSkillId;
+			if (pressedSkillId != null) {
+				RpgUiSounds.playClick();
+				selectedSkillId = pressedSkillId;
+			} else {
+				selectedSkillId = "";
+			}
 			return true;
 		}
 		return super.mouseClicked(event, doubleClick);
@@ -381,6 +509,9 @@ public final class SkillTreeScreen extends Screen {
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+		if (sidebarScrollArea != null && sidebarScrollArea.mouseDragged(event, dragX, dragY)) {
+			return true;
+		}
 		if (dragging) {
 			panX += event.x() - this.dragX;
 			panY += event.y() - this.dragY;
@@ -393,6 +524,9 @@ public final class SkillTreeScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
+		if (sidebarScrollArea != null && sidebarScrollArea.mouseReleased(event)) {
+			return true;
+		}
 		if (dragging) {
 			dragging = false;
 			pressedSkillId = null;
@@ -403,12 +537,8 @@ public final class SkillTreeScreen extends Screen {
 
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-		if (mouseX >= sidebarX()) {
-			if (mouseY >= SCREEN_MARGIN && mouseY < height - SCREEN_MARGIN - FOOTER_HEIGHT) {
-				sidebarScroll = Math.max(0, Math.min(SIDEBAR_MAX_SCROLL, sidebarScroll - (int) (verticalAmount * 18)));
-				return true;
-			}
-			return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+		if (sidebarScrollArea != null && sidebarScrollArea.mouseScrolled(mouseX, mouseY, verticalAmount)) {
+			return true;
 		}
 		double oldZoom = zoom;
 		zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom * (verticalAmount > 0 ? 1.12 : 1.0 / 1.12)));
@@ -419,6 +549,15 @@ public final class SkillTreeScreen extends Screen {
 		panX = mouseX - centerX - graphX * zoom;
 		panY = mouseY - baseY - graphY * zoom;
 		return true;
+	}
+
+	@Override
+	public boolean keyPressed(KeyEvent event) {
+		if (event.key() == 80) { // Tecla P
+			returnToCharacter();
+			return true;
+		}
+		return super.keyPressed(event);
 	}
 
 	private String hitNode(double mouseX, double mouseY) {
@@ -433,7 +572,7 @@ public final class SkillTreeScreen extends Screen {
 			JsonObject skill = skills.get(i).getAsJsonObject();
 			double x = centerX + panX + horizontalOffsets.getOrDefault(stringValue(skill, "id", ""), 0.0) * zoom;
 			double y = baseY + panY - depths.getOrDefault(stringValue(skill, "id", ""), 0) * 150.0 * zoom;
-			double halfWidth = Math.max(48, 64 * zoom) / 2.0;
+			double halfWidth = Math.max(44, 58 * zoom) / 2.0;
 			double halfHeight = halfWidth;
 			if (mouseX >= x - halfWidth && mouseX <= x + halfWidth && mouseY >= y - halfHeight && mouseY <= y + halfHeight) return skill;
 		}

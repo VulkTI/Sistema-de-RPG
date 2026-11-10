@@ -29,6 +29,7 @@ public final class RpgNetworking {
 
 	public static void register() {
 		PayloadTypeRegistry.clientboundPlay().register(RpgPayloads.Snapshot.TYPE, RpgPayloads.Snapshot.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(RpgPayloads.ClearChat.TYPE, RpgPayloads.ClearChat.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RpgPayloads.SelectClass.TYPE, RpgPayloads.SelectClass.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RpgPayloads.LearnSkill.TYPE, RpgPayloads.LearnSkill.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RpgPayloads.LearnUniversalSkill.TYPE, RpgPayloads.LearnUniversalSkill.CODEC);
@@ -43,6 +44,10 @@ public final class RpgNetworking {
 	public static void sendSnapshot(ServerPlayer player, boolean openMenu) {
 		JsonObject snapshot = makeSnapshot(player, openMenu);
 		ServerPlayNetworking.send(player, new RpgPayloads.Snapshot(GSON.toJson(snapshot)));
+	}
+
+	public static void sendClearChat(ServerPlayer player) {
+		ServerPlayNetworking.send(player, new RpgPayloads.ClearChat());
 	}
 
 	private static JsonObject makeSnapshot(ServerPlayer player, boolean openMenu) {

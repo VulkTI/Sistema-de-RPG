@@ -16,6 +16,7 @@ import br.com.rpgsystem.config.MobLevelConfig;
 import br.com.rpgsystem.skills.UniversalSkillConfig;
 import br.com.rpgsystem.skills.UniversalSkillTrees;
 import br.com.rpgsystem.skills.UniversalSkillEvents;
+import br.com.rpgsystem.sound.RpgSoundEvents;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ public final class RpgMod implements ModInitializer {
 		AffixComponents.register();
 		AffixRepository.register();
 		AffixItemGroups.register();
+		RpgSoundEvents.register();
 		ClassRegistry.register(new FerreiroClass());
 		ClassRegistry.register(new MineradorClass());
 		RpgNetworking.register();

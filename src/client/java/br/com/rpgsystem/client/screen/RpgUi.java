@@ -11,8 +11,7 @@ import java.util.List;
 
 /**
  * Vocabulário visual compartilhado pelas telas do sistema RPG.
- * Mantém a interface legível em resoluções pequenas e evita que cada tela
- * invente uma paleta ou uma forma diferente de apresentar progresso.
+ * Mantém a interface legível, consistente e responsiva com suporte a animações sutis.
  */
 public final class RpgUi {
 	public static final int BACKDROP = 0xB90B1020;
@@ -22,6 +21,7 @@ public final class RpgUi {
 	public static final int PANEL_HOVER = 0xF928354B;
 	public static final int BORDER = 0xFF33445D;
 	public static final int BORDER_SOFT = 0xFF25334A;
+	public static final int BORDER_HIGHLIGHT = 0xFF5A7CA6;
 	public static final int TEXT = 0xFFF3F6FF;
 	public static final int TEXT_MUTED = 0xFF9EABC2;
 	public static final int TEXT_DIM = 0xFF6C7890;
@@ -33,6 +33,32 @@ public final class RpgUi {
 	public static final int RED = 0xFFFF7185;
 
 	private RpgUi() {}
+
+	/** Retorna uma oscilação suave de 0.0 a 1.0 baseada no relógio do sistema. */
+	public static float pulse(float speed) {
+		double time = (System.currentTimeMillis() % 100000L) / 1000.0;
+		return (float) ((Math.sin(time * speed * Math.PI * 2.0) + 1.0) * 0.5);
+	}
+
+	/** Interpola linearmente entre duas cores ARGB. */
+	public static int blend(int c1, int c2, float ratio) {
+		float r = Mth.clamp(ratio, 0.0F, 1.0F);
+		float inv = 1.0F - r;
+		int a = (int) (((c1 >> 24) & 0xFF) * inv + ((c2 >> 24) & 0xFF) * r);
+		int red = (int) (((c1 >> 16) & 0xFF) * inv + ((c2 >> 16) & 0xFF) * r);
+		int g = (int) (((c1 >> 8) & 0xFF) * inv + ((c2 >> 8) & 0xFF) * r);
+		int b = (int) ((c1 & 0xFF) * inv + (c2 & 0xFF) * r);
+		return (a << 24) | (red << 16) | (g << 8) | b;
+	}
+
+	public static int withAlpha(int color, int alpha) {
+		return ((alpha & 0xFF) << 24) | (color & 0x00FFFFFF);
+	}
+
+	public static int withAlpha(int color, float alphaRatio) {
+		int alpha = Mth.clamp((int) (alphaRatio * 255.0F), 0, 255);
+		return (alpha << 24) | (color & 0x00FFFFFF);
+	}
 
 	public static void dim(GuiGraphicsExtractor graphics, int width, int height) {
 		graphics.fill(0, 0, width, height, BACKDROP);
@@ -48,6 +74,16 @@ public final class RpgUi {
 		if (width <= 0 || height <= 0) return;
 		graphics.fill(x, y, x + width, y + height, border);
 		if (width > 2 && height > 2) graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, fill);
+	}
+
+	public static void panelGlow(GuiGraphicsExtractor graphics, int x, int y, int width, int height,
+			int fill, int border, int glowColor, float glowAlpha) {
+		if (width <= 0 || height <= 0) return;
+		int effectiveBorder = blend(border, glowColor, glowAlpha);
+		graphics.fill(x, y, x + width, y + height, effectiveBorder);
+		if (width > 2 && height > 2) {
+			graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, fill);
+		}
 	}
 
 	public static void accent(GuiGraphicsExtractor graphics, int x, int y, int width, int color) {

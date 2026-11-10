@@ -1,0 +1,32 @@
+{
+  "ui.click": {
+    "subtitle": "subtitles.rpgsystem.ui.click",
+    "sounds": [
+      "rpgsystem:ui/click"
+    ]
+  },
+  "ui.skill_learn": {
+    "subtitle": "subtitles.rpgsystem.ui.skill_learn",
+    "sounds": [
+      "rpgsystem:ui/skill_learn"
+    ]
+  },
+  "ui.tab_switch": {
+    "subtitle": "subtitles.rpgsystem.ui.tab_switch",
+    "sounds": [
+      "rpgsystem:ui/tab_switch"
+    ]
+  },
+  "ui.open": {
+    "subtitle": "subtitles.rpgsystem.ui.open",
+    "sounds": [
+      "rpgsystem:ui/open"
+    ]
+  },
+  "ui.close": {
+    "subtitle": "subtitles.rpgsystem.ui.close",
+    "sounds": [
+      "rpgsystem:ui/close"
+    ]
+  }
+}

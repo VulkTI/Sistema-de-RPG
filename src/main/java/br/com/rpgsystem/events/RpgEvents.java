@@ -15,7 +15,11 @@ import br.com.rpgsystem.progression.ProgressionMath;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import br.com.rpgsystem.loot.LootToolHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -40,6 +44,20 @@ public final class RpgEvents {
 			RpgSavedData.Profile profile = RpgSavedData.get(server).profile(player.getUUID());
 			MineradorEffects.refreshMiningSpeed(player);
 			RpgNetworking.sendSnapshot(player, profile.selectedClassId().isBlank());
+		});
+
+		UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+			if (hand != net.minecraft.world.InteractionHand.MAIN_HAND) {
+				return InteractionResult.PASS;
+			}
+			if (!(player instanceof ServerPlayer serverPlayer) || !(level instanceof ServerLevel serverLevel)) {
+				return InteractionResult.PASS;
+			}
+			ItemStack stack = serverPlayer.getMainHandItem();
+			if (!LootToolHelper.isTool(stack)) {
+				return InteractionResult.PASS;
+			}
+			return LootToolHelper.handleUseOnBlock(serverPlayer, serverLevel, hit.getBlockPos());
 		});
 
 		PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) -> {

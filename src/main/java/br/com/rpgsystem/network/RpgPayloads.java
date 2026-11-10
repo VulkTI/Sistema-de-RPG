@@ -17,6 +17,12 @@ public final class RpgPayloads {
 		@Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
 	}
 
+	public record ClearChat() implements CustomPacketPayload {
+		public static final Type<ClearChat> TYPE = new Type<>(RpgMod.id("clear_chat"));
+		public static final StreamCodec<RegistryFriendlyByteBuf, ClearChat> CODEC = StreamCodec.unit(new ClearChat());
+		@Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
+	}
+
 	public record SelectClass(String classId) implements CustomPacketPayload {
 		public static final Type<SelectClass> TYPE = new Type<>(RpgMod.id("select_class"));
 		public static final StreamCodec<RegistryFriendlyByteBuf, SelectClass> CODEC = StreamCodec.composite(

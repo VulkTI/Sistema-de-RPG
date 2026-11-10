@@ -17,6 +17,13 @@ public final class RpgClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		ClientPlayNetworking.registerGlobalReceiver(RpgPayloads.ClearChat.TYPE, (payload, context) ->
+				context.client().execute(() -> {
+					if (context.client().gui != null && context.client().gui.hud != null && context.client().gui.hud.getChat() != null) {
+						context.client().gui.hud.getChat().clearMessages(false);
+					}
+				}));
+
 		ClientPlayNetworking.registerGlobalReceiver(RpgPayloads.Snapshot.TYPE, (payload, context) ->
 				context.client().execute(() -> {
 					RpgClientState.update(payload.json());
