@@ -30,4 +30,13 @@ public final class RpgPayloads {
 				ByteBufCodecs.STRING_UTF8, LearnSkill::skillId, LearnSkill::new);
 		@Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
 	}
+
+	public record LearnUniversalSkill(String skillId, String nodeId) implements CustomPacketPayload {
+		public static final Type<LearnUniversalSkill> TYPE = new Type<>(RpgMod.id("learn_universal_skill"));
+		public static final StreamCodec<RegistryFriendlyByteBuf, LearnUniversalSkill> CODEC = StreamCodec.composite(
+				ByteBufCodecs.STRING_UTF8, LearnUniversalSkill::skillId,
+				ByteBufCodecs.STRING_UTF8, LearnUniversalSkill::nodeId,
+				LearnUniversalSkill::new);
+		@Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
+	}
 }

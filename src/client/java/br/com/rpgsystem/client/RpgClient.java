@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 
 public final class RpgClient implements ClientModInitializer {
 	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(RpgMod.id("main"));
@@ -32,7 +31,14 @@ public final class RpgClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (OPEN_STATUS.consumeClick()) {
 				if (client.player != null && RpgClientState.hasSnapshot()) {
-					client.gui.setScreen(new PlayerStatusScreen());
+					var snapshot = RpgClientState.snapshot();
+					String selectedClass = snapshot.has("selectedClassId") && !snapshot.get("selectedClassId").isJsonNull()
+							? snapshot.get("selectedClassId").getAsString() : "";
+					if (selectedClass.isBlank()) {
+						client.gui.setScreen(new ClassSelectionScreen());
+					} else {
+						client.gui.setScreen(new PlayerStatusScreen());
+					}
 				}
 			}
 		});

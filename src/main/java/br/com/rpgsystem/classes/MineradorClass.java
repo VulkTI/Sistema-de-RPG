@@ -2,7 +2,6 @@ package br.com.rpgsystem.classes;
 
 import br.com.rpgsystem.RpgMod;
 import br.com.rpgsystem.config.XpConfig;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -23,13 +22,10 @@ public final class MineradorClass extends RpgClass {
 
 	/** XP de cada minério vanilla, incluindo as variantes de ardosiabissal. */
 	public int oreXp(BlockState state) {
-		String path = BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath();
-		if (path.startsWith("deepslate_")) path = path.substring("deepslate_".length());
-		return XpConfig.mineradorOreXp(path);
+		return XpConfig.mineradorOreXp(state);
 	}
 
 	public boolean isCommonMiningBlock(BlockState state) {
-		String path = BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath();
-		return path.equals("stone") || path.equals("deepslate");
+		return XpConfig.isMineradorCommonMiningBlock(state);
 	}
 }

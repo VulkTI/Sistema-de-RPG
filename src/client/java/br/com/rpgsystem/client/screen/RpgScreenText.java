@@ -14,12 +14,13 @@ public final class RpgScreenText {
 		graphics.text(font, text, drawX, y, color, shadow);
 	}
 
-	public static void drawWrapped(GuiGraphicsExtractor graphics, Font font, String text, int x, int y,
+	public static int drawWrapped(GuiGraphicsExtractor graphics, Font font, String text, int x, int y,
 			int maxWidth, int color) {
 		int lineY = y;
 		for (FormattedCharSequence line : font.split(Component.literal(text), Math.max(1, maxWidth))) {
 			graphics.text(font, line, x, lineY, color, true);
 			lineY += font.lineHeight;
 		}
+		return lineY;
 	}
 }

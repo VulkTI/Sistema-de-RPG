@@ -52,6 +52,14 @@ public final class MobLevelConfig {
 	}
 
 	private static JsonObject defaults() {
+		try (java.io.InputStream in = MobLevelConfig.class.getResourceAsStream("/data/rpgsystem/mob_levels.json")) {
+			if (in != null) {
+				return JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8)).getAsJsonObject();
+			}
+		} catch (Exception exception) {
+			RpgMod.LOGGER.warn("Não foi possível carregar /data/rpgsystem/mob_levels.json embutido.", exception);
+		}
+
 		JsonObject json = new JsonObject();
 		json.add("fallback_range", range(new LevelRange(1, 5)));
 		json.addProperty("health_per_level", 0.015D);
@@ -122,11 +130,9 @@ public final class MobLevelConfig {
 	public static double armorPerLevel() { return number("armor_per_level", 0.250D, 0D, 5D); }
 	public static double armorBonusCap() { return number("armor_bonus_cap", 20D, 0D, 30D); }
 
-	public static Map<String, LevelRange> biomeRanges() { return configuredRanges("biome_ranges", MobLevelRanges.defaultBiomeRanges()); }
+	public static Map<String, LevelRange> biomeRanges() { return AreaConfig.biomeRanges(); }
 	public static List<MobLevelRanges.StructureRange> structureRanges() {
-		Map<String, LevelRange> configured = configuredRanges("structure_ranges", defaultStructures());
-		return MobLevelRanges.defaultStructureRanges().stream()
-				.map(entry -> new MobLevelRanges.StructureRange(entry.id(), configured.getOrDefault(entry.id().toString(), entry.range()))).toList();
+		return AreaConfig.structureRanges();
 	}
 
 	private static Map<String, LevelRange> defaultStructures() {

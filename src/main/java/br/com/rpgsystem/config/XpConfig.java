@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +38,14 @@ public final class XpConfig {
 	}
 
 	private static JsonObject defaults() {
+		try (java.io.InputStream in = XpConfig.class.getResourceAsStream("/data/rpgsystem/xp.json")) {
+			if (in != null) {
+				return JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8)).getAsJsonObject();
+			}
+		} catch (Exception exception) {
+			System.err.println("Não foi possível ler /data/rpgsystem/xp.json embutido: " + exception.getMessage());
+		}
+
 		JsonObject json = new JsonObject();
 		json.addProperty("player_hostile_kill", 8);
 		JsonObject minerador = new JsonObject();
@@ -70,6 +80,15 @@ public final class XpConfig {
 	public static int mineradorOreXp(String path) {
 		JsonObject ores = section("minerador").getAsJsonObject("ores");
 		return ores.has(path) ? Math.max(0, ores.get(path).getAsInt()) : 0;
+	}
+	public static int mineradorOreXp(BlockState state) { return mineradorOreXp(miningPath(state)); }
+	public static boolean isMineradorCommonMiningBlock(BlockState state) {
+		String path = miningPath(state);
+		return path.equals("stone") || path.equals("deepslate");
+	}
+	public static String miningPath(BlockState state) {
+		String path = BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath();
+		return path.startsWith("deepslate_") ? path.substring("deepslate_".length()) : path;
 	}
 	public static int ferreiro(String key, int fallback) {
 		JsonObject section = section("ferreiro");

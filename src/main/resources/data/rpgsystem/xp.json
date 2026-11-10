@@ -1,0 +1,34 @@
+{
+  "player_hostile_kill": 15,
+  "minerador": {
+    "stone_blocks_per_reward": 64,
+    "stone_reward_xp": 12,
+    "ores": {
+      "coal_ore": 5,
+      "copper_ore": 9,
+      "nether_quartz_ore": 5,
+      "redstone_ore": 36,
+      "lapis_ore": 45,
+      "iron_ore": 18,
+      "gold_ore": 60,
+      "nether_gold_ore": 16,
+      "emerald_ore": 300,
+      "diamond_ore": 92,
+      "ancient_debris": 130
+    }
+  },
+  "ferreiro": {
+    "smelted_copper_ingot": 8,
+    "smelted_iron_ingot": 20,
+    "smelted_gold_ingot": 30,
+    "netherite_ingot_crafted": 400,
+    "metal_item_crafted_base": 20,
+    "material_bonus_copper": 10,
+    "material_bonus_iron": 20,
+    "material_bonus_gold": 40,
+    "material_bonus_diamond": 70,
+    "material_bonus_netherite": 140,
+    "bars_multiplier": 1.2
+  }
+}
+

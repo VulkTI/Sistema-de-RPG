@@ -11,6 +11,9 @@ import br.com.rpgsystem.network.RpgNetworking;
 import br.com.rpgsystem.classes.FerreiroClass;
 import br.com.rpgsystem.classes.RpgAction;
 import br.com.rpgsystem.affixes.AffixItemGroups;
+import br.com.rpgsystem.skills.UniversalSkill;
+import br.com.rpgsystem.skills.UniversalSkillConfig;
+import br.com.rpgsystem.skills.UniversalSkillService;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
@@ -38,6 +41,17 @@ public abstract class ResultSlotMixin {
 	private void rpgsystem$rollAffixOnCraft(Player entity, ItemStack craftedStack, CallbackInfo ci) {
 		if (CraftingAffixHelper.isShiftCraftInProgress()) return;
 		if (!(entity instanceof ServerPlayer player) || craftedStack.isEmpty()) return;
+		if (player.containerMenu instanceof AnvilMenu menu) {
+			ItemStack first = menu.getSlot(0).getItem();
+			boolean renameOnly = menu.getSlot(1).getItem().isEmpty()
+					&& craftedStack.get(DataComponents.CUSTOM_NAME) != null
+					&& first.get(DataComponents.CUSTOM_NAME) == null;
+			if (menu.getCost() > 0 && !renameOnly) UniversalSkillService.addXp(player, UniversalSkill.CONHECIMENTO,
+					UniversalSkillConfig.activityXp(UniversalSkill.CONHECIMENTO, "anvil", 18));
+		} else {
+			UniversalSkillService.addXp(player, UniversalSkill.CONHECIMENTO,
+					UniversalSkillConfig.activityXp(UniversalSkill.CONHECIMENTO, "craft", 4) * craftedStack.getCount());
+		}
 		RpgSavedData.Profile profile = RpgSavedData.get(player.level().getServer()).profile(player.getUUID());
 		final FerreiroClass blacksmith = profile.selectedClassId().equals("rpgsystem:ferreiro")
 				? ClassRegistry.byId(br.com.rpgsystem.RpgMod.id("ferreiro")).filter(FerreiroClass.class::isInstance)

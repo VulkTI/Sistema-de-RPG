@@ -9,6 +9,9 @@ import br.com.rpgsystem.classes.FerreiroClass;
 import br.com.rpgsystem.data.RpgSavedData;
 import br.com.rpgsystem.network.RpgNetworking;
 import br.com.rpgsystem.progression.ProgressionMath;
+import br.com.rpgsystem.skills.UniversalSkill;
+import br.com.rpgsystem.skills.UniversalSkillConfig;
+import br.com.rpgsystem.skills.UniversalSkillService;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
@@ -43,6 +46,8 @@ public final class CraftingAffixHelper {
 		int bars = SHIFT_CRAFT_BARS.get();
 		SHIFT_CRAFT_BARS.remove();
 		if (craftedStack.isEmpty()) return;
+		UniversalSkillService.addXp(player, UniversalSkill.CONHECIMENTO,
+				UniversalSkillConfig.activityXp(UniversalSkill.CONHECIMENTO, "craft", 4) * craftedStack.getCount());
 
 		RpgSavedData data = RpgSavedData.get(player.level().getServer());
 		RpgSavedData.Profile profile = data.profile(player.getUUID());

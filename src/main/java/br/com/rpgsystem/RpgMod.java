@@ -10,8 +10,12 @@ import br.com.rpgsystem.affixes.RpgAttributes;
 import br.com.rpgsystem.commands.RpgCommands;
 import br.com.rpgsystem.events.RpgEvents;
 import br.com.rpgsystem.network.RpgNetworking;
+import br.com.rpgsystem.config.AreaConfig;
 import br.com.rpgsystem.config.XpConfig;
 import br.com.rpgsystem.config.MobLevelConfig;
+import br.com.rpgsystem.skills.UniversalSkillConfig;
+import br.com.rpgsystem.skills.UniversalSkillTrees;
+import br.com.rpgsystem.skills.UniversalSkillEvents;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
@@ -23,8 +27,11 @@ public final class RpgMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		AreaConfig.load();
 		XpConfig.load();
 		MobLevelConfig.load();
+		UniversalSkillConfig.load();
+		UniversalSkillTrees.load();
 		RpgAttributes.register();
 		AffixComponents.register();
 		AffixRepository.register();
@@ -34,7 +41,8 @@ public final class RpgMod implements ModInitializer {
 		RpgNetworking.register();
 		RpgCommands.register();
 		RpgEvents.register();
-		LOGGER.info("Sistema RPG carregado com {} classe(s).", ClassRegistry.all().size());
+		UniversalSkillEvents.register();
+		LOGGER.info("Sistema RPG carregado com {} classe(s) e seis habilidades universais.", ClassRegistry.all().size());
 	}
 
 	public static Identifier id(String path) {
