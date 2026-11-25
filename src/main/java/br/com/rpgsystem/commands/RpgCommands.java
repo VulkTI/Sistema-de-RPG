@@ -90,7 +90,8 @@ public final class RpgCommands {
 										.suggests(RpgCommands::suggestAffixes)
 										.executes(RpgCommands::applyAffix)))
 						.then(Commands.literal("remove").executes(RpgCommands::removeAffix)))
-				.then(tableCommands(registryAccess)));
+				.then(tableCommands(registryAccess))
+				.then(br.com.rpgsystem.dungeon.command.DungeonCommands.register(registryAccess)));
 	}
 
 	private static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> tableCommands(
@@ -191,7 +192,7 @@ public final class RpgCommands {
 	private static int deleteTable(CommandContext<CommandSourceStack> context) {
 		String name = StringArgumentType.getString(context, "nome_tabela");
 		RpgLootTableSavedData data = RpgLootTableSavedData.get(context.getSource().getServer());
-		if (!data.removeTable(name)) {
+		if (!data.removeTable(context.getSource().getServer(), name)) {
 			context.getSource().sendFailure(Component.literal("A tabela de looting '" + name + "' não existe."));
 			return 0;
 		}

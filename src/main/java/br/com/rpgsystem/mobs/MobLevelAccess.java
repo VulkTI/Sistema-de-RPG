@@ -8,4 +8,10 @@ public interface MobLevelAccess {
 	default boolean rpgsystem$hasMobLevel() {
 		return rpgsystem$getMobLevel() >= 1;
 	}
+
+	default float rpgsystem$getAttackMultiplier() {
+		return 1.0F;
+	}
+
+	default void rpgsystem$setAttackMultiplier(float multiplier) {}
 }

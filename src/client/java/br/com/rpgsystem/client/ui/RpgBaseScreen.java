@@ -42,7 +42,6 @@ public abstract class RpgBaseScreen extends Screen {
 	protected void init() {
 		super.init();
 		layoutWindow();
-		RpgUiSounds.playOpen();
 
 		if (showCloseButton && hasWindowPanel) {
 			int closeBtnSize = 14;
@@ -97,14 +96,56 @@ public abstract class RpgBaseScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		RpgUiSounds.playClose();
 		super.onClose();
+	}
+
+	public boolean isAnyTextInputFocused() {
+		var focused = getFocused();
+		if (isWidgetTextInputFocused(focused)) {
+			return true;
+		}
+		for (var child : children()) {
+			if (isWidgetTextInputFocused(child)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isWidgetTextInputFocused(Object widget) {
+		if (widget instanceof net.minecraft.client.gui.components.EditBox eb) {
+			return eb.canConsumeInput() || eb.isFocused();
+		}
+		if (widget instanceof br.com.rpgsystem.dungeon.client.ui.RpgWaveListWidget waveList && waveList.getNewWaveInput() != null) {
+			return waveList.getNewWaveInput().canConsumeInput() || waveList.getNewWaveInput().isFocused();
+		}
+		return false;
 	}
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (event.key() == 80) { // Tecla P
+		var focused = getFocused();
+		if (focused instanceof net.minecraft.client.gui.components.EditBox editBox) {
+			if (editBox.keyPressed(event)) {
+				return true;
+			}
+		}
+
+		// Se qualquer campo de texto estiver ativo ou focado, NÃO fecha a tela com a tecla P nem bloqueia teclas
+		if (isAnyTextInputFocused()) {
+			return super.keyPressed(event);
+		}
+
+		if (event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_P) { // Tecla P
 			onClose();
+			return true;
+		}
+		// Intercepta teclas de seta para evitar que naveguem e ativem ou fechem o menu
+		if (event.isLeft() || event.isRight() || event.isUp() || event.isDown()
+				|| event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_LEFT
+				|| event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_RIGHT
+				|| event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_UP
+				|| event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_DOWN) {
 			return true;
 		}
 		return super.keyPressed(event);

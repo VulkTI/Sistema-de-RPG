@@ -17,6 +17,6 @@ public abstract class ItemStackDurabilityMixin {
 	@Inject(method = "hurtAndBreak", at = @At("HEAD"), cancellable = true)
 	private void rpgsystem$mineradorPreservesPickaxe(int amount, ServerLevel level, ServerPlayer player,
 			Consumer<ItemStack> onBreak, CallbackInfo ci) {
-		if (MineradorEffects.shouldPreventPickaxeDamage((ItemStack) (Object) this, player)) ci.cancel();
+		if (player != null && MineradorEffects.shouldPreventPickaxeDamage((ItemStack) (Object) this, player)) ci.cancel();
 	}
 }

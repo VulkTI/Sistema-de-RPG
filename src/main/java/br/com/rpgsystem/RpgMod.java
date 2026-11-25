@@ -40,10 +40,22 @@ public final class RpgMod implements ModInitializer {
 		RpgSoundEvents.register();
 		ClassRegistry.register(new FerreiroClass());
 		ClassRegistry.register(new MineradorClass());
+		br.com.rpgsystem.dungeon.block.DungeonBlocks.register();
+		br.com.rpgsystem.dungeon.network.DungeonNetworking.register();
 		RpgNetworking.register();
 		RpgCommands.register();
 		RpgEvents.register();
 		UniversalSkillEvents.register();
+
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+			br.com.rpgsystem.dungeon.data.DungeonRepository.init(server);
+			br.com.rpgsystem.dungeon.world.DungeonWorldManager.onWorldLoad(server);
+		});
+
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {
+			br.com.rpgsystem.dungeon.world.DungeonWorldManager.tick(server);
+		});
+
 		LOGGER.info("Sistema RPG carregado com {} classe(s) e seis habilidades universais.", ClassRegistry.all().size());
 	}
 

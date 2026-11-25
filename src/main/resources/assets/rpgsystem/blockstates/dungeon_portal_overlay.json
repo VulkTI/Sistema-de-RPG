@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "rpgsystem:block/dungeon_portal_overlay"
+    }
+  }
+}

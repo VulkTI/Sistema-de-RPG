@@ -8,6 +8,8 @@ Mod para Fabric em Minecraft 26.3 que adiciona progressão de jogador e de class
 - [Comandos](#comandos)
 - [Classes e perks](#classes-e-perks)
 - [Sistema de afixos](#sistema-de-afixos)
+- [Tabelas de Looting](#tabelas-de-looting-personalizadas)
+- [Sistema de dungeons](#sistema-de-dungeons)
 - [Níveis de criaturas e zonas](#níveis-de-criaturas)
 - [Geração de minérios por zonas](#geração-de-minérios-por-zonas)
 - [Guia para desenvolvimento](#guia-para-desenvolvimento-e-criação-de-conteúdo)
@@ -28,6 +30,7 @@ Para compilar o projeto no Windows, execute `./gradlew.bat build` (ou `compilar.
 - Sistema de afixos em armas, ferramentas, armaduras e outros itens compatíveis: modificadores de atributos, raridades, grupos, tags, itens específicos, tooltips e rolagem automática.
 - Herança de afixo ao aprimorar um item na ferraria; se o item-base não tiver afixo, o resultado pode receber um novo.
 - Atributo `rpgsystem:affix_luck`, comandos de administração e sincronização dos dados entre servidor e cliente.
+- Sistema completo de tabelas de looting customizadas com cálculo ponderado de pesos, deduplicação por NBT, ferramenta de aplicação para baús/barris e exportação automática em JSON.
 - Níveis persistentes de mobs, definidos por bioma/estrutura, escalonamento de combate e etiqueta do alvo sob a mira.
 - Seis habilidades universais — Combate, Mineração, Agropecuária, Conhecimento, Exploração e Comércio — com XP independente, nível máximo 20 e progresso persistente por UUID.
 - Cartões das seis habilidades na tela de status e telas informativas independentes carregadas dos JSONs em `src/main/resources/data/rpgsystem/universal_skills/`.
@@ -88,6 +91,105 @@ Os comandos de afixo atuam sobre o item na mão principal:
 ```
 
 `list` mostra os afixos compatíveis e as chances individuais estimadas na rolagem normal. `roll` faz uma rolagem normal, incluindo chance de nenhum afixo. `roll rarity` escolhe uniformemente entre afixos compatíveis daquela raridade, sem a rolagem normal de raridade/ausência. `roll <id>` simula rolagens normais até obter o afixo indicado e aplica o resultado; serve para teste e pode levar muitas rolagens simuladas. `apply` aplica diretamente um afixo compatível e `remove` retira o afixo atual.
+
+### Tabelas de Looting
+
+Gerenciamento dinâmico e teste de tabelas de itens para baús e futuras dungeons:
+
+```text
+/rpg table list
+/rpg table list <nome_tabela>
+/rpg table list <nome_tabela> <id|name|chance> <crescente|decrescente>
+/rpg table create <nome_tabela>
+/rpg table create <nome_tabela> <min> <max>
+/rpg table insert <nome_tabela> <item> <peso>
+/rpg table inserthand <nome_tabela> <peso>
+/rpg table deleteitem <nome_tabela> <id>
+/rpg table weight <nome_tabela> <id> <peso>
+/rpg table amount <nome_tabela> <min> <max>
+/rpg table delete <nome_tabela>
+/rpg table tool <nome_tabela>
+```
+
+- `/rpg table list`: exibe todas as tabelas criadas no mundo, com número de itens e limites mín/máx. Cada nome é clicável para abrir a listagem detalhada.
+- `/rpg table create <nome_tabela> <min> <max>`: cria a tabela já definindo a quantidade mínima e máxima de itens sorteados no baú.
+- `/rpg table insert` / `inserthand`: adiciona itens alocando automaticamente o menor ID numérico disponível. Se o item inserido já existir com o mesmo tipo e NBT/componentes, seu peso é atualizado sem duplicar o item.
+- `/rpg table list <nome_tabela>`: interface no chat dividida em colunas (ID, Nome, % de Chance / Peso) com botões clicáveis de ordenação interativa (`[ID]`, `[A-Z]`, `[Chance]`, `[Crescente]`, `[Decrescente]`), limpando mensagens anteriores automaticamente para visualização limpa.
+- `/rpg table tool <nome_tabela>`: entrega uma ferramenta especial de teste. Clicar com botão direito em qualquer baú, baú com armadilha ou barril preenche o recipiente sorteando os itens da tabela com base nos pesos configurados.
+- `/rpg table deleteitem` / `weight` / `amount`: remove itens reutilizando os IDs vagos, reajusta pesos ou redefine o intervalo de quantidade de itens.
+- `/rpg table delete`: apaga a tabela e seu arquivo correspondente.
+
+#### Persistência e exportação de tabelas
+- **Arquivos gerados em jogo:** salvos automaticamente em `.minecraft/config/rpgsystem/loot_tables/<nome>.json` a cada criação ou edição.
+- **Tabelas embutidas no mod:** para incluir tabelas fixas distribuídas junto ao mod (que funcionam em qualquer novo mundo), basta colocar o arquivo JSON em `src/main/resources/data/rpgsystem/loot_tables/<nome>.json`. No início do mundo, o mod carrega as tabelas da pasta config e os padrões embutidos no mod.
+
+## Sistema de dungeons
+
+O sistema permite criar modelos de dungeon no mundo, construir suas estruturas em uma dimensão de edição, configurar pontos de entrada e saída, ondas de inimigos, baús e regras de aparição. As configurações ficam associadas ao mundo e são persistidas no servidor. Os comandos ficam sob `/rpg dungeon`; o jogador precisa das permissões do servidor para executá-los.
+
+### Criar e editar uma dungeon
+
+Crie uma dungeon com nome de uma palavra (use `_` no lugar de espaços). Os argumentos opcionais são nível mínimo, nível máximo e peso usado na escolha aleatória:
+
+```text
+/rpg dungeon create templo
+/rpg dungeon create templo 5 20 3
+```
+
+O comando padrão cria nível 1–1 e peso 1. Depois de criar, use o botão clicável **EDITAR** oferecido no chat ou execute:
+
+```text
+/rpg dungeon editor templo
+```
+
+O editor abre a sessão de edição. Na tela de configuração, informe nome, níveis e peso. Selecione **Entrada** ou **Dungeon** e use a seta para escolher um arquivo de estrutura `.nbt`. Em singleplayer, o explorador começa em `saves/<mundo>/generated/minecraft/structures`; em servidor remoto, selecione um arquivo `.nbt` disponível na máquina do cliente. A leitura válida aparece em verde com o nome do arquivo. Para estruturas próprias, salve o NBT no formato vanilla de Structure Block.
+
+Com uma estrutura selecionada, **Construir** abre o espaço de trabalho no vazio e coloca a esquemática para edição. Sem esquemática, inicia um espaço vazio. Use `/rpg dungeon config` para voltar à configuração. **Salvar** grava os dados da dungeon; **Cancelar** encerra a sessão sem aplicar a edição atual. O modo de construção livre também permite ajustar blocos e usar as ferramentas de edição fornecidas pelo mod. Ao terminar uma estrutura, salve-a pela ação de salvamento do editor; o mod guarda a estrutura na pasta de estruturas geradas do mundo.
+
+### Configurar pontos, ondas e recompensas
+
+Na edição, use `/rpg dungeon config` para abrir a configuração. A tela apresenta as ferramentas de configuração disponíveis na sessão; use **Salvar** para persistir e **Cancelar** para sair. Configure a estrutura de entrada e a estrutura principal separadamente, escolhendo-as no seletor e marcando no espaço de edição os pontos de spawn/portais que a ferramenta solicitar.
+
+As ondas são listas ordenadas de aparições de mobs. Crie ou selecione uma onda, adicione os tipos de entidades e ajuste quantidade, intervalo e parâmetros oferecidos pela tela; reordene ou remova entradas conforme necessário. Os pontos de spawn de mobs determinam onde as criaturas aparecem. Pontos de baú associam recipientes à dungeon e podem usar as tabelas configuradas com `/rpg table`. Áreas de gatilho permitem associar ações como início de onda, recompensa de baú ou música ao espaço marcado. Salve cada tela de ferramenta antes de retornar ao editor.
+
+> Os campos exatos variam conforme a ferramenta aberta; as telas mostram os valores editáveis e seus rótulos. O arquivo da dungeon armazena dados das estruturas, portais, ondas, mobs, baús e gatilhos.
+
+### Testar, ativar e publicar no mundo
+
+Antes de ativar, confira se a dungeon tem uma estrutura principal e um ponto de surgimento do jogador configurado. A ativação valida esses requisitos e informa o que estiver faltando. Para testar aparição:
+
+```text
+/rpg dungeon spawn here templo
+/rpg dungeon spawn here templo 10
+/rpg dungeon spawn elective templo
+/rpg dungeon spawn elective templo 10
+```
+
+`here` instancia a dungeon na posição do comando; `elective` usa a rotina de posicionamento automático. O nível pode ser informado no fim. Sem nome, os comandos escolhem uma dungeon ativa elegível.
+
+Quando estiver pronta para uso, ative-a:
+
+```text
+/rpg dungeon activate templo
+/rpg dungeon deactivate templo
+```
+
+Ativar inclui a dungeon nas seleções disponíveis e valida os requisitos necessários; desativar a remove da seleção sem apagar seus dados. Para remover uma dungeon criada no mundo:
+
+```text
+/rpg dungeon delete templo
+```
+
+A exclusão só se aplica a dungeons locais criadas no mundo, não às dungeons oficiais distribuídas pelo mod. Dungeons oficiais podem ser ativadas ou desativadas, mas não apagadas.
+
+### Persistência e distribuição
+
+- Definições e estado das dungeons do mundo: `rpg_dungeons.json` na raiz do mundo.
+- Estruturas salvas pelo editor: `<mundo>/generated/minecraft/structures/`.
+- Definições de dungeon embutidas na distribuição do mod: `src/main/resources/data/rpgsystem/dungeons/official_dungeons.json`.
+- Estruturas embutidas: `src/main/resources/data/rpgsystem/structures/`; referencie-as com ID `rpgsystem:<nome>.nbt` no JSON.
+
+Faça backup do mundo antes de distribuir alterações de conteúdo. Em multiplayer, instale a mesma versão do mod no servidor e nos clientes; a persistência e a criação das instâncias são controladas pelo servidor. O caminho absoluto de uma esquemática escolhida no cliente funciona diretamente em singleplayer; em servidor dedicado, mantenha o NBT no diretório de estruturas do próprio servidor para que o servidor consiga carregá-lo.
 
 ## Classes e perks
 

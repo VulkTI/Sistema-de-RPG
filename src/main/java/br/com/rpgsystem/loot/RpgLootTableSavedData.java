@@ -15,6 +15,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
+import net.minecraft.world.level.storage.LevelResource;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -49,19 +51,19 @@ public final class RpgLootTableSavedData extends SavedData {
 		}
 		RpgLootTableSavedData data = overworld.getDataStorage().computeIfAbsent(TYPE);
 		if (!data.filesLoaded) {
-			data.loadBundledAndConfigFiles(server);
+			data.loadWorldAndBundledFiles(server);
 			data.filesLoaded = true;
 		}
 		return data;
 	}
 
-	public static Path getConfigDirectory() {
+	public static Path getWorldLootDirectory(MinecraftServer server) {
+		if (server == null) return null;
+		Path dir = server.getWorldPath(LevelResource.ROOT).resolve("rpg_loot_tables");
 		try {
-			if (FabricLoader.getInstance() != null && FabricLoader.getInstance().getConfigDir() != null) {
-				return FabricLoader.getInstance().getConfigDir().resolve("rpgsystem").resolve("loot_tables");
-			}
-		} catch (Throwable ignored) {}
-		return Path.of("config", "rpgsystem", "loot_tables");
+			if (!Files.exists(dir)) Files.createDirectories(dir);
+		} catch (IOException ignored) {}
+		return dir;
 	}
 
 	public Optional<RpgLootTable> getTable(String name) {
@@ -87,12 +89,18 @@ public final class RpgLootTableSavedData extends SavedData {
 	}
 
 	public boolean removeTable(String name) {
+		return removeTable(null, name);
+	}
+
+	public boolean removeTable(MinecraftServer server, String name) {
 		if (name == null) return false;
 		String key = name.toLowerCase(Locale.ROOT);
 		boolean removed = tables.remove(key) != null;
 		if (removed) {
 			setDirty();
-			deleteConfigFile(name);
+			if (server != null) {
+				deleteConfigFile(server, name);
+			}
 		}
 		return removed;
 	}
@@ -106,13 +114,13 @@ public final class RpgLootTableSavedData extends SavedData {
 	}
 
 	/**
-	 * Salva uma tabela em arquivo JSON no diretório de configuração externa (config/rpgsystem/loot_tables/<nome>.json).
+	 * Salva uma tabela em arquivo JSON no diretório do mundo (<world>/rpg_loot_tables/<nome>.json).
 	 */
 	public void syncToFile(MinecraftServer server, RpgLootTable table) {
 		if (server == null || table == null) return;
 		try {
-			Path dir = getConfigDirectory();
-			Files.createDirectories(dir);
+			Path dir = getWorldLootDirectory(server);
+			if (dir == null) return;
 			Path file = dir.resolve(table.name() + ".json");
 			RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, server.registryAccess());
 			DataResult<JsonElement> result = RpgLootTable.CODEC.encodeStart(ops, table);
@@ -129,11 +137,14 @@ public final class RpgLootTableSavedData extends SavedData {
 	}
 
 	/**
-	 * Deleta o arquivo JSON da tabela na pasta config/rpgsystem/loot_tables/.
+	 * Deleta o arquivo JSON da tabela na pasta do mundo (<world>/rpg_loot_tables/).
 	 */
-	public void deleteConfigFile(String tableName) {
+	public void deleteConfigFile(MinecraftServer server, String tableName) {
+		if (server == null) return;
 		try {
-			Path file = getConfigDirectory().resolve(tableName + ".json");
+			Path dir = getWorldLootDirectory(server);
+			if (dir == null) return;
+			Path file = dir.resolve(tableName + ".json");
 			Files.deleteIfExists(file);
 		} catch (IOException e) {
 			RpgMod.LOGGER.error("Falha ao remover arquivo de tabela de loot '{}'", tableName, e);
@@ -141,25 +152,25 @@ public final class RpgLootTableSavedData extends SavedData {
 	}
 
 	/**
-	 * Carrega tabelas padrão embutidas no mod (src/main/resources/data/rpgsystem/loot_tables/*.json)
-	 * e também tabelas da pasta config/rpgsystem/loot_tables/*.json.
+	 * Carrega tabelas salvas na pasta do mundo (<world>/rpg_loot_tables/*.json)
+	 * e também tabelas padrão embutidas no mod (src/main/resources/data/rpgsystem/loot_tables/*.json).
 	 */
-	public void loadBundledAndConfigFiles(MinecraftServer server) {
+	public void loadWorldAndBundledFiles(MinecraftServer server) {
 		if (server == null) return;
 		RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, server.registryAccess());
 
-		// 1. Carrega arquivos da pasta externa config/rpgsystem/loot_tables/ (tem prioridade sobre os padrões embutidos)
+		// 1. Carrega arquivos da pasta exclusiva deste mundo (<world>/rpg_loot_tables/)
 		try {
-			Path configDir = getConfigDirectory();
-			if (Files.isDirectory(configDir)) {
-				try (var stream = Files.walk(configDir, 1)) {
+			Path worldLootDir = getWorldLootDirectory(server);
+			if (worldLootDir != null && Files.isDirectory(worldLootDir)) {
+				try (var stream = Files.walk(worldLootDir, 1)) {
 					stream.filter(Files::isRegularFile)
 							.filter(p -> p.getFileName().toString().endsWith(".json"))
 							.forEach(p -> loadJsonFile(ops, p));
 				}
 			}
 		} catch (Throwable t) {
-			RpgMod.LOGGER.error("Erro ao carregar tabelas da pasta config/rpgsystem/loot_tables", t);
+			RpgMod.LOGGER.error("Erro ao carregar tabelas da pasta rpg_loot_tables do mundo", t);
 		}
 
 		// 2. Carrega recursos embutidos no mod (se existirem e ainda não estiverem carregados)

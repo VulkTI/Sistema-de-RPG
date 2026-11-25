@@ -113,7 +113,7 @@ public class RpgScrollArea {
 	}
 
 	public boolean mouseClicked(MouseButtonEvent event) {
-		if (event.button() == 1 && getMaxScroll() > 0) {
+		if (event.button() == 0 && getMaxScroll() > 0) {
 			double mx = event.x();
 			double my = event.y();
 			int trackX = x + width - scrollBarWidth;

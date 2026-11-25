@@ -1,4 +1,8 @@
 {
   "key.category.rpgsystem.main": "Sistema RPG",
-  "key.rpgsystem.open_status": "Abrir status do RPG"
+  "key.rpgsystem.open_status": "Abrir status do RPG",
+  "block.rpgsystem.dungeon_white_portal": "Portal da Dungeon (Entrada)",
+  "block.rpgsystem.dungeon_blue_portal": "Portal da Dungeon (Saída)",
+  "block.rpgsystem.dungeon_portal_overlay": "Overlay de Portal",
+  "block.rpgsystem.dungeon_area_overlay": "Overlay de Área"
 }

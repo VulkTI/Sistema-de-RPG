@@ -9,6 +9,7 @@ import br.com.rpgsystem.mining.MineradorEffects;
 import br.com.rpgsystem.config.XpConfig;
 import br.com.rpgsystem.mobs.MobLevelManager;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import br.com.rpgsystem.network.RpgNetworking;
 import br.com.rpgsystem.perks.PerkDefinition;
 import br.com.rpgsystem.progression.ProgressionMath;
@@ -44,6 +45,55 @@ public final class RpgEvents {
 			RpgSavedData.Profile profile = RpgSavedData.get(server).profile(player.getUUID());
 			MineradorEffects.refreshMiningSpeed(player);
 			RpgNetworking.sendSnapshot(player, profile.selectedClassId().isBlank());
+			br.com.rpgsystem.dungeon.editor.DungeonEditorSessionManager.onPlayerJoin(player);
+		});
+
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			ServerLevel world = server.getLevel(br.com.rpgsystem.dungeon.editor.DungeonEditorSessionManager.EDITOR_DIMENSION);
+			if (world != null) {
+				br.com.rpgsystem.dungeon.editor.DungeonEditorSessionManager.onWorldTick(world);
+			}
+		});
+
+		net.fabricmc.fabric.api.event.player.UseItemCallback.EVENT.register((p, l, hand) -> {
+			if (hand != net.minecraft.world.InteractionHand.MAIN_HAND || !(p instanceof ServerPlayer sp)) return InteractionResult.PASS;
+			return br.com.rpgsystem.dungeon.editor.DungeonEditorToolManager.handleUseItem(sp, hand);
+		});
+
+		net.fabricmc.fabric.api.event.player.AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
+			if (player instanceof ServerPlayer sp && level instanceof ServerLevel sl) {
+				BlockState state = sl.getBlockState(pos);
+				if (state.getBlock() instanceof br.com.rpgsystem.dungeon.block.WhitePortalBlock || state.getBlock() instanceof br.com.rpgsystem.dungeon.block.BluePortalBlock) {
+					var session = br.com.rpgsystem.dungeon.editor.DungeonEditorSessionManager.getSession(sp.getUUID());
+					if (session != null && session.getState() == br.com.rpgsystem.dungeon.editor.DungeonEditorSession.SessionState.TOOL_PORTAL_EDIT) {
+						br.com.rpgsystem.dungeon.editor.DungeonEditorToolManager.removePortalAt(sp, sl, session, pos);
+						return InteractionResult.SUCCESS;
+					}
+					// Fora da edição de portais, portal não pode ser quebrado fisicamente
+					return InteractionResult.FAIL;
+				}
+				if (state.getBlock() == br.com.rpgsystem.dungeon.block.DungeonBlocks.AREA_OVERLAY) {
+					var session = br.com.rpgsystem.dungeon.editor.DungeonEditorSessionManager.getSession(sp.getUUID());
+					if (session != null && session.getState() == br.com.rpgsystem.dungeon.editor.DungeonEditorSession.SessionState.TOOL_WAVE_EDIT) {
+						var held = sp.getMainHandItem();
+						if (!held.is(net.minecraft.world.item.Items.RECOVERY_COMPASS)) {
+							sp.sendSystemMessage(net.minecraft.network.chat.Component.literal("§cVocê precisa segurar o Seletor de Áreas para quebrar esta área!"), true);
+							return InteractionResult.FAIL;
+						}
+						br.com.rpgsystem.dungeon.editor.DungeonEditorToolManager.removeAreaAt(sp, sl, session, pos);
+						return InteractionResult.SUCCESS;
+					}
+					return InteractionResult.FAIL;
+				}
+			}
+			return InteractionResult.PASS;
+		});
+
+		PlayerBlockBreakEvents.BEFORE.register((l, p, pos, s, be) -> {
+			if (p instanceof ServerPlayer sp && l instanceof ServerLevel sl) {
+				return br.com.rpgsystem.dungeon.editor.DungeonEditorToolManager.handleBlockBreak(sp, sl, pos);
+			}
+			return true;
 		});
 
 		UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
@@ -53,6 +103,8 @@ public final class RpgEvents {
 			if (!(player instanceof ServerPlayer serverPlayer) || !(level instanceof ServerLevel serverLevel)) {
 				return InteractionResult.PASS;
 			}
+			InteractionResult dungeonRes = br.com.rpgsystem.dungeon.editor.DungeonEditorToolManager.handleUseBlock(serverPlayer, serverLevel, hit, hand);
+			if (dungeonRes != InteractionResult.PASS) return dungeonRes;
 			ItemStack stack = serverPlayer.getMainHandItem();
 			if (!LootToolHelper.isTool(stack)) {
 				return InteractionResult.PASS;

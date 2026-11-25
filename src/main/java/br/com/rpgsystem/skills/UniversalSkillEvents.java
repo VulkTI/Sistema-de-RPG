@@ -139,6 +139,8 @@ public final class UniversalSkillEvents {
 	}
 
 	private static void discoverStructure(ServerPlayer player) {
+		if (player == null || player.level() == null) return;
+		if (player.level().dimension().identifier().getNamespace().equals("rpgsystem")) return;
 		ServerLevel level = (ServerLevel) player.level();
 		RpgSavedData data = RpgSavedData.get(level.getServer());
 		RpgSavedData.Profile profile = data.profile(player.getUUID());

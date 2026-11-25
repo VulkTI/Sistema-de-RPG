@@ -247,9 +247,9 @@ public final class ClassSelectionScreen extends RpgBaseScreen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (event.key() == 263) { previous(); return true; } // Seta esquerda
-		if (event.key() == 262) { next(); return true; }     // Seta direita
-		if (event.key() == 257 || event.key() == 335) { confirm(); return true; } // Enter
+		if (event.isLeft() || event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_LEFT || event.key() == 263) { previous(); return true; }
+		if (event.isRight() || event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_RIGHT || event.key() == 262) { next(); return true; }
+		if (event.isConfirmation() || event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_RETURN || event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_NUMPADENTER || event.key() == 257 || event.key() == 335) { confirm(); return true; }
 		return super.keyPressed(event);
 	}
 

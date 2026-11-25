@@ -26,22 +26,22 @@ public final class RpgUiSounds {
 	}
 
 	public static void playClick() {
-		play(RpgSoundEvents.UI_CLICK != null ? RpgSoundEvents.UI_CLICK : SoundEvents.UI_BUTTON_CLICK.value(), 1.0F);
+		play(SoundEvents.UI_BUTTON_CLICK.value(), 1.0F);
 	}
 
 	public static void playSkillLearn() {
-		play(RpgSoundEvents.UI_SKILL_LEARN != null ? RpgSoundEvents.UI_SKILL_LEARN : SoundEvents.PLAYER_LEVELUP, 1.2F);
+		play(SoundEvents.PLAYER_LEVELUP, 1.2F);
 	}
 
 	public static void playTab() {
-		play(RpgSoundEvents.UI_TAB_SWITCH != null ? RpgSoundEvents.UI_TAB_SWITCH : SoundEvents.UI_BUTTON_CLICK.value(), 1.15F);
+		play(SoundEvents.UI_BUTTON_CLICK.value(), 1.15F);
 	}
 
 	public static void playOpen() {
-		play(RpgSoundEvents.UI_OPEN != null ? RpgSoundEvents.UI_OPEN : SoundEvents.UI_BUTTON_CLICK.value(), 0.9F);
+		// Desativado: sem sons de abertura de tela
 	}
 
 	public static void playClose() {
-		play(RpgSoundEvents.UI_CLOSE != null ? RpgSoundEvents.UI_CLOSE : SoundEvents.UI_BUTTON_CLICK.value(), 0.8F);
+		// Desativado: sem sons de fechamento de tela
 	}
 }

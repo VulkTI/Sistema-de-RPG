@@ -20,11 +20,13 @@ public final class MineradorEffects {
 	private MineradorEffects() {}
 
 	public static boolean isMinerador(ServerPlayer player) {
+		if (player == null || player.level() == null || player.level().getServer() == null) return false;
 		return RpgSavedData.get(player.level().getServer()).profile(player.getUUID()).selectedClassId().equals(MINERADOR_ID);
 	}
 
 	/** Mantém o atributo sincronizado para servidor e cliente ao entrar ou trocar de classe. */
 	public static void refreshMiningSpeed(ServerPlayer player) {
+		if (player == null) return;
 		AttributeInstance attribute = player.getAttribute(Attributes.BLOCK_BREAK_SPEED);
 		if (attribute == null) return;
 		attribute.removeModifier(MINING_SPEED_ID);
@@ -33,6 +35,7 @@ public final class MineradorEffects {
 
 	/** A rolagem ocorre antes da durabilidade vanilla, portanto combina naturalmente com Inquebrável. */
 	public static boolean shouldPreventPickaxeDamage(ItemStack stack, ServerPlayer player) {
-		return isMinerador(player) && stack.is(ItemTags.PICKAXES) && player.getRandom().nextDouble() < 0.10;
+		if (player == null || !stack.is(ItemTags.PICKAXES)) return false;
+		return isMinerador(player) && player.getRandom().nextDouble() < 0.10;
 	}
 }

@@ -20,6 +20,11 @@ public abstract class LivingEntityLevelMixin implements MobLevelAccess {
 		builder.define(RPGSYSTEM_MOB_LEVEL, 0);
 	}
 
+	@Unique private float rpgsystem$attackMultiplier = 1.0F;
+
 	@Override public int rpgsystem$getMobLevel() { return ((LivingEntity) (Object) this).getEntityData().get(RPGSYSTEM_MOB_LEVEL); }
 	@Override public void rpgsystem$setMobLevel(int level) { ((LivingEntity) (Object) this).getEntityData().set(RPGSYSTEM_MOB_LEVEL, Math.clamp(level, 1, 100)); }
+
+	@Override public float rpgsystem$getAttackMultiplier() { return rpgsystem$attackMultiplier; }
+	@Override public void rpgsystem$setAttackMultiplier(float multiplier) { this.rpgsystem$attackMultiplier = multiplier; }
 }

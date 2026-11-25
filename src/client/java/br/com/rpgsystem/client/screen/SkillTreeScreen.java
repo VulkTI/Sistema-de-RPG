@@ -125,7 +125,6 @@ public final class SkillTreeScreen extends Screen {
 	@Override
 	protected void init() {
 		super.init();
-		RpgUiSounds.playOpen();
 
 		int sidebarX = sidebarX();
 		int bodyHeight = height - SCREEN_MARGIN - FOOTER_HEIGHT;
@@ -199,7 +198,6 @@ public final class SkillTreeScreen extends Screen {
 	}
 
 	private void returnToCharacter() {
-		RpgUiSounds.playClose();
 		Minecraft.getInstance().gui.setScreen(new PlayerStatusScreen());
 	}
 
@@ -553,8 +551,24 @@ public final class SkillTreeScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (event.key() == 80) { // Tecla P
+		var focused = getFocused();
+		if (focused instanceof net.minecraft.client.gui.components.EditBox editBox) {
+			if (editBox.keyPressed(event)) {
+				return true;
+			}
+			if (editBox.canConsumeInput() || editBox.isFocused()) {
+				return super.keyPressed(event);
+			}
+		}
+		if (event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_P) { // Tecla P
 			returnToCharacter();
+			return true;
+		}
+		if (event.isLeft() || event.isRight() || event.isUp() || event.isDown()
+				|| event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_LEFT
+				|| event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_RIGHT
+				|| event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_UP
+				|| event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_DOWN) {
 			return true;
 		}
 		return super.keyPressed(event);
