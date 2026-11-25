@@ -14,8 +14,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.storage.LevelResource;
 
@@ -24,11 +26,13 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 public final class DungeonRepository {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final Map<String, DungeonDefinition> DUNGEONS = new LinkedHashMap<>();
+	private static final Map<String, String> DUNGEON_FOLDERS = new HashMap<>();
 	private static final Set<String> DISABLED_OFFICIAL_DUNGEONS = new HashSet<>();
 	private static boolean initialized = false;
 
@@ -36,6 +40,7 @@ public final class DungeonRepository {
 
 	public static synchronized void init(MinecraftServer server) {
 		DUNGEONS.clear();
+		DUNGEON_FOLDERS.clear();
 		DISABLED_OFFICIAL_DUNGEONS.clear();
 		loadBundledOfficialDungeons();
 		loadModConfigDungeons();
@@ -68,7 +73,9 @@ public final class DungeonRepository {
 		dungeon.setSource("WORLD");
 		DUNGEONS.put(key, dungeon);
 		if (server != null) {
-			saveWorldDungeons(server);
+			String folder = allocateFolderName(server, name);
+			DUNGEON_FOLDERS.put(key, folder);
+			saveDungeon(server, dungeon);
 		}
 		return dungeon;
 	}
@@ -78,10 +85,27 @@ public final class DungeonRepository {
 		String newKey = newName.toLowerCase(Locale.ROOT);
 		DungeonDefinition def = DUNGEONS.remove(oldKey);
 		if (def != null) {
+			String oldFolder = DUNGEON_FOLDERS.remove(oldKey);
 			def.setName(newName);
 			DUNGEONS.put(newKey, def);
 			if (server != null) {
-				saveWorldDungeons(server);
+				Path rootDir = getWorldDungeonsDirectory(server);
+				Path oldDir = rootDir.resolve(oldFolder != null ? oldFolder : sanitizeFolderName(oldName));
+				String newFolder = sanitizeFolderName(newName);
+				if (!newFolder.equals(oldFolder)) {
+					newFolder = allocateFolderName(server, newName);
+					Path newDir = rootDir.resolve(newFolder);
+					if (Files.exists(oldDir) && !oldDir.equals(newDir)) {
+						try {
+							Files.createDirectories(rootDir);
+							Files.move(oldDir, newDir);
+						} catch (IOException e) {
+							RpgMod.LOGGER.error("Erro ao renomear pasta da dungeon {} -> {}: {}", oldDir, newDir, e.getMessage());
+						}
+					}
+				}
+				DUNGEON_FOLDERS.put(newKey, newFolder);
+				saveDungeon(server, def);
 			}
 		}
 	}
@@ -95,7 +119,7 @@ public final class DungeonRepository {
 		}
 		def.setActive(true);
 		if (server != null) {
-			saveWorldDungeons(server);
+			saveDungeon(server, def);
 		}
 		return true;
 	}
@@ -106,7 +130,7 @@ public final class DungeonRepository {
 		DungeonDefinition def = opt.get();
 		def.setActive(false);
 		if (server != null) {
-			saveWorldDungeons(server);
+			saveDungeon(server, def);
 		}
 		return true;
 	}
@@ -122,39 +146,15 @@ public final class DungeonRepository {
 		}
 
 		DUNGEONS.remove(key);
+		String folder = DUNGEON_FOLDERS.remove(key);
 
 		if (server != null) {
 			try {
 				br.com.rpgsystem.dungeon.world.DungeonWorldManager.despawnDungeonByName(server, name);
 			} catch (Throwable ignored) {}
 
-			try {
-				Path structuresDir = getWorldStructuresDirectory(server);
-				if (Files.exists(structuresDir)) {
-					if (def.getEntranceStructure() != null && def.getEntranceStructure().getSchematicPath() != null
-							&& !def.getEntranceStructure().getSchematicPath().isBlank()) {
-						Path entPath = Path.of(def.getEntranceStructure().getSchematicPath());
-						if (entPath.isAbsolute()) {
-							Files.deleteIfExists(entPath);
-						} else {
-							Files.deleteIfExists(structuresDir.resolve(entPath.getFileName().toString()));
-						}
-					}
-					if (def.getDungeonStructure() != null && def.getDungeonStructure().getSchematicPath() != null
-							&& !def.getDungeonStructure().getSchematicPath().isBlank()) {
-						Path dungPath = Path.of(def.getDungeonStructure().getSchematicPath());
-						if (dungPath.isAbsolute()) {
-							Files.deleteIfExists(dungPath);
-						} else {
-							Files.deleteIfExists(structuresDir.resolve(dungPath.getFileName().toString()));
-						}
-					}
-				}
-			} catch (Exception ex) {
-				RpgMod.LOGGER.warn("Erro ao remover arquivos de esquemática da dungeon {}: {}", name, ex.getMessage());
-			}
-
-			saveWorldDungeons(server);
+			Path dungeonDir = getWorldDungeonsDirectory(server).resolve(folder != null ? folder : sanitizeFolderName(name));
+			deleteDirectoryRecursively(dungeonDir);
 		}
 		return true;
 	}
@@ -183,24 +183,166 @@ public final class DungeonRepository {
 		json.addProperty("active", false);
 
 		DungeonDefinition copy = deserializeDungeon(json);
-		DUNGEONS.put(newName.toLowerCase(Locale.ROOT), copy);
+		String copyKey = newName.toLowerCase(Locale.ROOT);
+		DUNGEONS.put(copyKey, copy);
 
 		if (server != null) {
-			saveWorldDungeons(server);
+			String folder = allocateFolderName(server, newName);
+			DUNGEON_FOLDERS.put(copyKey, folder);
+			saveDungeon(server, copy);
+			saveDisabledOfficialDungeons(server);
 		}
 		return copy;
 	}
 
-	public static Path getWorldDungeonsFile(MinecraftServer server) {
-		return server.getWorldPath(LevelResource.ROOT).resolve("rpg_dungeons.json");
+	public static Path getWorldDungeonsDirectory(MinecraftServer server) {
+		return server.getWorldPath(LevelResource.ROOT).resolve("rpg_dungeons");
 	}
 
-	public static Path getWorldStructuresDirectory(MinecraftServer server) {
-		Path dir = server.getWorldPath(LevelResource.GENERATED_DIR).resolve("minecraft").resolve("structures");
+	public static Path getDungeonDirectory(MinecraftServer server, String dungeonName) {
+		String key = dungeonName != null ? dungeonName.toLowerCase(Locale.ROOT) : "";
+		String folder = DUNGEON_FOLDERS.get(key);
+		if (folder == null) {
+			folder = allocateFolderName(server, dungeonName);
+			if (!key.isEmpty()) {
+				DUNGEON_FOLDERS.put(key, folder);
+			}
+		}
+		Path dir = getWorldDungeonsDirectory(server).resolve(folder);
 		try {
 			if (!Files.exists(dir)) Files.createDirectories(dir);
 		} catch (IOException ignored) {}
 		return dir;
+	}
+
+	public static String sanitizeFolderName(String name) {
+		if (name == null || name.isBlank()) return "dungeon";
+		String sanitized = name.trim().replaceAll("[^a-zA-Z0-9_\\-]", "_").toLowerCase(Locale.ROOT);
+		return sanitized.isBlank() ? "dungeon" : sanitized;
+	}
+
+	private static String allocateFolderName(MinecraftServer server, String dungeonName) {
+		String base = sanitizeFolderName(dungeonName);
+		Path root = getWorldDungeonsDirectory(server);
+		String candidate = base;
+		int suffix = 2;
+		while (Files.exists(root.resolve(candidate)) && isFolderUsedByOther(candidate, dungeonName)) {
+			candidate = base + "_" + suffix++;
+		}
+		return candidate;
+	}
+
+	private static boolean isFolderUsedByOther(String folder, String dungeonName) {
+		String targetKey = dungeonName != null ? dungeonName.toLowerCase(Locale.ROOT) : "";
+		for (Map.Entry<String, String> entry : DUNGEON_FOLDERS.entrySet()) {
+			if (entry.getValue().equalsIgnoreCase(folder) && !entry.getKey().equals(targetKey)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static void deleteDirectoryRecursively(Path dir) {
+		if (dir == null || !Files.exists(dir)) return;
+		try (var walk = Files.walk(dir)) {
+			walk.sorted(Comparator.reverseOrder()).forEach(p -> {
+				try {
+					Files.deleteIfExists(p);
+				} catch (IOException ex) {
+					RpgMod.LOGGER.warn("Erro ao deletar arquivo da dungeon {}: {}", p, ex.getMessage());
+				}
+			});
+		} catch (IOException ex) {
+			RpgMod.LOGGER.warn("Erro ao remover pasta da dungeon {}: {}", dir, ex.getMessage());
+		}
+	}
+
+	public static String importSchematicToDungeon(MinecraftServer server, String dungeonName, String rawPath) {
+		return importSchematicToDungeon(server, dungeonName, rawPath, null, null);
+	}
+
+	public static String importSchematicToDungeon(MinecraftServer server, String dungeonName, String rawPath,
+	                                              String previousPath, String otherSlotPath) {
+		if (rawPath == null || rawPath.isBlank()) return "";
+		if (rawPath.startsWith("rpgsystem:")) return rawPath;
+		if (server == null) return rawPath;
+
+		Path dungeonDir = getDungeonDirectory(server, dungeonName).toAbsolutePath().normalize();
+		Path source;
+		try {
+			source = Path.of(rawPath);
+		} catch (Exception e) {
+			return rawPath;
+		}
+
+		String resultPath;
+		if (!source.isAbsolute()) {
+			Path resolved = dungeonDir.resolve(source).normalize();
+			if (Files.isRegularFile(resolved)) {
+				resultPath = dungeonDir.relativize(resolved).toString().replace('\\', '/');
+			} else {
+				resultPath = rawPath.replace('\\', '/');
+			}
+		} else {
+			source = source.toAbsolutePath().normalize();
+			if (source.startsWith(dungeonDir)) {
+				resultPath = dungeonDir.relativize(source).toString().replace('\\', '/');
+			} else if (!Files.isRegularFile(source)) {
+				return rawPath;
+			} else {
+				String originalName = source.getFileName().toString();
+				boolean canOverwriteSameName = previousPath != null
+						&& previousPath.equalsIgnoreCase(originalName)
+						&& (otherSlotPath == null || !otherSlotPath.equalsIgnoreCase(originalName));
+				Path target = canOverwriteSameName
+						? dungeonDir.resolve(originalName)
+						: resolveUniqueTargetFile(dungeonDir, originalName, otherSlotPath);
+				try {
+					Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+					resultPath = target.getFileName().toString();
+				} catch (IOException e) {
+					RpgMod.LOGGER.error("Erro ao copiar esquemática '{}' para pasta da dungeon '{}': {}", source, dungeonDir, e.getMessage());
+					return rawPath;
+				}
+			}
+		}
+
+		deleteOldSchematicIfUnused(dungeonDir, previousPath, resultPath, otherSlotPath);
+		return resultPath;
+	}
+
+	public static void deleteOldSchematicIfUnused(Path dungeonDir, String oldPath, String newPath, String otherSlotPath) {
+		if (dungeonDir == null || oldPath == null || oldPath.isBlank() || oldPath.startsWith("rpgsystem:")) {
+			return;
+		}
+		if (oldPath.equalsIgnoreCase(newPath) || (otherSlotPath != null && oldPath.equalsIgnoreCase(otherSlotPath))) {
+			return;
+		}
+		try {
+			Path candidate = Path.of(oldPath);
+			if (candidate.isAbsolute()) return;
+			Path resolved = dungeonDir.resolve(candidate).normalize();
+			if (resolved.startsWith(dungeonDir) && Files.isRegularFile(resolved)) {
+				Files.deleteIfExists(resolved);
+			}
+		} catch (Exception ex) {
+			RpgMod.LOGGER.warn("Erro ao remover esquemática antiga '{}' em '{}': {}", oldPath, dungeonDir, ex.getMessage());
+		}
+	}
+
+	private static Path resolveUniqueTargetFile(Path dir, String fileName, String otherSlotPath) {
+		Path candidate = dir.resolve(fileName);
+		if (!Files.exists(candidate) && (otherSlotPath == null || !otherSlotPath.equalsIgnoreCase(fileName))) {
+			return candidate;
+		}
+		int dot = fileName.lastIndexOf('.');
+		String base = dot > 0 ? fileName.substring(0, dot) : fileName;
+		String ext = dot > 0 ? fileName.substring(dot) : "";
+		int counter = 1;
+		while (Files.exists(candidate) || (otherSlotPath != null && otherSlotPath.equalsIgnoreCase(candidate.getFileName().toString()))) {
+			candidate = dir.resolve(base + "_" + counter++ + ext);
+		}
+		return candidate;
 	}
 
 	public static Path getModConfigDirectory() {
@@ -212,7 +354,7 @@ public final class DungeonRepository {
 		return Path.of("config", "rpgsystem", "dungeons");
 	}
 
-	public static StructureTemplate loadStructureTemplate(ServerLevel level, String pathStr) {
+	public static StructureTemplate loadStructureTemplate(ServerLevel level, DungeonDefinition dungeon, String pathStr) {
 		if (pathStr == null || pathStr.isBlank()) return null;
 
 		// 1. Tenta recurso embutido se começar com rpgsystem:
@@ -223,9 +365,7 @@ public final class DungeonRepository {
 				if (in != null) {
 					CompoundTag tag = NbtIo.readCompressed(in, NbtAccounter.unlimitedHeap());
 					if (tag != null) {
-						StructureTemplate template = new StructureTemplate();
-						template.load(level.holderLookup(Registries.BLOCK), tag);
-						return template;
+						return loadTemplateFromTag(level, tag);
 					}
 				}
 			} catch (Exception e) {
@@ -234,27 +374,26 @@ public final class DungeonRepository {
 			return null;
 		}
 
-		// 2. Tenta arquivo do sistema
+		// 2. Resolve caminho relativo à pasta da dungeon ou caminho absoluto
 		Path path = null;
 		try {
-			path = Path.of(pathStr);
-		} catch (Exception ignored) {}
-
-		if (path != null && !Files.exists(path) && level.getServer() != null) {
-			// Tenta na pasta de estruturas do mundo
-			Path inWorld = getWorldStructuresDirectory(level.getServer()).resolve(path.getFileName().toString());
-			if (Files.exists(inWorld)) {
-				path = inWorld;
+			Path candidate = Path.of(pathStr);
+			if (!candidate.isAbsolute() && dungeon != null && level.getServer() != null) {
+				Path inDungeon = getDungeonDirectory(level.getServer(), dungeon.getName()).resolve(candidate).normalize();
+				if (Files.exists(inDungeon)) {
+					path = inDungeon;
+				}
 			}
-		}
+			if (path == null && Files.exists(candidate)) {
+				path = candidate;
+			}
+		} catch (Exception ignored) {}
 
 		if (path != null && Files.exists(path)) {
 			try {
 				CompoundTag tag = NbtIo.readCompressed(path, NbtAccounter.unlimitedHeap());
 				if (tag != null) {
-					StructureTemplate template = new StructureTemplate();
-					template.load(level.holderLookup(Registries.BLOCK), tag);
-					return template;
+					return loadTemplateFromTag(level, tag);
 				}
 			} catch (Exception e) {
 				RpgMod.LOGGER.error("Erro ao ler esquemática: {}", path, e);
@@ -264,29 +403,58 @@ public final class DungeonRepository {
 		return null;
 	}
 
-	public static synchronized void saveWorldDungeons(MinecraftServer server) {
-		Path file = getWorldDungeonsFile(server);
-		JsonObject root = new JsonObject();
+	private static StructureTemplate loadTemplateFromTag(ServerLevel level, CompoundTag tag) {
+		if (level.getServer() != null) {
+			int dataVersion = NbtUtils.getDataVersion(tag, 500);
+			tag = DataFixTypes.STRUCTURE.updateToCurrentVersion(level.getServer().getFixerUpper(), tag, dataVersion);
+		}
+		StructureTemplate template = new StructureTemplate();
+		template.load(level.holderLookup(Registries.BLOCK), tag);
+		return template;
+	}
 
+	public static synchronized void saveDungeon(MinecraftServer server, DungeonDefinition def) {
+		if (server == null || def == null) return;
+		if ("MOD".equalsIgnoreCase(def.getSource()) && def.isOfficial()) return;
+		Path dir = getDungeonDirectory(server, def.getName());
+		Path file = dir.resolve("dungeon.json");
+		try {
+			Files.createDirectories(dir);
+			Files.writeString(file, GSON.toJson(serializeDungeon(def)), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			RpgMod.LOGGER.error("Erro ao salvar dungeon '{}': {}", def.getName(), file, e);
+		}
+	}
+
+	public static synchronized void saveWorldDungeons(MinecraftServer server) {
+		if (server == null) return;
+		saveDisabledOfficialDungeons(server);
+		for (DungeonDefinition def : DUNGEONS.values()) {
+			if ("WORLD".equalsIgnoreCase(def.getSource()) || !def.isOfficial()) {
+				saveDungeon(server, def);
+			}
+		}
+	}
+
+	private static void saveDisabledOfficialDungeons(MinecraftServer server) {
+		Path file = getWorldDungeonsDirectory(server).resolve("disabled_official.json");
+		if (DISABLED_OFFICIAL_DUNGEONS.isEmpty()) {
+			try {
+				Files.deleteIfExists(file);
+			} catch (IOException ignored) {}
+			return;
+		}
+		JsonObject root = new JsonObject();
 		JsonArray disabledOfficial = new JsonArray();
 		for (String dis : DISABLED_OFFICIAL_DUNGEONS) {
 			disabledOfficial.add(dis);
 		}
 		root.add("disabled_official_dungeons", disabledOfficial);
-
-		JsonArray list = new JsonArray();
-		for (DungeonDefinition def : DUNGEONS.values()) {
-			if ("WORLD".equalsIgnoreCase(def.getSource()) || !def.isOfficial()) {
-				list.add(serializeDungeon(def));
-			}
-		}
-		root.add("dungeons", list);
-
 		try {
-			if (file.getParent() != null) Files.createDirectories(file.getParent());
+			Files.createDirectories(file.getParent());
 			Files.writeString(file, GSON.toJson(root), StandardCharsets.UTF_8);
 		} catch (IOException e) {
-			RpgMod.LOGGER.error("Erro ao salvar arquivo de dungeons do mundo: {}", file, e);
+			RpgMod.LOGGER.error("Erro ao salvar dungeons oficiais desabilitadas: {}", file, e);
 		}
 	}
 
@@ -338,34 +506,48 @@ public final class DungeonRepository {
 	}
 
 	private static void loadWorldDungeons(MinecraftServer server) {
-		Path file = getWorldDungeonsFile(server);
-		if (!Files.exists(file)) return;
+		Path rootDir = getWorldDungeonsDirectory(server);
+		if (!Files.exists(rootDir) || !Files.isDirectory(rootDir)) return;
 
-		try {
-			String content = Files.readString(file, StandardCharsets.UTF_8);
-			JsonObject root = JsonParser.parseString(content).getAsJsonObject();
-
-			if (root.has("disabled_official_dungeons")) {
-				for (JsonElement el : root.getAsJsonArray("disabled_official_dungeons")) {
-					String key = el.getAsString().toLowerCase(Locale.ROOT);
-					DISABLED_OFFICIAL_DUNGEONS.add(key);
-					DungeonDefinition official = DUNGEONS.get(key);
-					if (official != null) {
-						official.setActive(false);
+		Path disabledFile = rootDir.resolve("disabled_official.json");
+		if (Files.isRegularFile(disabledFile)) {
+			try {
+				String content = Files.readString(disabledFile, StandardCharsets.UTF_8);
+				JsonObject root = JsonParser.parseString(content).getAsJsonObject();
+				if (root.has("disabled_official_dungeons")) {
+					for (JsonElement el : root.getAsJsonArray("disabled_official_dungeons")) {
+						String key = el.getAsString().toLowerCase(Locale.ROOT);
+						DISABLED_OFFICIAL_DUNGEONS.add(key);
+						DungeonDefinition official = DUNGEONS.get(key);
+						if (official != null) {
+							official.setActive(false);
+						}
 					}
 				}
+			} catch (Exception ex) {
+				RpgMod.LOGGER.error("Erro ao carregar dungeons oficiais desabilitadas: {}", disabledFile, ex);
 			}
+		}
 
-			if (root.has("dungeons")) {
-				for (JsonElement el : root.getAsJsonArray("dungeons")) {
-					DungeonDefinition def = deserializeDungeon(el.getAsJsonObject());
+		try (var stream = Files.list(rootDir)) {
+			stream.filter(Files::isDirectory).forEach(subDir -> {
+				Path jsonFile = subDir.resolve("dungeon.json");
+				if (!Files.isRegularFile(jsonFile)) return;
+				try {
+					String content = Files.readString(jsonFile, StandardCharsets.UTF_8);
+					JsonObject obj = JsonParser.parseString(content).getAsJsonObject();
+					DungeonDefinition def = deserializeDungeon(obj);
 					def.setSource("WORLD");
 					def.setOfficial(false);
-					DUNGEONS.put(def.getName().toLowerCase(Locale.ROOT), def);
+					String key = def.getName().toLowerCase(Locale.ROOT);
+					DUNGEONS.put(key, def);
+					DUNGEON_FOLDERS.put(key, subDir.getFileName().toString());
+				} catch (Exception ex) {
+					RpgMod.LOGGER.error("Erro ao carregar dungeon da pasta '{}': {}", subDir, ex.getMessage());
 				}
-			}
+			});
 		} catch (Exception ex) {
-			RpgMod.LOGGER.error("Erro ao carregar arquivo de dungeons do mundo: {}", file, ex);
+			RpgMod.LOGGER.error("Erro ao listar pasta de dungeons do mundo: {}", rootDir, ex);
 		}
 	}
 

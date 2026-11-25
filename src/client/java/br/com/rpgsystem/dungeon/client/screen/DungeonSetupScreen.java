@@ -311,14 +311,13 @@ public final class DungeonSetupScreen extends RpgBaseScreen {
 			});
 			callbackHolder[0] = callback;
 
-			long windowHandle = minecraft.getWindow() != null ? minecraft.getWindow().handle() : MemoryUtil.NULL;
 			props = SDLProperties.SDL_CreateProperties();
 			if (props == 0) {
 				throw new IllegalStateException("SDL_CreateProperties falhou: " + SDLError.SDL_GetError());
 			}
 			SDLProperties.SDL_SetPointerProperty(props, SDLDialog.SDL_PROP_FILE_DIALOG_FILTERS_POINTER, filters.address());
 			SDLProperties.SDL_SetNumberProperty(props, SDLDialog.SDL_PROP_FILE_DIALOG_NFILTERS_NUMBER, 1L);
-			SDLProperties.SDL_SetPointerProperty(props, SDLDialog.SDL_PROP_FILE_DIALOG_WINDOW_POINTER, windowHandle);
+			// Não define SDL_PROP_FILE_DIALOG_WINDOW_POINTER para evitar que o diálogo modal do Windows trave a janela do Minecraft.
 			SDLProperties.SDL_SetStringProperty(props, SDLDialog.SDL_PROP_FILE_DIALOG_LOCATION_STRING, initialLocation);
 			SDLProperties.SDL_SetBooleanProperty(props, SDLDialog.SDL_PROP_FILE_DIALOG_MANY_BOOLEAN, false);
 			SDLProperties.SDL_SetStringProperty(props, SDLDialog.SDL_PROP_FILE_DIALOG_TITLE_STRING, "Selecionar Esquemática (.nbt)");
@@ -374,7 +373,7 @@ public final class DungeonSetupScreen extends RpgBaseScreen {
 	private static Path getWorldStructuresDirectory(Minecraft minecraft) {
 		MinecraftServer server = minecraft.getSingleplayerServer();
 		if (server != null) {
-			return server.getWorldPath(LevelResource.GENERATED_DIR).resolve("minecraft").resolve("structures");
+			return server.getWorldPath(LevelResource.GENERATED_DIR).resolve("minecraft").resolve("structure");
 		}
 		// Em servidores remotos não existe uma pasta de mundo local acessível ao cliente.
 		return minecraft.gameDirectory.toPath().resolve("schematics");

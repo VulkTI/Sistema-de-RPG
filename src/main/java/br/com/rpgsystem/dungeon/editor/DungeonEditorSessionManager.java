@@ -223,12 +223,24 @@ public final class DungeonEditorSessionManager {
 
 		// Se o jogador carregou uma esquemática válida, posiciona no mundo void para edição
 		if (path != null && !path.isBlank()) {
-			StructureTemplate template = DungeonRepository.loadStructureTemplate(editorLevel, path);
+			StructureTemplate template = DungeonRepository.loadStructureTemplate(editorLevel, def, path);
 			if (template != null) {
 				BlockPos origin = new BlockPos(0, 64, 0);
+
+				// Força o carregamento de todos os chunks que a estrutura vai ocupar
+				Vec3i size = template.getSize();
+				int chunkMinX = (origin.getX()) >> 4;
+				int chunkMinZ = (origin.getZ()) >> 4;
+				int chunkMaxX = (origin.getX() + size.getX() + 15) >> 4;
+				int chunkMaxZ = (origin.getZ() + size.getZ() + 15) >> 4;
+				for (int cx = chunkMinX; cx <= chunkMaxX; cx++) {
+					for (int cz = chunkMinZ; cz <= chunkMaxZ; cz++) {
+						editorLevel.getChunk(cx, cz);
+					}
+				}
+
 				template.placeInWorld(editorLevel, origin, origin, new StructurePlaceSettings(), editorLevel.getRandom(), 2);
 
-				Vec3i size = template.getSize();
 				for (int x = 0; x < size.getX(); x++) {
 					for (int y = 0; y < size.getY(); y++) {
 						for (int z = 0; z < size.getZ(); z++) {
@@ -239,6 +251,9 @@ public final class DungeonEditorSessionManager {
 						}
 					}
 				}
+			} else {
+				RpgMod.LOGGER.warn("Não foi possível carregar a esquemática '{}' para a dungeon '{}'", path, def != null ? def.getName() : "null");
+				player.sendSystemMessage(net.minecraft.network.chat.Component.literal("§cFalha ao carregar a esquemática '" + path + "' no editor!"), false);
 			}
 		}
 
@@ -323,8 +338,9 @@ public final class DungeonEditorSessionManager {
 			def.getEntranceStructure().setStructureName(structName);
 		}
 
-		Path structDir = DungeonRepository.getWorldStructuresDirectory(player.level().getServer());
-		Path structFile = structDir.resolve(structName + ".nbt");
+		Path structDir = DungeonRepository.getDungeonDirectory(player.level().getServer(), def.getName());
+		String fileName = structName + ".nbt";
+		Path structFile = structDir.resolve(fileName);
 
 		try {
 			NbtIo.writeCompressed(tag, structFile);
@@ -332,17 +348,25 @@ public final class DungeonEditorSessionManager {
 			RpgMod.LOGGER.error("Erro ao salvar arquivo de esquemática .nbt: {}", structFile, e);
 		}
 
-		// Atualiza o caminho completo da esquemática na dungeon
-		String fullPath = structFile.toAbsolutePath().toString();
-		if ("DUNGEON".equalsIgnoreCase(session.getSelectedStructure())) {
-			def.getDungeonStructure().setSchematicPath(fullPath);
-			session.setDungeonSchematicName(structName + ".nbt");
-			session.setDungeonSchematicPath(fullPath);
+		// Atualiza o caminho relativo da esquemática na dungeon (relativo à pasta da dungeon)
+		boolean isDungeon = "DUNGEON".equalsIgnoreCase(session.getSelectedStructure());
+		String oldPath = isDungeon
+				? def.getDungeonStructure().getSchematicPath()
+				: def.getEntranceStructure().getSchematicPath();
+		String otherPath = isDungeon
+				? def.getEntranceStructure().getSchematicPath()
+				: def.getDungeonStructure().getSchematicPath();
+
+		if (isDungeon) {
+			def.getDungeonStructure().setSchematicPath(fileName);
+			session.setDungeonSchematicName(fileName);
+			session.setDungeonSchematicPath(fileName);
 		} else {
-			def.getEntranceStructure().setSchematicPath(fullPath);
-			session.setEntranceSchematicName(structName + ".nbt");
-			session.setEntranceSchematicPath(fullPath);
+			def.getEntranceStructure().setSchematicPath(fileName);
+			session.setEntranceSchematicName(fileName);
+			session.setEntranceSchematicPath(fileName);
 		}
+		DungeonRepository.deleteOldSchematicIfUnused(structDir, oldPath, fileName, otherPath);
 
 		// Normaliza e converte coordenadas do editor para relativas à esquemática
 		if ("ENTRADA".equalsIgnoreCase(session.getSelectedStructure())) {

@@ -434,12 +434,39 @@ public final class DungeonNetworking {
 			def.setMinLevel(minLevel);
 			def.setMaxLevel(maxLevel);
 			def.setWeight(weight);
-			DungeonRepository.saveWorldDungeons(player.level().getServer());
 		}
+
+		if (schematicPath != null && !schematicPath.isBlank()) {
+			boolean isDungeon = "DUNGEON".equalsIgnoreCase(selectedStructure);
+			String prevPath = isDungeon
+					? def.getDungeonStructure().getSchematicPath()
+					: def.getEntranceStructure().getSchematicPath();
+			String otherPath = isDungeon
+					? def.getEntranceStructure().getSchematicPath()
+					: def.getDungeonStructure().getSchematicPath();
+			schematicPath = DungeonRepository.importSchematicToDungeon(
+					player.level().getServer(), def.getName(), schematicPath, prevPath, otherPath);
+			if (isDungeon) {
+				def.getDungeonStructure().setSchematicPath(schematicPath);
+			} else {
+				def.getEntranceStructure().setSchematicPath(schematicPath);
+			}
+		}
+		DungeonRepository.saveDungeon(player.level().getServer(), def);
 
 		DungeonEditorSession session = DungeonEditorSessionManager.getSession(player.getUUID());
 		if (session != null) {
 			session.setDungeonName(def.getName());
+			if (schematicPath != null && !schematicPath.isBlank()) {
+				String fileName = java.nio.file.Path.of(schematicPath).getFileName().toString();
+				if ("DUNGEON".equalsIgnoreCase(selectedStructure)) {
+					session.setDungeonSchematicPath(schematicPath);
+					session.setDungeonSchematicName(fileName);
+				} else {
+					session.setEntranceSchematicPath(schematicPath);
+					session.setEntranceSchematicName(fileName);
+				}
+			}
 		}
 
 		DungeonEditorSessionManager.startBuildingStructure(player, selectedStructure, schematicPath);
@@ -466,12 +493,22 @@ public final class DungeonNetworking {
 			def.setWeight(weight);
 		}
 		if (json.has("entranceSchematicPath") && !json.get("entranceSchematicPath").getAsString().isBlank()) {
-			def.getEntranceStructure().setSchematicPath(json.get("entranceSchematicPath").getAsString());
+			String relEnt = DungeonRepository.importSchematicToDungeon(
+					player.level().getServer(), def.getName(),
+					json.get("entranceSchematicPath").getAsString(),
+					def.getEntranceStructure().getSchematicPath(),
+					def.getDungeonStructure().getSchematicPath());
+			def.getEntranceStructure().setSchematicPath(relEnt);
 		}
 		if (json.has("dungeonSchematicPath") && !json.get("dungeonSchematicPath").getAsString().isBlank()) {
-			def.getDungeonStructure().setSchematicPath(json.get("dungeonSchematicPath").getAsString());
+			String relDung = DungeonRepository.importSchematicToDungeon(
+					player.level().getServer(), def.getName(),
+					json.get("dungeonSchematicPath").getAsString(),
+					def.getDungeonStructure().getSchematicPath(),
+					def.getEntranceStructure().getSchematicPath());
+			def.getDungeonStructure().setSchematicPath(relDung);
 		}
-		DungeonRepository.saveWorldDungeons(player.level().getServer());
+		DungeonRepository.saveDungeon(player.level().getServer(), def);
 
 		DungeonEditorSessionManager.cancelSession(player);
 		player.sendSystemMessage(Component.literal("§aDungeon '§f" + def.getName() + "§a' salva com sucesso!"));

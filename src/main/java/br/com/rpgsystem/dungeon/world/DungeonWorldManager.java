@@ -340,7 +340,7 @@ public final class DungeonWorldManager {
 		// 1. Gera Estrutura de Entrada no mundo com rotação aleatória (N, S, L, O)
 		Rotation entRotation = Rotation.getRandom(worldLevel.getRandom());
 		instance.setEntranceRotation(entRotation);
-		loadAndPlaceSchematic(worldLevel, entrancePos, dungeon.getEntranceStructure().getSchematicPath(), instance, true, entRotation);
+		loadAndPlaceSchematic(worldLevel, entrancePos, dungeon, dungeon.getEntranceStructure().getSchematicPath(), instance, true, entRotation);
 
 		// 2. Coloca portal branco de entrada se configurado (respeitando a rotação da entrada)
 		PortalData entPortal = dungeon.getEntranceStructure().getEntrancePortal();
@@ -360,7 +360,7 @@ public final class DungeonWorldManager {
 		}
 
 		// 3. Gera Estrutura da Dungeon na dimensão de instâncias (sem rotação para manter coordenadas relativas do editor)
-		loadAndPlaceSchematic(dungeonLevel, dungeonOrigin, dungeon.getDungeonStructure().getSchematicPath(), instance, false, Rotation.NONE);
+		loadAndPlaceSchematic(dungeonLevel, dungeonOrigin, dungeon, dungeon.getDungeonStructure().getSchematicPath(), instance, false, Rotation.NONE);
 
 		// Limpa qualquer bloco de portal azul (saída) que possa ter vindo de esquemáticas antigas
 		PortalData dungExitPortal = dungeon.getDungeonStructure().getExitPortal();
@@ -393,14 +393,14 @@ public final class DungeonWorldManager {
 		return true;
 	}
 
-	private static void loadAndPlaceSchematic(ServerLevel level, BlockPos origin, String pathStr,
+	private static void loadAndPlaceSchematic(ServerLevel level, BlockPos origin, DungeonDefinition dungeon, String pathStr,
 	                                          ActiveDungeonInstance instance, boolean isEntrance, Rotation rotation) {
 		if (pathStr == null || pathStr.isBlank()) {
 			level.setBlock(origin, Blocks.STONE.defaultBlockState(), 3);
 			return;
 		}
 
-		StructureTemplate template = DungeonRepository.loadStructureTemplate(level, pathStr);
+		StructureTemplate template = DungeonRepository.loadStructureTemplate(level, dungeon, pathStr);
 
 		if (template != null) {
 			StructurePlaceSettings settings = new StructurePlaceSettings();
